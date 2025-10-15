@@ -1,0 +1,788 @@
+{
+  "title": "Management WATHQ API's System",
+  "_locale": "en",
+  "common": {
+    "loading": "Loading...",
+    "errorStatus": "Error",
+    "successStatus": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "notAvailable": "N/A",
+    "view": "View",
+    "deploy": "Deploy",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "back": "Back",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "settings": "Settings",
+    "help": "Help",
+    "about": "About",
+    "contact": "Contact",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "active": "Active",
+    "inactive": "Inactive",
+    "required": "Required",
+    "optional": "Optional",
+    "selectOption": "Select an option",
+    "browse": "Browse",
+    "upload": "Upload",
+    "download": "Download",
+    "success": "Success",
+    "error": "Error",
+    "showingResults": "Showing {count} results",
+    "refresh": "Refresh",
+    "filteredBy": "Filtered by",
+    "noSearchResults": "No search results",
+    "noData": "No data",
+    "clearSearch": "Clear search",
+    "selectedItems": "Selected {count} items",
+    "activateSelected": "Activate Selected",
+    "deactivateSelected": "Deactivate Selected",
+    "regularUser": "Regular User",
+    "superuser": "Super User",
+    "grantSuperuser": "Grant Superuser",
+    "removeSuperuser": "Remove Superuser",
+    "cannotModifyOwnSuperuser": "You cannot modify your own superuser status",
+    "superuserToggleConfirm": "Are you sure you want to {action} superuser privileges for {username}? This will change their access level.",
+    "superuserToggleSuccess": "Successfully {action} superuser privileges for {username}",
+    "granted": "granted",
+    "removed": "removed",
+    "clearSelection": "Clear selection",
+    "retry": "Retry",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "firstPage": "First Page",
+    "lastPage": "Last Page",
+    "nextPage": "Next Page",
+    "previousPage": "Previous Page",
+    "manage": "Manage",
+    "running": "Running",
+    "stopped": "Stopped",
+    "actions": "Actions",
+    "tenant_id": "Tenant ID",
+    "user_id": "User ID",
+    "service_slug": "Service Slug",
+    "endpoint": "Endpoint",
+    "method": "Method",
+    "status_code": "Status Code",
+    "duration_ms": "Duration MS",
+    "fetched_at": "Fetched At",
+    "name": "Name",
+    "slug": "Slug",
+    "description": "Description",
+    "is_active": "Is Active",
+    "is_super_admin": "Is Super Admin",
+    "created_at": "Created At",
+    "updated_at": "Updated At",
+    "deleted_at": "Deleted At",
+    "max_users": "Max Users",
+    "service_id": "Service ID",
+    "service_name": "Service Name",
+    "id": "ID",
+    "full_external_url": "Full External URL",
+    "response_body": "Response Body",
+    "fetched_by": "Fetched By",
+    "editTenant": "Edit Tenant",
+    "editTenantDescription": "Edit tenant {name}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "noResults": "No Results"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "switchTheme": "Switch theme"
+  },
+  "language": {
+    "english": "English",
+    "arabic": "العربية",
+    "switchLanguage": "Switch language"
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "notifications": "Notifications",
+    "profile": "Profile",
+    "login": "Login",
+    "test-notifications": "Test Notifications"
+  },
+  "profile": {
+    "title": "Profile",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "isActive": "Active",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activeStatus": "Active",
+    "inactiveStatus": "Inactive",
+    "isSuperAdmin": "Super Admin",
+    "isSuperAdminStatus": "Super Admin",
+    "permissions": "Permissions"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your application experience",
+    "saved": "Settings saved successfully",
+    "sections": {
+      "appearance": "Appearance",
+      "language": "Language & Region",
+      "notifications": "Notifications",
+      "privacy": "Privacy & Security",
+      "advanced": "Advanced"
+    },
+    "appearance": {
+      "title": "Appearance Settings",
+      "theme": "Theme",
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "font": "Font Family",
+      "fontSize": "Font Size",
+      "fontPreview": "The quick brown fox jumps over the lazy dog. 1234567890",
+      "accentColor": "Accent Color"
+    },
+    "language": {
+      "title": "Language & Region Settings",
+      "select": "Language",
+      "dateFormat": "Date Format",
+      "timeFormat": "Time Format"
+    },
+    "notifications": {
+      "title": "Notification Settings",
+      "email": {
+        "title": "Email Notifications",
+        "deployments": "Deployment Updates",
+        "deploymentsDesc": "Get notified about deployment status changes",
+        "security": "Security Alerts",
+        "securityDesc": "Important security notifications and login alerts",
+        "updates": "Product Updates",
+        "updatesDesc": "New features and product announcements",
+        "marketing": "Marketing Communications",
+        "marketingDesc": "Tips, tutorials, and promotional content"
+      },
+      "sound": {
+        "title": "Sound Settings",
+        "enable": "Enable notification sounds",
+        "volume": "Volume"
+      }
+    },
+    "privacy": {
+      "title": "Privacy & Security Settings",
+      "dataCollection": {
+        "title": "Data Collection",
+        "analytics": "Usage Analytics",
+        "analyticsDesc": "Help improve the app by sharing anonymous usage data"
+      },
+      "session": {
+        "title": "Session Management",
+        "rememberMe": "Remember Login",
+        "rememberMeDesc": "Stay logged in across browser sessions"
+      }
+    },
+    "advanced": {
+      "title": "Advanced Settings",
+      "performance": {
+        "title": "Performance",
+        "animations": "Enable Animations",
+        "animationsDesc": "Show smooth transitions and animations"
+      },
+      "dashboard": {
+        "title": "Dashboard Settings",
+        "autoRefresh": "Enable Auto-Refresh",
+        "autoRefreshDesc": "Automatically refresh dashboard stats and charts",
+        "refreshInterval": "Refresh Interval",
+        "refreshIntervalNote": "Dashboard will refresh every specified seconds (10-300 seconds)"
+      },
+      "reset": {
+        "title": "Reset Settings",
+        "description": "This will reset all settings to their default values. This action cannot be undone.",
+        "button": "Reset All Settings",
+        "confirm": "Are you sure you want to reset all settings? This action cannot be undone."
+      }
+    }
+  },
+  "login": {
+    "title": "Login",
+    "subtitle": "Login to your account",
+    "usernamePlaceholder": "Enter your username",
+    "passwordPlaceholder": "Enter your password",
+    "createAccount": "Create an account",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot Password",
+    "username": "Username",
+    "password": "Password",
+    "login": "Login",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "ATQAN Dashboard management wathq api's ",
+    "refresh": "Refresh",
+    "systemTenants": "System Tenants",
+    "viewAllTenants": "View All Tenants",
+    "servicesHistoryError": "Failed to load services history",
+    "servicesHistoryLoading": "Loading services history...",
+    "servicesHistoryNoData": "No services history found",
+    "servicesHistoryTryAgain": "Try Again",
+    "viewAllServicesOnline": "View All Services Online",
+    "systemServicesHistory": "System Services History",
+    "systemServicesHistoryLoading": "Loading system services history...",
+    "systemServicesHistoryNoData": "No system services history found",
+    "systemServicesHistoryTryAgain": "Try Again",
+    "systemServicesHistoryError": "Failed to load system services history",
+    "viewAllServicesOffline": "View All Services Offline",
+    "systemWathqOfflineData": "System Wathq Offline Data",
+    "systemWathqOfflineDataLoading": "Loading system wathq offline data...",
+    "systemWathqOfflineDataNoData": "No system wathq offline data found",
+    "systemWathqOfflineDataTryAgain": "Try Again",
+    "systemWathqOfflineDataError": "Failed to load system wathq offline data",
+    "tenantsError": "Failed to load tenants",
+    "tenantsLoading": "Loading tenants...",
+    "tenantsNoData": "No tenants found",
+    "tenantsTryAgain": "Try Again",
+    "wathqOfflineDataError": "Failed to load system wathq offline data",
+    "stats": {
+      "online_requests_count": "Online Requests Count",
+      "offline_requests_count": "Offline Requests Count",
+      "tenants_count": "Tenants Count",
+      "users_count": "Users Count"
+    },
+    "charts": {
+      "onlineServicesTitle": "Online Services Activity",
+      "offlineServicesTitle": "Offline Services Activity",
+      "requestsOverTime": "Requests Over Time",
+      "statusCodeDistribution": "Status Code Distribution",
+      "noDataAvailable": "No chart data available",
+      "requests": "Requests",
+      "statusCode": "Status Code",
+      "count": "Count",
+      "last24Hours": "Last 24 Hours",
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days"
+    },
+    "recentApps": "Recent Applications",
+    "viewAllApps": "View All Apps",
+    "viewAllUsers": "View All Users",
+    "systemUsers": "System Users",
+    "systemApps": "System Applications",
+    "runningProcesses": "Running Processes",
+    "loading": "Loading dashboard...",
+    "error": "Failed to load applications",
+    "usersError": "Failed to load users",
+    "appsError": "Failed to load applications",
+    "processesError": "Failed to load processes",
+    "noProcesses": "No running processes",
+    "tryAgain": "Try Again",
+    "noApps": "No applications found",
+    "getStarted": "Get started by adding your first application"
+  },
+  "nav": {
+    "dashboard": "ATQAN API'S MS",
+    "tenants": "Tenants",
+    "wathqServices": "Wathq Services",
+    "settings": "Settings",
+    "addTenant": "Add Tenant",
+    "addWathqService": "Add Wathq Service",
+    "profile": "Profile",
+    "resetPassword": "Reset Password",
+    "logout": "Logout"
+  },
+  "sidebar": {
+    "menu": "Menu",
+    "home": "Home",
+    "tenants": "Tenants",
+    "tenantServices": "Tenant Services",
+    "wathqServices": "Wathq Services",
+    "metrics": "Metrics",
+    "users": "Users",
+    "notifications": "Notifications",
+    "collapse": "Collapse Sidebar",
+    "expand": "Expand Sidebar",
+    "open": "Open Menu",
+    "close": "Close Menu"
+  },
+  "metrics": {
+    "title": "Analytics & Metrics",
+    "subtitle": "System performance and usage analytics",
+    "stats": {
+      "totalTenants": "Total Tenants",
+      "totalUsers": "Total Users",
+      "onlineRequests": "Online Requests",
+      "offlineRequests": "Offline Requests",
+      "thisMonth": "this month",
+      "live": "Live",
+      "queued": "Queued"
+    },
+    "timeRange": {
+      "last7Days": "Last 7 Days",
+      "last30Days": "Last 30 Days",
+      "last90Days": "Last 90 Days",
+      "lastYear": "Last Year"
+    },
+    "charts": {
+      "usersGrowth": "Users Growth",
+      "tenantsGrowth": "Tenants Growth",
+      "requestsOverview": "Requests Overview",
+      "serviceHistory": "Service History",
+      "users": "Users",
+      "tenants": "Tenants",
+      "online": "Online",
+      "offline": "Offline",
+      "serviceRequests": "Service Requests",
+      "total": "Total",
+      "records": "Records"
+    },
+    "tables": {
+      "recentServices": "Recent Services",
+      "offlineQueue": "Offline Queue",
+      "viewAll": "View All",
+      "service": "Service",
+      "tenant": "Tenant",
+      "endpoint": "Endpoint",
+      "status": "Status",
+      "date": "Date"
+    }
+  },
+  "notifications": {
+    "unread": "Unread Notifications",
+    "viewAll": "View all notifications",
+    "total": "total",
+    "success": {
+      "appDeployed": "Application deployed successfully",
+      "appUpdated": "Application updated successfully",
+      "appDeleted": "Application deleted successfully",
+      "settingsSaved": "Settings saved successfully"
+    },
+    "error": {
+      "deployFailed": "Deployment failed",
+      "updateFailed": "Update failed",
+      "deleteFailed": "Delete failed",
+      "loadFailed": "Failed to load data"
+    },
+    "all": "All",
+    "read": "Read Notifications",
+    "markAllAsRead": "Mark All As Read",
+    "title": "Notifications",
+    "markAsUnread": "Mark as Unread",
+    "markAsRead": "Mark as Read",
+    "noNotifications": "No notifications",
+    "allCaughtUp": "All Caught Up"
+  },
+  "tenants": {
+    "title": "Tenants",
+    "subtitle": "Manage your organization tenants",
+    "list": "Tenants List",
+    "addTenant": "Add Tenant",
+    "editTenant": "Edit Tenant",
+    "deleteTenant": "Delete Tenant",
+    "createTenant": "Create Tenant",
+    "createTenantDescription": "Create a new tenant for your organization",
+    "editTenantDescription": "Update {name} tenant details",
+    "createFirstTenant": "Create Your First Tenant",
+    "noTenants": "No Tenants Yet",
+    "noTenantsMessage": "Get started by creating your first tenant",
+    "confirmDelete": "Are you sure you want to delete {name}?",
+    "confirmActivate": "Are you sure you want to activate this tenant?",
+    "confirmDeactivate": "Are you sure you want to deactivate this tenant?",
+    "backToList": "Back to Tenants",
+    "confirmDeleteMessage": "This action cannot be undone.",
+    "confirmDeleteButton": "Delete Tenant",
+    "confirmDeleteCancelButton": "Cancel",
+    "createTenantSuccess": "Tenant created successfully",
+    "createTenantError": "Failed to create tenant",
+    "updateTenantSuccess": "Tenant updated successfully",
+    "updateTenantError": "Failed to update tenant",
+    "deleteTenantSuccess": "Tenant deleted successfully",
+    "deleteTenantError": "Failed to delete tenant",
+    "services":{
+      "table":{
+        "service": "Service",
+        "approval": "Approval",
+        "usage": "Usage",
+        "status": "Status",
+        "actions": "Actions",
+        "groupBy": "Group By"
+      },
+      "stats":{
+        "total": "Total Services",
+        "active": "Active",
+        "inactive": "Inactive",
+        "approved": "Approved",
+        "pending": "Pending",
+        "rejected": "Rejected",
+        "totalUsers": "Total Users"
+      },
+      "quickActions": {
+        "users": "Users",
+        "edit": "Edit",
+        "assign": "Assign",
+        "delete": "Delete"
+      },
+      "title": "Services",
+      "subtitle": "Manage your organization services"
+    },
+    "stats": {
+      "total": "Total Tenants",
+      "active": "Active",
+      "inactive": "Inactive",
+      "totalUsers": "Total Users"
+    },
+    "table": {
+      "name": "Name",
+      "slug": "Slug",
+      "status": "Status",
+      "users": "Users",
+      "createdAt": "Created",
+      "actions": "Actions"
+    },
+    "form": {
+      "tenantDetails": "Tenant Details",
+      "fillRequiredFields": "Fill in the required information below",
+      "updateDetails": "Update tenant information",
+      "name": "Tenant Name",
+      "namePlaceholder": "Enter tenant name (English only)",
+      "nameEnglishOnly": "Name must contain only English letters, numbers, and basic symbols (-, _, &)",
+      "nameAr": "Arabic Name",
+      "nameArPlaceholder": "أدخل اسم المستأجر بالعربية",
+      "nameArHelp": "Arabic name for RTL display (optional)",
+      "slug": "Slug",
+      "slugPlaceholder": "tenant-slug",
+      "slugHelp": "Auto-generated from name (lowercase, numbers, hyphens only)",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description of this tenant",
+      "maxUsers": "Maximum Users",
+      "maxUsersPlaceholder": "10",
+      "logo": "Logo",
+      "logoUpload": "Choose Logo Image",
+      "logoHelp": "Upload a logo image (JPG, PNG, SVG, WebP) - Max 2MB",
+      "logoPreview": "Preview",
+      "logoInvalidType": "Invalid file type. Please upload JPG, PNG, SVG, or WebP image.",
+      "logoTooLarge": "File size exceeds 2MB. Please choose a smaller image.",
+      "logoUploadFailed": "Failed to upload image. Please try again.",
+      "existingLogo": "Current Logo",
+      "isActive": "Active Status",
+      "create": "Create Tenant",
+      "update": "Update Tenant"
+    },
+    "assignService": {
+      "title": "Assign Service to Tenant",
+      "button": "Assign Service",
+      "assigningTo": "Assigning service to tenant",
+      "selectService": "Select Service",
+      "noServices": "No services available",
+      "requiresApproval": "Requires Approval",
+      "price": "Price",
+      "maxUsers": "Maximum Users",
+      "maxUsersPlaceholder": "10",
+      "maxUsersHelp": "Maximum number of users allowed for this service",
+      "apiKey": "Wathq API Key",
+      "apiKeyPlaceholder": "Enter Wathq API Key",
+      "apiKeyHelp": "API key provided by Wathq for service integration",
+      "assign": "Assign Service",
+      "errors": {
+        "serviceRequired": "Please select a service",
+        "maxUsersRequired": "Maximum users must be greater than 0",
+        "apiKeyRequired": "API key is required"
+      }
+    },
+    "manageUsers": "Manage Users"
+  },
+  "users": {
+    "title": "Users",
+    "subtitle": "Manage all system users across tenants",
+    "list": "Users List",
+    "allUsers": "All Users",
+    "search": "Search users...",
+    "addUser": "Add User",
+    "editUser": "Edit User",
+    "deleteUser": "Delete User",
+    "createUser": "Create User",
+    "createUserDescription": "Create a new user for this tenant",
+    "editUserDescription": "Update {name} user details",
+    "createFirstUser": "Create Your First User",
+    "noUsers": "No Users Yet",
+    "noUsersMessage": "Get started by creating your first user",
+    "confirmDelete": "Are you sure you want to delete {name}?",
+    "confirmActivate": "Are you sure you want to activate this user?",
+    "confirmDeactivate": "Are you sure you want to deactivate this user?",
+    "stats": {
+      "total": "Total Users",
+      "active": "Active",
+      "inactive": "Inactive",
+      "admins": "Admins",
+      "superAdmins": "Super Admins",
+      "regularUsers": "Regular Users"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "role": {
+      "superAdmin": "Super Admin",
+      "user": "User"
+    },
+    "table": {
+      "name": "Name",
+      "email": "Email",
+      "status": "Status",
+      "role": "Role",
+      "tenant": "Tenant",
+      "createdAt": "Created",
+      "actions": "Actions",
+      "admin": "Admin",
+      "user": "User",
+      "rowsPerPage": "Rows per page",
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "results": "results"
+    },
+    "actions": {
+      "viewDetails": "View Details",
+      "viewTenant": "View Tenant",
+      "edit": "Edit User",
+      "delete": "Delete User",
+      "activate": "Activate",
+      "deactivate": "Deactivate"
+    },
+    "form": {
+      "userDetails": "User Details",
+      "fillRequiredFields": "Fill in the required information below",
+      "updateDetails": "Update user information",
+      "email": "Email",
+      "emailPlaceholder": "user@example.com",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Enter first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Enter last name",
+      "password": "Password",
+      "passwordPlaceholder": "Enter password",
+      "passwordHelp": "Minimum 8 characters with uppercase, lowercase, and number",
+      "nameAr": "Arabic Name",
+      "nameArPlaceholder": "أدخل الاسم بالعربية",
+      "nameArHelp": "Full Arabic name for RTL display (optional)",
+      "logo": "Avatar/Photo",
+      "logoUpload": "Choose Avatar Image",
+      "logoHelp": "Upload an avatar image (JPG, PNG, WebP) - Max 2MB",
+      "logoPreview": "Preview",
+      "logoInvalidType": "Invalid file type. Please upload JPG, PNG, or WebP image.",
+      "logoTooLarge": "File size exceeds 2MB. Please choose a smaller image.",
+      "logoUploadFailed": "Failed to upload image. Please try again.",
+      "existingLogo": "Current Avatar",
+      "isActive": "Active Status",
+      "isSuperAdmin": "Super Admin",
+      "create": "Create User",
+      "update": "Update User"
+    }
+  },
+  "websocket": {
+    "metrics": {
+      "title": "WebSocket Metrics",
+      "connected": "Live",
+      "disconnected": "Offline",
+      "activeConnections": "Active Connections",
+      "connectedUsers": "Connected Users",
+      "managementUsers": "Management Users",
+      "connectedTenants": "Connected Tenants",
+      "messagesSent": "Messages Sent",
+      "totalConnections": "Total Connections",
+      "errorRate": "Error Rate",
+      "uptime": "Uptime"
+    }
+  },
+  "tenantServices": {
+    "title": "Tenant Services",
+    "subtitle": "Manage tenant service subscriptions and usage",
+    "list": "Services List",
+    "noServices": "No Services Found",
+    "noServicesMessage": "No tenant services are currently registered",
+    "approveService": "Approve Service",
+    "deleteService": "Delete Service",
+    "confirmApprove": "Are you sure you want to approve {name}? This will enable the service for the tenant.",
+    "confirmDelete": "Are you sure you want to delete {name}? This action cannot be undone.",
+    "confirmActivate": "Are you sure you want to activate {name}?",
+    "confirmDeactivate": "Are you sure you want to deactivate {name}?",
+    "approved": "Approved",
+    "pending": "Pending Approval",
+    "requiresApproval": "Requires Approval",
+    "stats": {
+      "total": "Total Services",
+      "active": "Active",
+      "inactive": "Inactive",
+      "approved": "Approved",
+      "pending": "Pending",
+      "totalUsage": "Total Usage"
+    },
+    "table": {
+      "service": "Service",
+      "tenant": "Tenant",
+      "status": "Status",
+      "approval": "Approval",
+      "usage": "Usage",
+      "actions": "Actions",
+      "maxUsers": "Max Users",
+      "registered": "Registered"
+    },
+    "filters": {
+      "allCategories": "All Categories",
+      "allStatuses": "All Statuses",
+      "allApprovals": "All Approvals",
+      "wathq": "Wathq",
+      "other": "Other",
+      "approved": "Approved",
+      "pending": "Pending"
+    },
+    "groupByOptions": {
+      "none": "No Grouping",
+      "category": "By Category",
+      "status": "By Status",
+      "approval": "By Approval",
+      "tenant": "By Tenant"
+    },
+    "sort": {
+      "registeredAt": "Registration Date",
+      "serviceName": "Service Name",
+      "usage": "Usage Count",
+      "approvedAt": "Approval Date"
+    },
+    "actions": {
+      "approve": "Approve Service"
+    },
+    "details": {
+      "serviceId": "Service ID",
+      "price": "Price",
+      "apiKey": "API Key",
+      "approvedBy": "Approved By"
+    }
+  },
+  "wathq": {
+    "title": "Wathq API Services",
+    "subtitle": "Access and manage Wathq government API services",
+    "recentActivity": "Recent Activity",
+    "testResult": "Test Result",
+    "duration": "Duration",
+    "endpoint": "Endpoint",
+    "selectEndpoint": "Select an endpoint",
+    "selectEndpointPrompt": "Select an endpoint to test",
+    "selectEndpointDescription": "Choose an API endpoint from the dropdown above to get started",
+    "response": "Response",
+    "requestSuccess": "Request completed successfully",
+    "requestFailed": "Request failed",
+    "copiedToClipboard": "Copied to clipboard",
+    "copyFailed": "Failed to copy",
+    "exportSuccess": "Response exported successfully",
+    "stats": {
+      "totalRequests": "Total Requests",
+      "successful": "Successful",
+      "failed": "Failed",
+      "avgDuration": "Avg Duration",
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month"
+    },
+    "services": {
+      "title": "Wathq Services",
+      "available": "Available Services",
+      "commercialRegistration": {
+        "name": "Commercial Registration",
+        "description": "Query and verify commercial registration information",
+        "fields": {
+          "crNumber": "CR Number",
+          "dateGregorian": "Date (Gregorian)"
+        }
+      },
+      "companyContract": {
+        "name": "Company Contract",
+        "description": "Retrieve and verify company contract details",
+        "fields": {
+          "contractNumber": "Contract Number",
+          "companyCR": "Company CR Number"
+        }
+      },
+      "attorney": {
+        "name": "Attorney Authorization",
+        "description": "Verify attorney authorization and power of attorney documents",
+        "fields": {
+          "authorizationNumber": "Authorization Number",
+          "identityNumber": "Identity Number"
+        }
+      },
+      "realEstate": {
+        "name": "Real Estate",
+        "description": "Query real estate deed and property information",
+        "fields": {
+          "deedNumber": "Deed Number",
+          "deedDate": "Deed Date"
+        }
+      },
+      "nationalAddress": {
+        "name": "National Address",
+        "description": "Retrieve national address details and verification",
+        "fields": {
+          "identityNumber": "Identity Number",
+          "addressId": "Address ID"
+        }
+      },
+      "employee": {
+        "name": "Employee Verification",
+        "description": "Verify employee information and employment status",
+        "fields": {
+          "employeeId": "Employee ID",
+          "companyId": "Company ID"
+        }
+      }
+    },
+    "tabs": {
+      "testApi": "Test API",
+      "liveRequests": "Live Requests",
+      "requestLogs": "Request Logs",
+      "offlineRequests": "Offline Requests"
+    },
+    "actions": {
+      "testApi": "Test API",
+      "makeLiveRequest": "Make Live Request",
+      "sendRequest": "Send Request",
+      "copyResponse": "Copy Response",
+      "copy": "Copy",
+      "copied": "Copied!",
+      "export": "Export",
+      "exportJson": "Export JSON"
+    },
+    "metadata": {
+      "status": "Status",
+      "duration": "Duration",
+      "timestamp": "Timestamp",
+      "size": "Size"
+    },
+    "logs": {
+      "empty": {
+        "title": "No Requests",
+        "description": "No API requests have been made yet"
+      },
+      "table": {
+        "endpoint": "Endpoint",
+        "status": "Status",
+        "duration": "Duration",
+        "timestamp": "Timestamp"
+      },
+      "requestDetails": "Request Details",
+      "requestData": "Request Data",
+      "responseData": "Response Data"
+    }
+  }
+}

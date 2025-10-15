@@ -1,0 +1,315 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand Theme Variables (from logo) */
+:root {
+  --color-brand: #5A6BEA; /* primary */
+  --color-brand-deep: #4A5FD3; /* secondary */
+  --color-accent: #F28C1B; /* accent */
+}
+
+.dark:root {
+  --color-brand: #4A5FD3;
+  --color-brand-deep: #3F51B5;
+  --color-accent: #d87916;
+}
+
+/* Optional helpers for non-Tailwind usage */
+.bg-brand { background-color: var(--color-brand); }
+.bg-accent { background-color: var(--color-accent); }
+.text-brand { color: var(--color-brand); }
+.text-accent { color: var(--color-accent); }
+
+/* RTL/LTR Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+
+/* Arabic Font Support */
+body.rtl {
+  font-family: 'Segoe UI', 'Tahoma', 'Arial', 'Helvetica Neue', sans-serif;
+}
+
+/* RTL-specific spacing utilities */
+[dir="rtl"] .space-x-reverse > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 1;
+}
+
+/* Custom RTL-aware animations */
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-enter-from {
+  transform: translateX(100%);
+}
+
+[dir="rtl"] .slide-enter-from {
+  transform: translateX(-100%);
+}
+
+.slide-leave-to {
+  transform: translateX(-100%);
+}
+
+[dir="rtl"] .slide-leave-to {
+  transform: translateX(100%);
+}
+
+/* Theme transition */
+* {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* Dark mode improvements */
+.dark {
+  color-scheme: dark;
+}
+
+/* RTL-aware text alignment */
+[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left;
+}
+
+/* RTL-aware margins and paddings */
+[dir="rtl"] .ml-auto {
+  margin-left: unset;
+  margin-right: auto;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-right: unset;
+  margin-left: auto;
+}
+
+/* RTL-aware positioning for dropdowns */
+[dir="rtl"] .absolute.right-0 {
+  right: unset;
+  left: 0;
+}
+
+[dir="rtl"] .absolute.left-0 {
+  left: unset;
+  right: 0;
+}
+
+/* RTL-aware button icon positioning */
+[dir="rtl"] .ml-1 {
+  margin-left: unset;
+  margin-right: 0.25rem;
+}
+
+[dir="rtl"] .ml-2 {
+  margin-left: unset;
+  margin-right: 0.5rem;
+}
+
+[dir="rtl"] .ml-3 {
+  margin-left: unset;
+  margin-right: 0.75rem;
+}
+
+[dir="rtl"] .mr-1 {
+  margin-right: unset;
+  margin-left: 0.25rem;
+}
+
+[dir="rtl"] .mr-2 {
+  margin-right: unset;
+  margin-left: 0.5rem;
+}
+
+[dir="rtl"] .mr-3 {
+  margin-right: unset;
+  margin-left: 0.75rem;
+}
+
+/* RTL-aware padding for buttons and cards */
+[dir="rtl"] .pl-2 {
+  padding-left: unset;
+  padding-right: 0.5rem;
+}
+
+[dir="rtl"] .pl-3 {
+  padding-left: unset;
+  padding-right: 0.75rem;
+}
+
+[dir="rtl"] .pl-4 {
+  padding-left: unset;
+  padding-right: 1rem;
+}
+
+[dir="rtl"] .pr-2 {
+  padding-right: unset;
+  padding-left: 0.5rem;
+}
+
+[dir="rtl"] .pr-3 {
+  padding-right: unset;
+  padding-left: 0.75rem;
+}
+
+[dir="rtl"] .pr-4 {
+  padding-right: unset;
+  padding-left: 1rem;
+}
+
+/* RTL-aware dropdown positioning */
+[dir="rtl"] .dropdown-rtl {
+  right: unset !important;
+  left: 0 !important;
+}
+
+[dir="rtl"] .dropdown-rtl-end {
+  right: unset !important;
+  left: 0 !important;
+}
+
+/* RTL-aware card content alignment */
+[dir="rtl"] .card-content-rtl {
+  text-align: right;
+}
+
+[dir="rtl"] .card-content-rtl .flex {
+  flex-direction: row-reverse;
+}
+
+/* RTL-aware button groups */
+[dir="rtl"] .button-group-rtl {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .button-group-rtl .space-x-2 > * + * {
+  margin-left: unset;
+  margin-right: 0.5rem;
+}
+
+/* RTL-aware form fields */
+[dir="rtl"] .form-field-rtl {
+  text-align: right;
+}
+
+[dir="rtl"] .form-field-rtl input,
+[dir="rtl"] .form-field-rtl textarea,
+[dir="rtl"] .form-field-rtl select {
+  text-align: right;
+}
+
+/* RTL-aware notification badges */
+[dir="rtl"] .notification-badge {
+  right: unset;
+  left: -0.25rem;
+}
+
+/* RTL-aware user menu positioning */
+[dir="rtl"] .user-menu-rtl {
+  right: unset !important;
+  left: 0 !important;
+}
+
+/* RTL-aware chevron rotation */
+[dir="rtl"] .chevron-rtl {
+  transform: rotate(180deg);
+}
+
+/* RTL-aware icon spacing in buttons */
+[dir="rtl"] .button-icon-rtl {
+  margin-left: unset !important;
+  margin-right: 0.5rem !important;
+}
+
+/* RTL-aware card header alignment */
+[dir="rtl"] .card-header-rtl {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .card-header-rtl .space-x-3 > * + * {
+  margin-left: unset !important;
+  margin-right: 0.75rem !important;
+}
+
+/* RTL-aware dropdown menu items */
+[dir="rtl"] .dropdown-item-rtl {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+[dir="rtl"] .dropdown-item-rtl .ml-auto {
+  margin-left: unset !important;
+  margin-right: auto !important;
+}
+
+/* RTL-aware status badges */
+[dir="rtl"] .status-badge-rtl {
+  margin-left: unset !important;
+  margin-right: 0.5rem !important;
+}
+
+/* Custom scrollbar for both themes */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 dark:bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400 dark:bg-gray-500;
+}
+
+/* RTL-aware utility classes */
+[dir="rtl"] .rtl-flip {
+  transform: scaleX(-1);
+}
+
+[dir="rtl"] .rtl-reverse {
+  flex-direction: row-reverse;
+}
+
+[dir="rtl"] .rtl-text-right {
+  text-align: right;
+}
+
+[dir="rtl"] .rtl-text-left {
+  text-align: left;
+}
+
+/* RTL-aware spacing for complex layouts */
+[dir="rtl"] .rtl-space-x-2 > * + * {
+  margin-left: unset !important;
+  margin-right: 0.5rem !important;
+}
+
+[dir="rtl"] .rtl-space-x-3 > * + * {
+  margin-left: unset !important;
+  margin-right: 0.75rem !important;
+}
+
+[dir="rtl"] .rtl-space-x-4 > * + * {
+  margin-left: unset !important;
+  margin-right: 1rem !important;
+}
+
+[dir="rtl"] .rtl-space-x-6 > * + * {
+  margin-left: unset !important;
+  margin-right: 1.5rem !important;
+}

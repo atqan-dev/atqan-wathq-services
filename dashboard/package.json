@@ -1,0 +1,46 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "cross-env PORT=3001 HOST=0.0.0.0 NITRO_HOST=0.0.0.0 NITRO_PORT=5501 nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "clean": "rm -rf .nuxt .output node_modules pnpm-lock.yaml",
+    "cleann": "npx nuxi cleanup",
+    "start": "nuxt start",
+    "stop": "nuxt stop",
+    "start:prod": "pm2 start ecosystem.config.cjs",
+    "stop:prod": "pm2 stop ecosystem.config.cjs",
+    "delete:prod": "pm2 delete ecosystem.config.cjs"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^3.17.7",
+    "@nuxt/ui": "^2.22.0",
+    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/i18n": "^9.5.6",
+    "@nuxtjs/tailwindcss": "^6.14.0",
+    "@pinia/nuxt": "^0.11.1",
+    "chart.js": "^4.5.1",
+    "h3": "^1.15.3",
+    "pinia": "^3.0.3",
+    "vue": "^3.5.17",
+    "vue-chartjs": "^5.3.2",
+    "vue-i18n": "^9.14.5",
+    "vue-router": "^4.5.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@iconify-json/heroicons": "^1.2.2",
+    "@iconify-json/simple-icons": "^1.2.43",
+    "@nuxt/devtools": "^2.6.2",
+    "cross-env": "^10.0.0",
+    "nuxt": "^3.17.7",
+    "pm2": "^5.3.0",
+    "tailwindcss": "^3.4.17"
+  }
+}

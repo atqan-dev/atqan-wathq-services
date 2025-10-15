@@ -1,0 +1,792 @@
+{
+  "title": "إدارة  API's نظام",
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "خطأ",
+    "_locale": "ar",
+    "welcome": "مرحباً",
+    "success": "نجح",
+    "warning": "تحذير",
+    "info": "معلومات",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "notAvailable": "غير متاح",
+    "create": "إنشاء",
+    "update": "تحديث",
+    "view": "عرض",
+    "search": "بحث",
+    "filter": "تصفية",
+    "sort": "ترتيب",
+    "actions": "إجراءات",
+    "name": "الاسم",
+    "description": "الوصف",
+    "type": "النوع",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "user": "المستخدم",
+    "role": "الدور",
+    "permissions": "الصلاحيات",
+    "settings": "الإعدادات",
+    "configuration": "التكوين",
+    "details": "التفاصيل",
+    "summary": "الملخص",
+    "statistics": "الإحصائيات",
+    "logs": "السجلات",
+    "history": "التاريخ",
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام",
+    "switchTheme": "تبديل المظهر",
+    "showingResults": "عرض {count} النتائج",
+    "refresh": "تحديث",
+    "filteredBy": "تصفية حسب",
+    "noSearchResults": "لا توجد نتائج للبحث",
+    "noData": "لا توجد بيانات",
+    "clearSearch": "مسح البحث",
+    "selectedItems": "تم اختيار {count} عناصر",
+    "activateSelected": "تفعيل المحدد",
+    "deactivateSelected": "إلغاء تفعيل المحدد",
+    "regularUser": "مستخدم عادي",
+    "superuser": "مستخدم مشرف",
+    "grantSuperuser": "منح صلاحيات المشرف",
+    "removeSuperuser": "إزالة صلاحيات المشرف",
+    "cannotModifyOwnSuperuser": "لا يمكنك تعديل صلاحيات المشرف الخاصة بك",
+    "superuserToggleConfirm": "هل أنت متأكد من أنك تريد {action} صلاحيات المشرف لـ {username}؟ سيؤدي هذا إلى تغيير مستوى الوصول الخاص بهم.",
+    "superuserToggleSuccess": "تم {action} صلاحيات المشرف لـ {username} بنجاح",
+    "granted": "منح",
+    "removed": "إزالة",
+    "clearSelection": "مسح التحديد",
+    "retry": "إعادة المحاولة",
+    "firstPage": "الصفحة الأولى",
+    "lastPage": "الصفحة الأخيرة",
+    "nextPage": "التالي",
+    "previousPage": "السابق",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "activate": "تفعيل",
+    "deactivate": "إلغاء تفعيل",
+    "manage": "إدارة",
+    "running": "قيد التشغيل",
+    "stopped": "متوقف",
+    "id": "تسلسل",
+    "endpoint": "النقطة النهائية",
+    "method": "النوع",
+    "status_code": "الكود",
+    "duration_ms": "الوقت",
+    "fetched_at": "تم التحميل في",
+    "slug": "الرابط الموحد",
+    "is_active": "نشط",
+    "is_super_admin": "المشرف",
+    "created_at": "تم إنشاء",
+    "updated_at": "تم التحديث في",
+    "deleted_at": "تم الحذف في" ,
+    "max_users": "الحد الأقصى للإستخدام",
+    "service_id": "رقم الخدمة",
+    "service_name": "اسم الخدمة",
+    "user_id": "رقم المستخدم",
+    "service_slug": "الرابط الموحد",
+    "tenant_id": "رقم المستأجر",
+    "full_external_url": "الرابط الموحد",
+    "response_body": "الإجابة",
+    "fetched_by": "تم التحميل بواسطة",
+    "optional": "اختياري",
+    "approve": "موافقة علي الخدمة",
+    "reject": "رفض الخدمة",
+    "backToList": "العودة للقائمة",
+    "back": "العودة",
+    "noResults": "لا توجد نتائج للبحث"
+  },
+  "language": {
+    "english": "English",
+    "arabic": "العربية",
+    "switchLanguage": "تبديل اللغة"
+  },
+  "breadcrumb": {
+    "home": "الرئيسية",
+    "notifications": "الإشعارات",
+    "profile": "الملف الشخصي",
+    "login": "تسجيل الدخول",
+    "test-notifications": "اختبار الإشعارات"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الأخير",
+    "email": "البريد الإلكتروني",
+    "isActive": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "activeStatus": "نشط",
+    "inactiveStatus": "غير نشط",
+    "isSuperAdmin": "مدير النظام",
+    "isSuperAdminStatus": "الدور",
+    "permissions": "الصلاحيات"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "subtitle": "تخصيص تجربة التطبيق الخاصة بك",
+    "saved": "تم حفظ الإعدادات بنجاح",
+    "sections": {
+      "appearance": "المظهر",
+      "language": "اللغة والمنطقة",
+      "notifications": "الإشعارات",
+      "privacy": "الخصوصية والأمان",
+      "advanced": "متقدم"
+    },
+    "appearance": {
+      "title": "إعدادات المظهر",
+      "theme": "السمة",
+      "themes": {
+        "light": "فاتح",
+        "dark": "داكن",
+        "system": "النظام"
+      },
+      "font": "نوع الخط",
+      "fontSize": "حجم الخط",
+      "fontPreview": "الثعلب البني السريع يقفز فوق الكلب الكسول. ١٢٣٤٥٦٧٨٩٠",
+      "accentColor": "لون التمييز"
+    },
+    "language": {
+      "title": "إعدادات اللغة والمنطقة",
+      "select": "اللغة",
+      "dateFormat": "تنسيق التاريخ",
+      "timeFormat": "تنسيق الوقت"
+    },
+    "notifications": {
+      "title": "إعدادات الإشعارات",
+      "email": {
+        "title": "إشعارات البريد الإلكتروني",
+        "deployments": "تحديثات النشر",
+        "deploymentsDesc": "احصل على إشعارات حول تغييرات حالة النشر",
+        "security": "تنبيهات الأمان",
+        "securityDesc": "إشعارات الأمان المهمة وتنبيهات تسجيل الدخول",
+        "updates": "تحديثات المنتج",
+        "updatesDesc": "الميزات الجديدة وإعلانات المنتج",
+        "marketing": "الاتصالات التسويقية",
+        "marketingDesc": "النصائح والدروس والمحتوى الترويجي"
+      },
+      "sound": {
+        "title": "إعدادات الصوت",
+        "enable": "تفعيل أصوات الإشعارات",
+        "volume": "مستوى الصوت"
+      }
+    },
+    "privacy": {
+      "title": "إعدادات الخصوصية والأمان",
+      "dataCollection": {
+        "title": "جمع البيانات",
+        "analytics": "تحليلات الاستخدام",
+        "analyticsDesc": "ساعد في تحسين التطبيق من خلال مشاركة بيانات الاستخدام المجهولة"
+      },
+      "session": {
+        "title": "إدارة الجلسة",
+        "rememberMe": "تذكر تسجيل الدخول",
+        "rememberMeDesc": "البقاء مسجلاً عبر جلسات المتصفح"
+      }
+    },
+    "advanced": {
+      "title": "الإعدادات المتقدمة",
+      "performance": {
+        "title": "الأداء",
+        "animations": "تفعيل الحركات",
+        "animationsDesc": "عرض انتقالات وحركات سلسة"
+      },
+      "dashboard": {
+        "title": "إعدادات لوحة التحكم",
+        "autoRefresh": "تفعيل التحديث التلقائي",
+        "autoRefreshDesc": "تحديث إحصائيات ورسوم لوحة التحكم تلقائياً",
+        "refreshInterval": "فترة التحديث",
+        "refreshIntervalNote": "سيتم تحديث لوحة التحكم كل عدد الثواني المحدد (10-300 ثانية)"
+      },
+      "reset": {
+        "title": "إعادة تعيين الإعدادات",
+        "description": "سيؤدي هذا إلى إعادة تعيين جميع الإعدادات إلى قيمها الافتراضية. لا يمكن التراجع عن هذا الإجراء.",
+        "button": "إعادة تعيين جميع الإعدادات",
+        "confirm": "هل أنت متأكد من أنك تريد إعادة تعيين جميع الإعدادات؟ لا يمكن التراجع عن هذا الإجراء."
+      }
+    }
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "subtitle": "تسجيل الدخول إلى حسابك",
+    "usernamePlaceholder": "أدخل اسم المستخدم",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "createAccount": "إنشاء حساب",
+    "rememberMe": "تذكرني",
+    "forgotPassword": "نسيت كلمة المرور",
+    "login": "تسجيل الدخول",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "demoCredentials": "حسابات التجربة",
+    "successful": "تـم تسجول الدخول بنجاح",
+    "welcomeBack": "مرحــبا بك مجددا",
+    "loginFailed": "تسجيل دخول خاطئ",
+    "loginFailedMessage": "تسجيل دخول خاطئ فضلا أعد المحاولة",
+    "usernameRequired": "اســم المستخدم مطلوب ",
+    "passwordRequired": "الرقم السري مطلوب"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "أتقن - لوحة التحكم الخاصة  ببوابة واثق الاستعلامية ",
+    "refresh": "تحديث",
+    "systemTenants": "مستأجرين نظام الاستعلامات",
+    "viewAllTenants": "عرض جميع المستأجرين",
+    "tenantsError": "فشل في تحميل المستأجرين",
+    "tenantsLoading": "جاري تحميل المستأجرين...",
+    "tenantsNoData": "لم يتم العثور على مستأجرين",
+    "tenantsTryAgain": "حاول مرة أخرى",
+    "viewAllServicesOnline": "عرض جميع الطلبات المتصلة",
+    "systemServicesHistory": "سجل الطلبات المتصلة",
+    "systemServicesHistoryLoading": "جاري تحميل سجل الطلبات المتصلة...",
+    "systemServicesHistoryNoData": "لم يتم العثور على سجل الطلبات المتصلة",
+    "systemServicesHistoryTryAgain": "حاول مرة أخرى",
+    "systemServicesHistoryError": "فشل في تحميل سجل الطلبات المتصلة",
+    "viewAllServicesOffline": "عرض جميع الطلبات غير المتصلة",
+    "systemWathqOfflineData": "سجل الطلبات غير المتصلة",
+    "systemWathqOfflineDataLoading": "جاري تحميل سجل الطلبات غير المتصلة...",
+    "systemWathqOfflineDataNoData": "لم يتم العثور على سجل الطلبات غير المتصلة",
+    "systemWathqOfflineDataTryAgain": "حاول مرة أخرى",
+    "systemWathqOfflineDataError": "فشل في تحميل سجل الطلبات غير المتصلة",
+    "wathqOfflineDataError": "فشل في تحميل سجل الطلبات غير المتصلة",
+    "stats": {
+      "online_requests_count": "إجمالي الطلبات المتصلة",
+      "offline_requests_count": "إجمالي الطلبات غير المتصلة",
+      "tenants_count": "إجمالي المستأجرين",
+      "users_count": "إجمالي المستخدمين"
+    },
+    "charts": {
+      "onlineServicesTitle": "نشاط الخدمات المتصلة",
+      "offlineServicesTitle": "نشاط الخدمات غير المتصلة",
+      "requestsOverTime": "الطلبات عبر الزمن",
+      "statusCodeDistribution": "توزيع رموز الحالة",
+      "noDataAvailable": "لا توجد بيانات متاحة للرسم البياني",
+      "requests": "الطلبات",
+      "statusCode": "رمز الحالة",
+      "count": "العدد",
+      "last24Hours": "آخر 24 ساعة",
+      "last7Days": "آخر 7 أيام",
+      "last30Days": "آخر 30 يومًا"
+    },
+    "recentApps": "التطبيقات الحديثة",
+    "viewAllApps": "عرض جميع التطبيقات",
+    "viewAllUsers": "عرض جميع المستخدمين",
+    "systemUsers": "مستخدمو النظام",
+    "systemApps": "تطبيقات النظام",
+    "runningProcesses": "العمليات الجارية",
+    "loading": "جاري تحميل لوحة التحكم...",
+    "error": "فشل في تحميل التطبيقات",
+    "usersError": "فشل في تحميل المستخدمين",
+    "appsError": "فشل في تحميل التطبيقات",
+    "processesError": "فشل في تحميل العمليات",
+    "noProcesses": "لا توجد عمليات جارية",
+    "tryAgain": "حاول مرة أخرى",
+    "noApps": "لم يتم العثور على تطبيقات",
+    "getStarted": "ابدأ بإضافة تطبيقك الأول"
+  },
+  "nav": {
+    "dashboard": "أتقن لإدارة الاستعلامات",
+    "tenants": "المستـأجرين",
+    "wathqServices": "خدمات واثق",
+    "settings": "الإعدادات",
+    "addTenant": "إضافة مستأجر",
+    "addWathqService": "إضافة خدمة واثق",
+    "profile": "الملف الشخصي",
+    "resetPassword": "إعادة تعيين كلمة المرور",
+    "logout": "تسجيل الخروج"
+  },
+  "sidebar": {
+    "menu": "القائمة",
+    "home": "الرئيسية",
+    "tenants": "المستأجرين",
+    "tenantServices": "خدمات المستأجرين",
+    "wathqServices": "خدمات واثق",
+    "metrics": "المقاييس",
+    "users": "المستخدمين",
+    "notifications": "الإشعارات",
+    "collapse": "طي الشريط الجانبي",
+    "expand": "توسيع الشريط الجانبي",
+    "open": "فتح القائمة",
+    "close": "إغلاق القائمة"
+  },
+  "metrics": {
+    "title": "التحليلات والمقاييس",
+    "subtitle": "أداء النظام وتحليلات الاستخدام",
+    "stats": {
+      "totalTenants": "إجمالي المستأجرين",
+      "totalUsers": "إجمالي المستخدمين",
+      "onlineRequests": "الطلبات المتصلة",
+      "offlineRequests": "الطلبات غير المتصلة",
+      "thisMonth": "هذا الشهر",
+      "live": "مباشر",
+      "queued": "في الانتظار"
+    },
+    "timeRange": {
+      "last7Days": "آخر 7 أيام",
+      "last30Days": "آخر 30 يوم",
+      "last90Days": "آخر 90 يوم",
+      "lastYear": "السنة الماضية"
+    },
+    "charts": {
+      "usersGrowth": "نمو المستخدمين",
+      "tenantsGrowth": "نمو المستأجرين",
+      "requestsOverview": "نظرة عامة على الطلبات",
+      "serviceHistory": "سجل الخدمات",
+      "users": "المستخدمون",
+      "tenants": "المستأجرون",
+      "online": "متصل",
+      "offline": "غير متصل",
+      "serviceRequests": "طلبات الخدمة",
+      "total": "الإجمالي",
+      "records": "سجلات"
+    },
+    "tables": {
+      "recentServices": "الخدمات الأخيرة",
+      "offlineQueue": "قائمة الانتظار",
+      "viewAll": "عرض الكل",
+      "service": "الخدمة",
+      "tenant": "المستأجر",
+      "endpoint": "نقطة النهاية",
+      "status": "الحالة",
+      "date": "التاريخ"
+    }
+  },
+  "notifications": {
+    "markAllAsUnread": "تعليم كغير مقرؤة",
+    "viewAll": "عرض الكل",
+    "total": "إجمالي",
+    "success": {
+      "appDeployed": "تم نشر التطبيق بنجاح",
+      "appUpdated": "تم تحديث التطبيق بنجاح",
+      "appDeleted": "تم حذف التطبيق بنجاح",
+      "settingsSaved": "تم حفظ الإعدادات بنجاح"
+    },
+    "error": {
+      "deployFailed": "فشل النشر",
+      "updateFailed": "فشل التحديث",
+      "deleteFailed": "فشل الحذف",
+      "loadFailed": "فشل تحميل البيانات"
+    },
+    "all": "الكل",
+    "unread": "غير مقرؤة",
+    "read": "القراءة",
+    "markAllAsRead": "تعليم كمقرؤة",
+    "title": "الإشعارات",
+    "markAsUnread": "تعليم كغير مقرؤة",
+    "markAsRead": "تعليم كمقرؤة",
+    "noNotifications": "لايوجد إشعارات",
+    "allCaughtUp": "الإشعارات كلها"
+  },
+  "tenants": {
+    "title": "المستأجرين",
+    "subtitle": "إدارة مستأجري مؤسستك",
+    "list": "قائمة المستأجرين",
+    "addTenant": "إضافة مستأجر",
+    "editTenant": "تعديل مستأجر",
+    "deleteTenant": "حذف مستأجر",
+    "createTenant": "إنشاء مستأجر",
+    "createTenantDescription": "إنشاء مستأجر جديد لمؤسستك",
+    "editTenantDescription": "تحديث تفاصيل المستأجر {name}",
+    "createFirstTenant": "إنشاء أول مستأجر",
+    "noTenants": "لا يوجد مستأجرين بعد",
+    "noTenantsMessage": "ابدأ بإنشاء أول مستأجر لك",
+    "confirmDelete": "هل أنت متأكد من حذف {name}؟",
+    "confirmActivate": "هل أنت متأكد من تفعيل هذا المستأجر؟",
+    "confirmDeactivate": "هل أنت متأكد من إلغاء تفعيل هذا المستأجر؟",
+    "backToList": "العودة للمستأجرين",
+    "confirmDeleteMessage": "لا يمكن التراجع عن هذا الإجراء.",
+    "confirmDeleteButton": "حذف المستأجر",
+    "confirmDeleteCancelButton": "إلغاء",
+    "createTenantSuccess": "تم إنشاء المستأجر بنجاح",
+    "createTenantError": "فشل في إنشاء المستأجر",
+    "updateTenantSuccess": "تم تحديث المستأجر بنجاح",
+    "updateTenantError": "فشل في تحديث المستأجر",
+    "deleteTenantSuccess": "تم حذف المستأجر بنجاح",
+    "deleteTenantError": "فشل في حذف المستأجر",
+    "services":{
+      "table":{
+        "service": "الخدمة",
+        "approval": "الموافقة",
+        "usage": "الاستخدام",
+        "status": "الحالة",
+        "actions": "الإجراءات",
+        "groupBy": ""
+      },
+      "stats":{
+        "total": "إجمالي الخدمات",
+        "active": "نشط",
+        "inactive": "غير نشط",
+        "approved": "تم الموافقة",
+        "pending": "قيد الانتظار",
+        "rejected": "مرفوض",
+        "totalUsers": "إجمالي المستخدمين"
+      },
+      "quickActions": {
+        "users": "المستخدمون",
+        "edit": "تعديل",
+        "assign": "تعيين",
+        "delete": "حذف"
+      },
+      "title": "خدمات",
+      "subtitle": "إدارة خدمات المستأجر"
+    },
+    "stats": {
+      "total": "إجمالي المستأجرين",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "totalUsers": "إجمالي المستخدمين"
+    },
+    "table": {
+      "name": "الاسم",
+      "slug": "المعرف",
+      "status": "الحالة",
+      "users": "المستخدمون",
+      "createdAt": "تاريخ الإنشاء",
+      "actions": "الإجراءات"
+    },
+    "form": {
+      "tenantDetails": "تفاصيل المستأجر",
+      "fillRequiredFields": "املأ المعلومات المطلوبة أدناه",
+      "updateDetails": "تحديث معلومات المستأجر",
+      "name": "اسم المستأجر",
+      "namePlaceholder": "أدخل اسم المستأجر (بالإنجليزية فقط)",
+      "nameEnglishOnly": "يجب أن يحتوي الاسم على أحرف إنجليزية وأرقام ورموز أساسية فقط (-, _, &)",
+      "nameAr": "الاسم بالعربية",
+      "nameArPlaceholder": "أدخل اسم المستأجر بالعربية",
+      "nameArHelp": "الاسم بالعربية لعرض RTL (اختياري)",
+      "slug": "المعرف",
+      "slugPlaceholder": "tenant-slug",
+      "slugHelp": "يتم إنشاؤه تلقائياً من الاسم (أحرف صغيرة، أرقام، شرطات فقط)",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف مختصر لهذا المستأجر",
+      "maxUsers": "الحد الأقصى للمستخدمين",
+      "maxUsersPlaceholder": "10",
+      "logo": "الشعار",
+      "logoUpload": "اختر صورة الشعار",
+      "logoHelp": "رفع صورة الشعار (JPG, PNG, SVG, WebP) - الحد الأقصى 2 ميجابايت",
+      "logoPreview": "معاينة",
+      "logoInvalidType": "نوع ملف غير صالح. يرجى رفع صورة JPG أو PNG أو SVG أو WebP.",
+      "logoTooLarge": "حجم الملف يتجاوز 2 ميجابايت. يرجى اختيار صورة أصغر.",
+      "logoUploadFailed": "فشل رفع الصورة. يرجى المحاولة مرة أخرى.",
+      "existingLogo": "الشعار الحالي",
+      "isActive": "حالة التفعيل",
+      "create": "إنشاء مستأجر",
+      "update": "تحديث المستأجر"
+    },
+    "assignService": {
+      "title": "إضافة خدمة للمستأجر",
+      "button": "إضافة خدمة",
+      "assigningTo": "إضافة خدمة للمستأجر",
+      "selectService": "اختر الخدمة",
+      "noServices": "لا توجد خدمات متاحة",
+      "requiresApproval": "يتطلب الموافقة",
+      "price": "السعر",
+      "maxUsers": "الحد الأقصى للمستخدمين",
+      "maxUsersPlaceholder": "10",
+      "maxUsersHelp": "الحد الأقصى لعدد المستخدمين المسموح بهم لهذه الخدمة",
+      "apiKey": "مفتاح واثق API",
+      "apiKeyPlaceholder": "أدخل مفتاح واثق API",
+      "apiKeyHelp": "مفتاح API المقدم من واثق لتكامل الخدمة",
+      "assign": "إضافة الخدمة",
+      "errors": {
+        "serviceRequired": "يرجى اختيار خدمة",
+        "maxUsersRequired": "يجب أن يكون الحد الأقصى للمستخدمين أكبر من 0",
+        "apiKeyRequired": "مفتاح API مطلوب"
+      }
+    },
+    "manageUsers": "إدارة المستخدمين"
+  },
+  "users": {
+    "title": "المستخدمون",
+    "subtitle": "إدارة جميع مستخدمي النظام عبر المستأجرين",
+    "list": "قائمة المستخدمين",
+    "allUsers": "جميع المستخدمين",
+    "search": "بحث عن مستخدمين...",
+    "addUser": "إضافة مستخدم",
+    "editUser": "تعديل مستخدم",
+    "deleteUser": "حذف مستخدم",
+    "createUser": "إنشاء مستخدم",
+    "createUserDescription": "إنشاء مستخدم جديد لهذا المستأجر",
+    "editUserDescription": "تحديث تفاصيل المستخدم {name}",
+    "createFirstUser": "إنشاء أول مستخدم",
+    "noUsers": "لا يوجد مستخدمين بعد",
+    "noUsersMessage": "ابدأ بإنشاء أول مستخدم لك",
+    "confirmDelete": "هل أنت متأكد من حذف {name}؟",
+    "confirmActivate": "هل أنت متأكد من تفعيل هذا المستخدم؟",
+    "confirmDeactivate": "هل أنت متأكد من إلغاء تفعيل هذا المستخدم؟",
+    "stats": {
+      "total": "إجمالي المستخدمين",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "admins": "المشرفون",
+      "superAdmins": "المشرفون العامون",
+      "regularUsers": "المستخدمون العاديون"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "role": {
+      "superAdmin": "مشرف عام",
+      "user": "مستخدم"
+    },
+    "table": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "status": "الحالة",
+      "role": "الدور",
+      "tenant": "المستأجر",
+      "createdAt": "تاريخ الإنشاء",
+      "actions": "الإجراءات",
+      "admin": "مشرف",
+      "user": "مستخدم",
+      "rowsPerPage": "عدد الصفوف",
+      "showing": "عرض",
+      "to": "إلى",
+      "of": "من",
+      "results": "نتيجة"
+    },
+    "actions": {
+      "viewDetails": "عرض التفاصيل",
+      "viewTenant": "عرض المستأجر",
+      "edit": "تعديل المستخدم",
+      "delete": "حذف المستخدم",
+      "activate": "تفعيل",
+      "deactivate": "إلغاء التفعيل"
+    },
+    "form": {
+      "userDetails": "تفاصيل المستخدم",
+      "fillRequiredFields": "املأ المعلومات المطلوبة أدناه",
+      "updateDetails": "تحديث معلومات المستخدم",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "user@example.com",
+      "firstName": "الاسم الأول",
+      "firstNamePlaceholder": "أدخل الاسم الأول",
+      "lastName": "اسم العائلة",
+      "lastNamePlaceholder": "أدخل اسم العائلة",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "أدخل كلمة المرور",
+      "passwordHelp": "8 أحرف على الأقل تحتوي على حرف كبير وصغير ورقم",
+      "nameAr": "الاسم بالعربية",
+      "nameArPlaceholder": "أدخل الاسم الكامل بالعربية",
+      "nameArHelp": "الاسم الكامل بالعربية لعرض RTL (اختياري)",
+      "logo": "الصورة الشخصية",
+      "logoUpload": "اختر الصورة الشخصية",
+      "logoHelp": "رفع صورة شخصية (JPG, PNG, WebP) - الحد الأقصى 2 ميجابايت",
+      "logoPreview": "معاينة",
+      "logoInvalidType": "نوع ملف غير صالح. يرجى رفع صورة JPG أو PNG أو WebP.",
+      "logoTooLarge": "حجم الملف يتجاوز 2 ميجابايت. يرجى اختيار صورة أصغر.",
+      "logoUploadFailed": "فشل رفع الصورة. يرجى المحاولة مرة أخرى.",
+      "existingLogo": "الصورة الحالية",
+      "isActive": "حالة التفعيل",
+      "isSuperAdmin": "مشرف عام",
+      "create": "إنشاء مستخدم",
+      "update": "تحديث المستخدم"
+    }
+  },
+  "websocket": {
+    "metrics": {
+      "title": "مقاييس WebSocket",
+      "connected": "مباشر",
+      "disconnected": "غير متصل",
+      "activeConnections": "الاتصالات النشطة",
+      "connectedUsers": "المستخدمون المتصلون",
+      "managementUsers": "مستخدمو الإدارة",
+      "connectedTenants": "المستأجرون المتصلون",
+      "messagesSent": "الرسائل المرسلة",
+      "totalConnections": "إجمالي الاتصالات",
+      "errorRate": "معدل الخطأ",
+      "uptime": "وقت التشغيل"
+    }
+  },
+  "tenantServices": {
+    "title": "خدمات المستأجرين",
+    "subtitle": "إدارة اشتراكات واستخدام خدمات المستأجرين",
+    "list": "قائمة الخدمات",
+    "noServices": "لم يتم العثور على خدمات",
+    "noServicesMessage": "لا توجد خدمات مستأجرين مسجلة حالياً",
+    "approveService": "الموافقة على الخدمة",
+    "deleteService": "حذف الخدمة",
+    "confirmApprove": "هل أنت متأكد أنك تريد الموافقة على {name}؟ سيتم تفعيل الخدمة للمستأجر.",
+    "confirmDelete": "هل أنت متأكد أنك تريد حذف {name}؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirmActivate": "هل أنت متأكد أنك تريد تفعيل {name}؟",
+    "confirmDeactivate": "هل أنت متأكد أنك تريد إلغاء تفعيل {name}؟",
+    "approved": "موافق عليه",
+    "pending": "في انتظار الموافقة",
+    "requiresApproval": "يتطلب الموافقة",
+    "stats": {
+      "total": "إجمالي الخدمات",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "approved": "موافق عليه",
+      "pending": "في الانتظار",
+      "totalUsage": "إجمالي الاستخدام"
+    },
+    "table": {
+      "service": "الخدمة",
+      "tenant": "المستأجر",
+      "status": "الحالة",
+      "approval": "الموافقة",
+      "usage": "الاستخدام",
+      "actions": "الإجراءات",
+      "maxUsers": "الحد الأقصى للمستخدمين",
+      "registered": "مسجل"
+    },
+    "filters": {
+      "allCategories": "جميع الفئات",
+      "allStatuses": "جميع الحالات",
+      "allApprovals": "جميع الموافقات",
+      "wathq": "واثق",
+      "other": "أخرى",
+      "approved": "موافق عليه",
+      "pending": "في الانتظار"
+    },
+    "groupByOptions": {
+      "none": "بدون تجميع",
+      "category": "حسب الفئة",
+      "status": "حسب الحالة",
+      "approval": "حسب الموافقة",
+      "tenant": "حسب المستأجر"
+    },
+    "sort": {
+      "registeredAt": "تاريخ التسجيل",
+      "serviceName": "اسم الخدمة",
+      "usage": "عدد الاستخدام",
+      "approvedAt": "تاريخ الموافقة"
+    },
+    "actions": {
+      "approve": "الموافقة على الخدمة"
+    },
+    "details": {
+      "serviceId": "معرف الخدمة",
+      "price": "السعر",
+      "apiKey": "مفتاح API",
+      "approvedBy": "تمت الموافقة بواسطة"
+    }
+  },
+  "wathq": {
+    "title": "خدمات واثق API",
+    "subtitle": "الوصول وإدارة خدمات واثق الحكومية",
+    "recentActivity": "النشاط الأخير",
+    "testResult": "نتيجة الاختبار",
+    "duration": "المدة الزمنية",
+    "endpoint": "نقطة النهاية",
+    "selectEndpoint": "اختر نقطة النهاية",
+    "selectEndpointPrompt": "اختر نقطة النهاية للاختبار",
+    "selectEndpointDescription": "اختر نقطة نهاية API من القائمة المنسدلة أعلاه للبدء",
+    "response": "الاستجابة",
+    "requestSuccess": "تم إكمال الطلب بنجاح",
+    "requestFailed": "فشل الطلب",
+    "copiedToClipboard": "تم النسخ إلى الحافظة",
+    "copyFailed": "فشل النسخ",
+    "exportSuccess": "تم تصدير الاستجابة بنجاح",
+    "stats": {
+      "totalRequests": "إجمالي الطلبات",
+      "successful": "ناجحة",
+      "failed": "فاشلة",
+      "avgDuration": "متوسط المدة",
+      "today": "اليوم",
+      "thisWeek": "هذا الأسبوع",
+      "thisMonth": "هذا الشهر"
+    },
+    "services": {
+      "title": "خدمات واثق",
+      "available": "الخدمات المتاحة",
+      "commercialRegistration": {
+        "name": "السجل التجاري",
+        "description": "الاستعلام والتحقق من معلومات السجل التجاري",
+        "fields": {
+          "crNumber": "رقم السجل التجاري",
+          "dateGregorian": "التاريخ (ميلادي)"
+        }
+      },
+      "companyContract": {
+        "name": "عقد الشركة",
+        "description": "استرجاع والتحقق من تفاصيل عقد الشركة",
+        "fields": {
+          "contractNumber": "رقم العقد",
+          "companyCR": "رقم السجل التجاري للشركة"
+        }
+      },
+      "attorney": {
+        "name": "التوكيل",
+        "description": "التحقق من التوكيل ومستندات التفويض",
+        "fields": {
+          "authorizationNumber": "رقم التوكيل",
+          "identityNumber": "رقم الهوية"
+        }
+      },
+      "realEstate": {
+        "name": "العقارات",
+        "description": "الاستعلام عن معلومات الصك العقاري والعقار",
+        "fields": {
+          "deedNumber": "رقم الصك",
+          "deedDate": "تاريخ الصك"
+        }
+      },
+      "nationalAddress": {
+        "name": "العنوان الوطني",
+        "description": "استرجاع تفاصيل العنوان الوطني والتحقق منه",
+        "fields": {
+          "identityNumber": "رقم الهوية",
+          "addressId": "معرف العنوان"
+        }
+      },
+      "employee": {
+        "name": "التحقق من الموظف",
+        "description": "التحقق من معلومات الموظف وحالة التوظيف",
+        "fields": {
+          "employeeId": "رقم الموظف",
+          "companyId": "رقم الشركة"
+        }
+      }
+    },
+    "tabs": {
+      "testApi": "اختبار API",
+      "liveRequests": "الطلبات المباشرة",
+      "requestLogs": "سجل الطلبات",
+      "offlineRequests": "الطلبات غير المتصلة"
+    },
+    "actions": {
+      "testApi": "اختبار API",
+      "makeLiveRequest": "إجراء طلب مباشر",
+      "sendRequest": "إرسال الطلب",
+      "copyResponse": "نسخ الاستجابة",
+      "copy": "نسخ",
+      "copied": "تم النسخ!",
+      "export": "تصدير",
+      "exportJson": "تصدير JSON"
+    },
+    "metadata": {
+      "status": "الحالة",
+      "duration": "المدة",
+      "timestamp": "الطابع الزمني",
+      "size": "الحجم"
+    },
+    "logs": {
+      "empty": {
+        "title": "لا توجد طلبات",
+        "description": "لم يتم إجراء أي طلبات API بعد"
+      },
+      "table": {
+        "endpoint": "نقطة النهاية",
+        "status": "الحالة",
+        "duration": "المدة",
+        "timestamp": "الطابع الزمني"
+      },
+      "requestDetails": "تفاصيل الطلب",
+      "requestData": "بيانات الطلب",
+      "responseData": "بيانات الاستجابة"
+    }
+  },
+  "passwordReset":{
+    "title":"إعادة تعيين كلمة المرور",
+    "subtitle":"لقد طلبت إعادة تعيين كلمة المرور الخاصة بك. يرجى إدخال كلمة المرور الجديدة.",
+    "newPassword":"كلمة المرور الجديدة",
+    "confirmPassword":"تأكيد كلمة المرور",
+    "reset":"إعادة تعيين",
+    "backToLogin":"العودة إلى تسجيل الدخول"
+  }
+}

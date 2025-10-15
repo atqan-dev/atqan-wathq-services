@@ -1,0 +1,413 @@
+<template>
+  <div class="space-y-4">
+    <!-- Endpoint Selection -->
+    <div class="grid grid-cols-1 gap-4">
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ t('wathq.endpoint') }}
+      </label>
+      <USelect
+        v-model="selectedEndpoint"
+        :options="endpointOptions"
+        size="lg"
+        :placeholder="t('wathq.selectEndpoint')"
+        @change="handleEndpointChange"
+      />
+    </div>
+
+    <!-- Endpoint Details -->
+    <UCard v-if="selectedEndpointData">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <UBadge :color="getMethodColor(selectedEndpointData.method)" variant="subtle">
+              {{ selectedEndpointData.method }}
+            </UBadge>
+            <h3 class="font-semibold text-gray-900 dark:text-white">
+              {{ selectedEndpointData.name }}
+            </h3>
+          </div>
+        </div>
+      </template>
+
+      <!-- Description -->
+      <div v-if="selectedEndpointData.description" class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+        <p class="text-sm text-blue-700 dark:text-blue-300">
+          {{ selectedEndpointData.description }}
+        </p>
+      </div>
+
+      <!-- Parameters Form -->
+      <form v-if="selectedEndpointData.params.length > 0" @submit.prevent="handleSubmit" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div v-for="param in selectedEndpointData.params" :key="param.key">
+            <UInput
+              v-model="formData[param.key]"
+              :label="param.label"
+              :placeholder="param.placeholder"
+              :required="param.required"
+            >
+              <template v-if="param.description" #help>
+                <span class="text-xs text-gray-500">{{ param.description }}</span>
+              </template>
+            </UInput>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <UButton
+            type="submit"
+            :loading="isLoading"
+            icon="i-heroicons-paper-airplane"
+            size="lg"
+          >
+            {{ t('wathq.actions.sendRequest') }}
+          </UButton>
+          <UButton
+            type="button"
+            color="gray"
+            variant="ghost"
+            @click="resetForm"
+          >
+            {{ t('common.reset') }}
+          </UButton>
+        </div>
+      </form>
+
+      <!-- No Parameters -->
+      <div v-else>
+        <UButton
+          :loading="isLoading"
+          icon="i-heroicons-paper-airplane"
+          size="lg"
+          @click="handleSubmit"
+        >
+          {{ t('wathq.actions.sendRequest') }}
+        </UButton>
+      </div>
+    </UCard>
+
+    <!-- Response Section -->
+    <UCard v-if="response">
+      <template #header>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <h3 class="font-semibold text-gray-900 dark:text-white">
+              {{ t('wathq.response') }}
+            </h3>
+            <UBadge
+              :color="response.success ? 'green' : 'red'"
+              variant="subtle"
+            >
+              {{ response.success ? t('common.success') : t('common.error') }}
+            </UBadge>
+            <span v-if="response.duration_ms" class="text-sm text-gray-500">
+              {{ response.duration_ms }}ms
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <UButton
+              size="sm"
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-clipboard-document"
+              @click="copyResponse"
+              :title="t('wathq.actions.copyResponse')"
+            >
+              {{ copied ? t('wathq.actions.copied') : t('wathq.actions.copy') }}
+            </UButton>
+            <UButton
+              size="sm"
+              color="gray"
+              variant="ghost"
+              icon="i-heroicons-arrow-down-tray"
+              @click="exportResponse"
+              :title="t('wathq.actions.exportJson')"
+            >
+              {{ t('wathq.actions.export') }}
+            </UButton>
+          </div>
+        </div>
+      </template>
+
+      <!-- Response Code Block -->
+      <div class="relative">
+        <pre class="text-xs bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg overflow-auto max-h-[600px] font-mono leading-relaxed"><code>{{ formattedResponse }}</code></pre>
+        
+        <!-- Quick Copy Button on Hover -->
+        <UButton
+          size="xs"
+          color="gray"
+          variant="solid"
+          icon="i-heroicons-clipboard-document"
+          class="absolute top-2 right-2 opacity-0 hover:opacity-100 transition-opacity"
+          @click="copyResponse"
+        />
+      </div>
+
+      <!-- Response Metadata -->
+      <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div>
+            <span class="text-gray-500 dark:text-gray-400">{{ t('wathq.metadata.status') }}:</span>
+            <span class="ml-2 font-medium" :class="response.success ? 'text-green-600' : 'text-red-600'">
+              {{ response.status_code || (response.success ? '200' : '500') }}
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-500 dark:text-gray-400">{{ t('wathq.metadata.duration') }}:</span>
+            <span class="ml-2 font-medium text-gray-900 dark:text-white">
+              {{ response.duration_ms }}ms
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-500 dark:text-gray-400">{{ t('wathq.metadata.timestamp') }}:</span>
+            <span class="ml-2 font-medium text-gray-900 dark:text-white">
+              {{ formatTimestamp(response.timestamp) }}
+            </span>
+          </div>
+          <div>
+            <span class="text-gray-500 dark:text-gray-400">{{ t('wathq.metadata.size') }}:</span>
+            <span class="ml-2 font-medium text-gray-900 dark:text-white">
+              {{ formatBytes(JSON.stringify(response.data).length) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </UCard>
+
+    <!-- Empty State -->
+    <UCard v-if="!selectedEndpoint && !response">
+      <div class="text-center py-12">
+        <UIcon name="i-heroicons-cursor-arrow-rays" class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          {{ t('wathq.selectEndpointPrompt') }}
+        </h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          {{ t('wathq.selectEndpointDescription') }}
+        </p>
+      </div>
+    </UCard>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue'
+import { useI18n } from '~/composables/useI18n'
+import { useAlert } from '~/composables/useAlert'
+
+interface EndpointParam {
+  key: string
+  label: string
+  placeholder?: string
+  required?: boolean
+  description?: string
+  type?: 'text' | 'number' | 'select'
+  options?: Array<{ value: string; label: string }>
+}
+
+interface EndpointDefinition {
+  id: string
+  name: string
+  description?: string
+  path: string
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  params: EndpointParam[]
+  category?: string
+}
+
+interface Props {
+  endpoints: EndpointDefinition[]
+  baseUrl: string
+  serviceType: string
+}
+
+interface Response {
+  success: boolean
+  data?: any
+  error?: string
+  status_code?: number
+  duration_ms: number
+  timestamp: string
+}
+
+const props = defineProps<Props>()
+
+const { t } = useI18n()
+const { success: showSuccess, error: showError } = useAlert()
+
+const selectedEndpoint = ref<string>('')
+const formData = ref<Record<string, any>>({})
+const response = ref<Response | null>(null)
+const isLoading = ref(false)
+const copied = ref(false)
+
+// Endpoint options for select
+const endpointOptions = computed(() => {
+  return props.endpoints.map(endpoint => ({
+    value: endpoint.id,
+    label: endpoint.name,
+    description: endpoint.description
+  }))
+})
+
+// Selected endpoint data
+const selectedEndpointData = computed(() => {
+  return props.endpoints.find(e => e.id === selectedEndpoint.value)
+})
+
+// Formatted response
+const formattedResponse = computed(() => {
+  if (!response.value) return ''
+  const data = response.value.success ? response.value.data : { error: response.value.error }
+  return JSON.stringify(data, null, 2)
+})
+
+// Handle endpoint change
+function handleEndpointChange() {
+  formData.value = {}
+  response.value = null
+}
+
+// Reset form
+function resetForm() {
+  formData.value = {}
+  if (selectedEndpointData.value) {
+    selectedEndpointData.value.params.forEach(param => {
+      formData.value[param.key] = ''
+    })
+  }
+}
+
+// Handle submit
+async function handleSubmit() {
+  if (!selectedEndpointData.value) return
+
+  try {
+    isLoading.value = true
+    const startTime = Date.now()
+
+    // Build URL with path parameters
+    let url = `${props.baseUrl}${selectedEndpointData.value.path}`
+    
+    // Replace path parameters
+    selectedEndpointData.value.params.forEach(param => {
+      if (formData.value[param.key]) {
+        url = url.replace(`{${param.key}}`, formData.value[param.key])
+      }
+    })
+
+    // Make request
+    const res = await fetch(url, {
+      method: selectedEndpointData.value.method,
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+
+    const duration = Date.now() - startTime
+    const data = await res.json()
+
+    response.value = {
+      success: res.ok,
+      data: data,
+      status_code: res.status,
+      duration_ms: duration,
+      timestamp: new Date().toISOString()
+    }
+
+    if (res.ok) {
+      showSuccess(t('wathq.requestSuccess'))
+    } else {
+      showError(t('wathq.requestFailed'))
+    }
+  } catch (err: any) {
+    const duration = Date.now() - Date.now()
+    response.value = {
+      success: false,
+      error: err.message || 'Request failed',
+      duration_ms: duration,
+      timestamp: new Date().toISOString()
+    }
+    showError(err.message || t('wathq.requestFailed'))
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Copy response
+async function copyResponse() {
+  if (!response.value) return
+  
+  try {
+    await navigator.clipboard.writeText(formattedResponse.value)
+    copied.value = true
+    showSuccess(t('wathq.copiedToClipboard'))
+    
+    setTimeout(() => {
+      copied.value = false
+    }, 2000)
+  } catch (err) {
+    showError(t('wathq.copyFailed'))
+  }
+}
+
+// Export response
+function exportResponse() {
+  if (!response.value) return
+
+  const blob = new Blob([formattedResponse.value], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${props.serviceType}-${selectedEndpoint.value}-${Date.now()}.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+  
+  showSuccess(t('wathq.exportSuccess'))
+}
+
+// Get method color
+function getMethodColor(method: string): 'blue' | 'green' | 'yellow' | 'red' {
+  switch (method) {
+    case 'GET':
+      return 'blue'
+    case 'POST':
+      return 'green'
+    case 'PUT':
+    case 'PATCH':
+      return 'yellow'
+    case 'DELETE':
+      return 'red'
+    default:
+      return 'blue'
+  }
+}
+
+// Format timestamp
+function formatTimestamp(timestamp: string): string {
+  return new Date(timestamp).toLocaleTimeString()
+}
+
+// Format bytes
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 B'
+  const k = 1024
+  const sizes = ['B', 'KB', 'MB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+}
+
+// Watch endpoint change
+watch(selectedEndpoint, () => {
+  if (selectedEndpointData.value) {
+    // Initialize form data
+    selectedEndpointData.value.params.forEach(param => {
+      if (!formData.value[param.key]) {
+        formData.value[param.key] = ''
+      }
+    })
+  }
+})
+</script>
