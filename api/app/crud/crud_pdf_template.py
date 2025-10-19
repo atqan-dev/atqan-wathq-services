@@ -361,7 +361,9 @@ class CRUDGeneratedPdf(CRUDBase[GeneratedPdf, GeneratedPdfCreate, None]):
         limit: int = 100,
     ) -> tuple[List[GeneratedPdf], int]:
         """Get generated PDFs for a template."""
-        query = db.query(GeneratedPdf).filter(
+        query = db.query(GeneratedPdf).options(
+            joinedload(GeneratedPdf.template)
+        ).filter(
             GeneratedPdf.template_id == template_id
         )
 
@@ -385,7 +387,9 @@ class CRUDGeneratedPdf(CRUDBase[GeneratedPdf, GeneratedPdfCreate, None]):
         limit: int = 100,
     ) -> tuple[List[GeneratedPdf], int]:
         """Get generated PDFs by user."""
-        query = db.query(GeneratedPdf).filter(
+        query = db.query(GeneratedPdf).options(
+            joinedload(GeneratedPdf.template)
+        ).filter(
             GeneratedPdf.generated_by == user_id
         )
 

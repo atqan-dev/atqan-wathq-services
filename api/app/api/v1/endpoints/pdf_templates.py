@@ -69,7 +69,11 @@ def list_templates(
     }
 
 
-@router.post("/templates", response_model=schemas.PdfTemplate, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/templates",
+    response_model=schemas.PdfTemplate,
+    status_code=status.HTTP_201_CREATED,
+)
 def create_template(
     *,
     db: Session = Depends(deps.get_db),
@@ -226,7 +230,10 @@ def duplicate_template(
     return duplicated
 
 
-@router.get("/templates/{template_id}/versions", response_model=schemas.PdfTemplateVersionListResponse)
+@router.get(
+    "/templates/{template_id}/versions",
+    response_model=schemas.PdfTemplateVersionListResponse,
+)
 def list_template_versions(
     template_id: UUID,
     db: Session = Depends(deps.get_db),
@@ -262,7 +269,10 @@ def list_template_versions(
     return {"versions": version_list, "total": total}
 
 
-@router.get("/templates/{template_id}/versions/{version_number}", response_model=schemas.PdfTemplateVersion)
+@router.get(
+    "/templates/{template_id}/versions/{version_number}",
+    response_model=schemas.PdfTemplateVersion,
+)
 def get_template_version(
     template_id: UUID,
     version_number: int,
@@ -292,7 +302,9 @@ def get_template_version(
     return version_data
 
 
-@router.post("/templates/{template_id}/generate", response_model=schemas.GeneratedPdfResponse)
+@router.post(
+    "/templates/{template_id}/generate", response_model=schemas.GeneratedPdfResponse
+)
 def generate_pdf_from_template(
     template_id: UUID,
     generate_req: schemas.GeneratePdfRequest,
@@ -327,6 +339,7 @@ def generate_pdf_from_template(
 
     # Generate PDF
     import time
+
     start_time = time.time()
 
     try:
@@ -411,9 +424,7 @@ def download_generated_pdf(
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={
-            "Content-Disposition": f'attachment; filename="{pdf.filename}"'
-        },
+        headers={"Content-Disposition": f'attachment; filename="{pdf.filename}"'},
     )
 
 
@@ -428,28 +439,49 @@ def list_generated_pdfs(
     """
     List generated PDFs.
     """
-    if template_id:
-        pdfs, total = generated_pdf.get_multi_by_template(
-            db, template_id=template_id, skip=skip, limit=limit
-        )
-    else:
-        pdfs, total = generated_pdf.get_multi_by_user(
-            db, user_id=current_user.id, skip=skip, limit=limit
-        )
+    try:
+        if template_id:
+            pdfs, total = generated_pdf.get_multi_by_template(
+                db, template_id=template_id, skip=skip, limit=limit
+            )
+        else:
+            pdfs, total = generated_pdf.get_multi_by_user(
+                db, user_id=current_user.id, skip=skip, limit=limit
+            )
 
-    # Convert to list response
-    pdf_list = []
-    for pdf_item in pdfs:
-        pdf_data = schemas.GeneratedPdfList.model_validate(pdf_item)
-        pdf_data.template_name = pdf_item.template.name if pdf_item.template else "Unknown"
-        pdf_list.append(pdf_data)
+        # Convert to list response
+        pdf_list = []
+        for pdf_item in pdfs:
+            # Create dict from model and add template_name
+            pdf_dict = {
+                "id": pdf_item.id,
+                "template_id": pdf_item.template_id,
+                "template_name": (
+                    pdf_item.template.name if pdf_item.template else "Unknown"
+                ),
+                "filename": pdf_item.filename,
+                "file_size": pdf_item.file_size,
+                "download_count": pdf_item.download_count,
+                "created_at": pdf_item.created_at,
+                "expires_at": pdf_item.expires_at,
+            }
+            pdf_data = schemas.GeneratedPdfList.model_validate(pdf_dict)
+            pdf_list.append(pdf_data)
 
-    return {
-        "pdfs": pdf_list,
-        "total": total,
-        "page": skip // limit + 1,
-        "page_size": limit,
-    }
+        return {
+            "pdfs": pdf_list,
+            "total": total,
+            "page": skip // limit + 1,
+            "page_size": limit,
+        }
+    except Exception as e:
+        import traceback
+
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to list generated PDFs: {str(e)}",
+        )
 
 
 @router.get("/categories", response_model=List[str])

@@ -161,7 +161,6 @@ class PdfTemplateVersionList(BaseModel):
 # Generated PDF schemas
 class GeneratePdfRequest(BaseModel):
     """Schema for PDF generation request."""
-    template_id: UUID
     data: Dict[str, Any]
     filename: str | None = None
     use_version: int | None = None  # Specific version number

@@ -4,10 +4,10 @@
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-          {{ $t('pdf_templates.title', 'PDF Templates') }}
+          {{ t('pdf_templates.title', 'PDF Templates') }}
         </h1>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          {{ $t('pdf_templates.description', 'Design and manage PDF templates with GrapesJS') }}
+          {{ t('pdf_templates.description', 'Design and manage PDF templates with GrapesJS') }}
         </p>
       </div>
       <UButton
@@ -16,7 +16,7 @@
         color="primary"
         @click="navigateTo('/pdf-templates/create')"
       >
-        {{ $t('pdf_templates.create', 'Create Template') }}
+        {{ t('pdf_templates.create', 'Create Template') }}
       </UButton>
     </div>
 
@@ -26,7 +26,7 @@
         <UInput
           v-model="filters.search"
           icon="i-heroicons-magnifying-glass"
-          :placeholder="$t('pdf_templates.search', 'Search templates...')"
+          :placeholder="t('pdf_templates.search', 'Search templates...')"
           @input="debouncedSearch"
         />
         
@@ -49,7 +49,7 @@
           icon="i-heroicons-arrow-path"
           @click="resetFilters"
         >
-          {{ $t('common.reset', 'Reset') }}
+          {{ t('common.reset', 'Reset') }}
         </UButton>
       </div>
     </UCard>
@@ -62,17 +62,17 @@
     <div v-else-if="templates.length === 0" class="text-center py-12">
       <UIcon name="i-heroicons-document-text" class="mx-auto w-12 h-12 text-gray-400" />
       <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-white">
-        {{ $t('pdf_templates.no_templates', 'No templates') }}
+        {{ t('pdf_templates.no_templates', 'No templates') }}
       </h3>
       <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        {{ $t('pdf_templates.no_templates_desc', 'Get started by creating a new template.') }}
+        {{ t('pdf_templates.no_templates_desc', 'Get started by creating a new template.') }}
       </p>
       <div class="mt-6">
         <UButton
           icon="i-heroicons-plus"
           @click="navigateTo('/pdf-templates/create')"
         >
-          {{ $t('pdf_templates.create', 'Create Template') }}
+          {{ t('pdf_templates.create', 'Create Template') }}
         </UButton>
       </div>
     </div>
@@ -157,7 +157,7 @@
               size="sm"
               @click.stop="editTemplate(template.id)"
             >
-              {{ $t('common.edit', 'Edit') }}
+              {{ t('common.edit', 'Edit') }}
             </UButton>
             
             <div class="flex gap-2">
@@ -198,14 +198,14 @@
           <div class="flex items-center gap-3">
             <UIcon name="i-heroicons-exclamation-triangle" class="w-6 h-6 text-red-500" />
             <h3 class="text-lg font-semibold">
-              {{ $t('pdf_templates.delete_confirm', 'Delete Template') }}
+              {{ t('pdf_templates.delete_confirm', 'Delete Template') }}
             </h3>
           </div>
         </template>
 
         <p class="text-gray-600 dark:text-gray-300">
           {{
-            $t(
+            t(
               'pdf_templates.delete_confirm_message',
               'Are you sure you want to delete this template? This action cannot be undone.'
             )
@@ -215,10 +215,10 @@
         <template #footer>
           <div class="flex justify-end gap-3">
             <UButton variant="outline" @click="showDeleteModal = false">
-              {{ $t('common.cancel', 'Cancel') }}
+              {{ t('common.cancel', 'Cancel') }}
             </UButton>
             <UButton color="red" @click="deleteTemplate" :loading="deleting">
-              {{ $t('common.delete', 'Delete') }}
+              {{ t('common.delete', 'Delete') }}
             </UButton>
           </div>
         </template>
@@ -231,6 +231,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { usePdfTemplates } from '~/composables/usePdfTemplates'
 import type { PdfTemplateList } from '~/composables/usePdfTemplates'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 definePageMeta({
   layout: 'default',

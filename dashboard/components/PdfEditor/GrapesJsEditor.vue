@@ -1,12 +1,48 @@
 <template>
-  <div>
-    <div ref="editorContainer" class="grapesjs-editor" />
+  <div class="grapesjs-wrapper">
+    <!-- Top Toolbar -->
+    <div class="gjs-editor-toolbar">
+      <div class="panel__devices"></div>
+      <div class="panel__basic-actions"></div>
+      <div class="panel__switcher"></div>
+    </div>
+
+    <!-- Main Editor Area -->
+    <div class="gjs-editor-container">
+      <!-- Left Sidebar - Blocks -->
+      <div class="gjs-left-sidebar">
+        <div class="gjs-sidebar-header">
+          <h3>{{ t('pdf_editor.blocks', 'Blocks') }}</h3>
+        </div>
+        <div id="blocks" class="gjs-blocks-container"></div>
+      </div>
+
+      <!-- Center Canvas -->
+      <div class="gjs-canvas-wrapper">
+        <div ref="editorContainer" class="grapesjs-editor" />
+      </div>
+
+      <!-- Right Sidebar - Panels -->
+      <div class="gjs-right-sidebar">
+        <div class="gjs-sidebar-header">
+          <h3>{{ t('pdf_editor.settings', 'Settings') }}</h3>
+        </div>
+        <div class="gjs-panels-container">
+          <div class="layers-container"></div>
+          <div class="styles-container"></div>
+          <div class="traits-container"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Editor } from 'grapesjs'
+
+const { t } = useI18n()
 
 interface Props {
   modelValue?: {
@@ -243,6 +279,102 @@ const initEditor = async () => {
       },
     })
 
+    // Add custom blocks for PDF templates
+    const blockManager = editor.BlockManager
+    
+    // Add custom text blocks
+    blockManager.add('heading-1', {
+      label: 'Heading 1',
+      category: 'Typography',
+      content: '<h1 style="font-size: 2em; font-weight: bold; margin: 0.5em 0;">Heading 1</h1>',
+    })
+    
+    blockManager.add('heading-2', {
+      label: 'Heading 2',
+      category: 'Typography',
+      content: '<h2 style="font-size: 1.5em; font-weight: bold; margin: 0.5em 0;">Heading 2</h2>',
+    })
+    
+    blockManager.add('paragraph', {
+      label: 'Paragraph',
+      category: 'Typography',
+      content: '<p style="margin: 0.5em 0;">Insert your text here...</p>',
+    })
+    
+    // Add layout blocks
+    blockManager.add('2-columns', {
+      label: '2 Columns',
+      category: 'Layout',
+      content: `
+        <div style="display: flex; gap: 1rem;">
+          <div style="flex: 1; padding: 1rem; border: 1px dashed #ccc;">Column 1</div>
+          <div style="flex: 1; padding: 1rem; border: 1px dashed #ccc;">Column 2</div>
+        </div>
+      `,
+    })
+    
+    blockManager.add('3-columns', {
+      label: '3 Columns',
+      category: 'Layout',
+      content: `
+        <div style="display: flex; gap: 1rem;">
+          <div style="flex: 1; padding: 1rem; border: 1px dashed #ccc;">Column 1</div>
+          <div style="flex: 1; padding: 1rem; border: 1px dashed #ccc;">Column 2</div>
+          <div style="flex: 1; padding: 1rem; border: 1px dashed #ccc;">Column 3</div>
+        </div>
+      `,
+    })
+    
+    // Add table block
+    blockManager.add('table', {
+      label: 'Table',
+      category: 'Layout',
+      content: `
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr>
+              <th style="border: 1px solid #ddd; padding: 8px; background: #f3f4f6;">Header 1</th>
+              <th style="border: 1px solid #ddd; padding: 8px; background: #f3f4f6;">Header 2</th>
+              <th style="border: 1px solid #ddd; padding: 8px; background: #f3f4f6;">Header 3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">Cell 1</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">Cell 2</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">Cell 3</td>
+            </tr>
+            <tr>
+              <td style="border: 1px solid #ddd; padding: 8px;">Cell 4</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">Cell 5</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">Cell 6</td>
+            </tr>
+          </tbody>
+        </table>
+      `,
+    })
+    
+    // Add variable block for dynamic data
+    blockManager.add('variable', {
+      label: 'Variable',
+      category: 'Dynamic',
+      content: '<span style="background: #fef3c7; padding: 2px 6px; border-radius: 3px; font-family: monospace;">{{ variable_name }}</span>',
+    })
+    
+    // Add divider
+    blockManager.add('divider', {
+      label: 'Divider',
+      category: 'Basic',
+      content: '<hr style="border: none; border-top: 1px solid #e5e7eb; margin: 1rem 0;" />',
+    })
+    
+    // Add image placeholder
+    blockManager.add('image-placeholder', {
+      label: 'Image',
+      category: 'Media',
+      content: '<div style="width: 200px; height: 150px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; border: 2px dashed #d1d5db; border-radius: 4px;"><span style="color: #9ca3af;">Image</span></div>',
+    })
+
     emit('editor:ready', editor)
   } catch (error) {
     console.error('Failed to initialize GrapesJS editor:', error)
@@ -314,11 +446,83 @@ watch(
 /* GrapesJS styles */
 @import 'grapesjs/dist/css/grapes.min.css';
 
-.grapesjs-editor {
+.grapesjs-wrapper {
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   overflow: hidden;
+  background: #f9fafb;
+}
+
+.gjs-editor-toolbar {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.gjs-editor-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.gjs-left-sidebar,
+.gjs-right-sidebar {
+  width: 250px;
+  background: #ffffff;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.gjs-right-sidebar {
+  border-right: none;
+  border-left: 1px solid #e5e7eb;
+}
+
+.gjs-sidebar-header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f9fafb;
+  flex-shrink: 0;
+}
+
+.gjs-sidebar-header h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gjs-blocks-container,
+.gjs-panels-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.gjs-canvas-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f3f4f6;
+}
+
+.grapesjs-editor {
+  width: 100%;
+  height: 100%;
+  flex: 1;
 }
 
 /* Custom panel styles */
@@ -349,17 +553,59 @@ watch(
 }
 
 /* Customize blocks panel */
+.gjs-block-category {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.gjs-block-category .gjs-title {
+  background: #f9fafb;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.gjs-blocks-c {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
 .gjs-block {
-  width: auto !important;
+  width: 100% !important;
+  min-height: 60px !important;
   padding: 0.75rem !important;
-  margin: 0.5rem !important;
+  margin: 0 !important;
   border-radius: 0.375rem !important;
   border: 1px solid #e5e7eb !important;
+  background: #ffffff !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
 }
 
 .gjs-block:hover {
   border-color: #3b82f6 !important;
+  background: #eff6ff !important;
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+.gjs-block__media {
+  margin-bottom: 0.25rem !important;
+}
+
+.gjs-block-label {
+  font-size: 0.75rem !important;
+  color: #374151 !important;
+  font-weight: 500 !important;
+  text-align: center !important;
 }
 
 /* Canvas styles */

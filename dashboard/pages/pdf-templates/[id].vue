@@ -216,8 +216,7 @@
               variant="ghost"
               size="sm"
               icon="i-heroicons-arrow-down-tray"
-              :to="downloadPdf(row.id)"
-              target="_blank"
+              @click="handleDownload(row.id, row.filename)"
             >
               Download
             </UButton>
@@ -450,6 +449,23 @@ const formatFileSize = (bytes?: number) => {
   if (bytes === 0) return '0 Bytes'
   const i = Math.floor(Math.log(bytes) / Math.log(1024))
   return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i]
+}
+
+const handleDownload = async (pdfId: string, filename: string) => {
+  try {
+    await downloadPdf(pdfId, filename)
+    toast.add({
+      title: 'Success',
+      description: 'PDF downloaded successfully',
+      color: 'green',
+    })
+  } catch (error: any) {
+    toast.add({
+      title: 'Error',
+      description: error.message || 'Failed to download PDF',
+      color: 'red',
+    })
+  }
 }
 
 // Lifecycle

@@ -93,8 +93,7 @@ export interface GeneratedPdfList {
 }
 
 export const usePdfTemplates = () => {
-  const config = useRuntimeConfig()
-  const { $fetch } = useNuxtApp()
+  const { authenticatedFetch } = useAuthenticatedFetch()
 
   /**
    * List PDF templates with filters
@@ -107,7 +106,7 @@ export const usePdfTemplates = () => {
     is_public?: boolean
     search?: string
   }) => {
-    return await $fetch('/api/v1/pdf-templates/templates', {
+    return await authenticatedFetch('/api/v1/pdf-templates/templates', {
       method: 'GET',
       params,
     })
@@ -117,7 +116,7 @@ export const usePdfTemplates = () => {
    * Get template by ID
    */
   const getTemplate = async (templateId: string): Promise<PdfTemplateDetail> => {
-    return await $fetch(`/api/v1/pdf-templates/templates/${templateId}`, {
+    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}`, {
       method: 'GET',
     })
   }
@@ -141,7 +140,7 @@ export const usePdfTemplates = () => {
     page_orientation?: string
     tenant_id?: number
   }): Promise<PdfTemplate> => {
-    return await $fetch('/api/v1/pdf-templates/templates', {
+    return await authenticatedFetch('/api/v1/pdf-templates/templates', {
       method: 'POST',
       body: data,
     })
@@ -170,7 +169,7 @@ export const usePdfTemplates = () => {
     }>,
     createVersion: boolean = true
   ): Promise<PdfTemplate> => {
-    return await $fetch(`/api/v1/pdf-templates/templates/${templateId}`, {
+    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}`, {
       method: 'PUT',
       body: data,
       params: { create_version: createVersion },
@@ -181,7 +180,7 @@ export const usePdfTemplates = () => {
    * Delete template
    */
   const deleteTemplate = async (templateId: string): Promise<void> => {
-    return await $fetch(`/api/v1/pdf-templates/templates/${templateId}`, {
+    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}`, {
       method: 'DELETE',
     })
   }
@@ -197,7 +196,7 @@ export const usePdfTemplates = () => {
       include_versions?: boolean
     }
   ): Promise<PdfTemplate> => {
-    return await $fetch(`/api/v1/pdf-templates/templates/${templateId}/duplicate`, {
+    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}/duplicate`, {
       method: 'POST',
       body: data,
     })
@@ -210,7 +209,7 @@ export const usePdfTemplates = () => {
     templateId: string,
     params?: { skip?: number; limit?: number }
   ) => {
-    return await $fetch(`/api/v1/pdf-templates/templates/${templateId}/versions`, {
+    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}/versions`, {
       method: 'GET',
       params,
     })
@@ -223,7 +222,7 @@ export const usePdfTemplates = () => {
     templateId: string,
     versionNumber: number
   ): Promise<PdfTemplateVersion> => {
-    return await $fetch(
+    return await authenticatedFetch(
       `/api/v1/pdf-templates/templates/${templateId}/versions/${versionNumber}`,
       {
         method: 'GET',
@@ -243,7 +242,7 @@ export const usePdfTemplates = () => {
       expires_in_days?: number
     }
   ) => {
-    return await $fetch(`/api/v1/pdf-templates/templates/${templateId}/generate`, {
+    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}/generate`, {
       method: 'POST',
       body: data,
     })
@@ -252,8 +251,30 @@ export const usePdfTemplates = () => {
   /**
    * Download generated PDF
    */
-  const downloadPdf = (pdfId: string): string => {
-    return `/api/v1/pdf-templates/downloads/${pdfId}`
+  const downloadPdf = async (pdfId: string, filename?: string) => {
+    try {
+      // Use authenticatedFetch with blob response type
+      const blob = await authenticatedFetch<Blob>(
+        `/api/v1/pdf-templates/downloads/${pdfId}`,
+        {
+          method: 'GET',
+          responseType: 'blob',
+        }
+      )
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename || `document-${pdfId}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (error: any) {
+      // Handle error response
+      throw new Error(error.data?.detail || error.message || 'Failed to download PDF')
+    }
   }
 
   /**
@@ -264,7 +285,7 @@ export const usePdfTemplates = () => {
     limit?: number
     template_id?: string
   }) => {
-    return await $fetch('/api/v1/pdf-templates/generated', {
+    return await authenticatedFetch('/api/v1/pdf-templates/generated', {
       method: 'GET',
       params,
     })
@@ -274,7 +295,7 @@ export const usePdfTemplates = () => {
    * Get template categories
    */
   const getCategories = async (): Promise<string[]> => {
-    return await $fetch('/api/v1/pdf-templates/categories', {
+    return await authenticatedFetch('/api/v1/pdf-templates/categories', {
       method: 'GET',
     })
   }
@@ -289,7 +310,7 @@ export const usePdfTemplates = () => {
       sample_data?: Record<string, any>
     }
   ) => {
-    return await $fetch(`/api/v1/pdf-templates/templates/${templateId}/data-mapping`, {
+    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}/data-mapping`, {
       method: 'PUT',
       body: data,
     })
