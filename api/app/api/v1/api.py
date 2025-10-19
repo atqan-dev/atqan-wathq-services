@@ -12,6 +12,7 @@ from app.api.v1.endpoints import (
     management_auth,
     notifications,
     password_reset,
+    pdf_templates,
     permissions,
     request_analytics,
     roles,
@@ -83,4 +84,11 @@ api_router.include_router(
     request_analytics.router,
     prefix="/management/analytics",
     tags=["request-analytics"]
+)
+
+# PDF Templates endpoints - for management users only
+api_router.include_router(
+    pdf_templates.router,
+    prefix="/pdf-templates",
+    tags=["pdf-templates"]
 )

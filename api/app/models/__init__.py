@@ -14,9 +14,14 @@ from .permission import Permission, Role
 from .service import Service, TenantService
 from .tenant import Tenant
 from .user import User
+from .api_request_counter import (
+    ApiRequestCounter,
+    ApiRequestSummary,
+    RequestType,
+)
+from .pdf_template import GeneratedPdf, PdfTemplate, PdfTemplateVersion
 from .wathq_call_log import WathqCallLog
 from .wathq_offline_data import WathqOfflineData
-from .api_request_counter import ApiRequestCounter, ApiRequestSummary, RequestType
 
 __all__ = [
     "User",
@@ -35,5 +40,8 @@ __all__ = [
     "NotificationType",
     "ApiRequestCounter",
     "ApiRequestSummary",
-    "RequestType"
+    "RequestType",
+    "PdfTemplate",
+    "PdfTemplateVersion",
+    "GeneratedPdf",
 ]
