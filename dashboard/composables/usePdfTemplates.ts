@@ -92,6 +92,27 @@ export interface GeneratedPdfList {
   expires_at?: string
 }
 
+export interface PdfTemplateListResponse {
+  templates: PdfTemplateList[]
+  total: number
+  skip: number
+  limit: number
+}
+
+export interface PdfTemplateVersionListResponse {
+  versions: PdfTemplateVersion[]
+  total: number
+  skip: number
+  limit: number
+}
+
+export interface GeneratedPdfListResponse {
+  pdfs: GeneratedPdfList[]
+  total: number
+  skip: number
+  limit: number
+}
+
 export const usePdfTemplates = () => {
   const { authenticatedFetch } = useAuthenticatedFetch()
 
@@ -105,8 +126,8 @@ export const usePdfTemplates = () => {
     is_active?: boolean
     is_public?: boolean
     search?: string
-  }) => {
-    return await authenticatedFetch('/api/v1/pdf-templates/templates', {
+  }): Promise<PdfTemplateListResponse> => {
+    return await authenticatedFetch<PdfTemplateListResponse>('/api/v1/pdf-templates/templates', {
       method: 'GET',
       params,
     })
@@ -208,8 +229,8 @@ export const usePdfTemplates = () => {
   const listVersions = async (
     templateId: string,
     params?: { skip?: number; limit?: number }
-  ) => {
-    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}/versions`, {
+  ): Promise<PdfTemplateVersionListResponse> => {
+    return await authenticatedFetch<PdfTemplateVersionListResponse>(`/api/v1/pdf-templates/templates/${templateId}/versions`, {
       method: 'GET',
       params,
     })
@@ -241,8 +262,8 @@ export const usePdfTemplates = () => {
       use_version?: number
       expires_in_days?: number
     }
-  ) => {
-    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}/generate`, {
+  ): Promise<GeneratedPdf> => {
+    return await authenticatedFetch<GeneratedPdf>(`/api/v1/pdf-templates/templates/${templateId}/generate`, {
       method: 'POST',
       body: data,
     })
@@ -251,7 +272,7 @@ export const usePdfTemplates = () => {
   /**
    * Download generated PDF
    */
-  const downloadPdf = async (pdfId: string, filename?: string) => {
+  const downloadPdf = async (pdfId: string, filename?: string): Promise<void> => {
     try {
       // Use authenticatedFetch with blob response type
       const blob = await authenticatedFetch<Blob>(
@@ -284,8 +305,8 @@ export const usePdfTemplates = () => {
     skip?: number
     limit?: number
     template_id?: string
-  }) => {
-    return await authenticatedFetch('/api/v1/pdf-templates/generated', {
+  }): Promise<GeneratedPdfListResponse> => {
+    return await authenticatedFetch<GeneratedPdfListResponse>('/api/v1/pdf-templates/generated', {
       method: 'GET',
       params,
     })
@@ -295,7 +316,7 @@ export const usePdfTemplates = () => {
    * Get template categories
    */
   const getCategories = async (): Promise<string[]> => {
-    return await authenticatedFetch('/api/v1/pdf-templates/categories', {
+    return await authenticatedFetch<string[]>('/api/v1/pdf-templates/categories', {
       method: 'GET',
     })
   }
@@ -309,8 +330,8 @@ export const usePdfTemplates = () => {
       data_mapping: Record<string, any>
       sample_data?: Record<string, any>
     }
-  ) => {
-    return await authenticatedFetch(`/api/v1/pdf-templates/templates/${templateId}/data-mapping`, {
+  ): Promise<PdfTemplate> => {
+    return await authenticatedFetch<PdfTemplate>(`/api/v1/pdf-templates/templates/${templateId}/data-mapping`, {
       method: 'PUT',
       body: data,
     })

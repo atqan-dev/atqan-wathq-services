@@ -142,6 +142,7 @@ class PdfGeneratorService:
     ) -> str:
         """
         Render Jinja2 template with provided data.
+        Supports both {variable} and {{ variable }} syntax.
 
         Args:
             html_content: HTML template with Jinja2 placeholders
@@ -150,6 +151,18 @@ class PdfGeneratorService:
         Returns:
             Rendered HTML
         """
+        import re
+        
+        # Convert single curly braces {var} to double {{ var }}
+        # This regex looks for {word} but not {{ or }}
+        def replace_single_braces(match):
+            var_name = match.group(1)
+            return f"{{{{ {var_name} }}}}"
+        
+        # Replace {variable} with {{ variable }} (but not already doubled)
+        html_content = re.sub(r'(?<!\{)\{([a-zA-Z_][a-zA-Z0-9_]*)\}(?!\})', replace_single_braces, html_content)
+        
+        # Now render with Jinja2
         template = Template(html_content)
         return template.render(**data)
 

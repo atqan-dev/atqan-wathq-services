@@ -10,10 +10,10 @@
         />
         <div>
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-            {{ isEdit ? $t('pdf_templates.edit_template', 'Edit Template') : $t('pdf_templates.create_template', 'Create Template') }}
+            {{ isEdit ? t('pdf_templates.edit_template', 'Edit Template') : t('pdf_templates.create_template', 'Create Template') }}
           </h1>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {{ $t('pdf_templates.editor_description', 'Design your PDF template using the visual editor') }}
+            {{ t('pdf_templates.editor_description', 'Design your PDF template using the visual editor') }}
           </p>
         </div>
       </div>
@@ -24,7 +24,7 @@
           icon="i-heroicons-eye"
           @click="previewTemplate"
         >
-          {{ $t('common.preview', 'Preview') }}
+          {{ t('common.preview', 'Preview') }}
         </UButton>
         
         <UButton
@@ -32,7 +32,7 @@
           :loading="saving"
           @click="saveTemplate"
         >
-          {{ $t('common.save', 'Save') }}
+          {{ t('common.save', 'Save') }}
         </UButton>
       </div>
     </div>
@@ -41,7 +41,7 @@
     <UCard>
       <template #header>
         <h3 class="text-lg font-semibold">
-          {{ $t('pdf_templates.settings', 'Template Settings') }}
+          {{ t('pdf_templates.settings', 'Template Settings') }}
         </h3>
       </template>
 
@@ -62,7 +62,7 @@
           label="Slug"
           required
           :error="errors.slug"
-          :help="$t('pdf_templates.slug_help', 'URL-friendly identifier')"
+          :help="t('pdf_templates.slug_help', 'URL-friendly identifier')"
         >
           <UInput
             v-model="form.slug"
@@ -125,7 +125,7 @@
       <template #header>
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-semibold">
-            {{ $t('pdf_templates.visual_editor', 'Visual Editor') }}
+            {{ t('pdf_templates.visual_editor', 'Visual Editor') }}
           </h3>
           
           <div class="flex gap-2">
@@ -180,7 +180,7 @@
         <UButton
           @click="updateFromCode"
         >
-          {{ $t('common.apply', 'Apply Changes') }}
+          {{ t('common.apply', 'Apply Changes') }}
         </UButton>
       </div>
     </UCard>
@@ -189,9 +189,9 @@
     <UCard>
       <template #header>
         <h3 class="text-lg font-semibold">
-          {{ $t('pdf_templates.data_mapping', 'Data Mapping') }}
+          {{ t('pdf_templates.data_mapping', 'Data Mapping') }}
           <span class="text-sm font-normal text-gray-500">
-            ({{ $t('common.optional', 'Optional') }})
+            ({{ t('common.optional', 'Optional') }})
           </span>
         </h3>
       </template>
@@ -227,7 +227,7 @@
         <template #header>
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold">
-              {{ $t('common.preview', 'Preview') }}
+              {{ t('common.preview', 'Preview') }}
             </h3>
             <UButton
               variant="ghost"
@@ -248,7 +248,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { usePdfTemplates } from '~/composables/usePdfTemplates'
+import { useI18n } from 'vue-i18n'
+import { navigateTo } from '#app'
 
+const { t } = useI18n()
 definePageMeta({
   layout: 'default',
   middleware: 'auth',

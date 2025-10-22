@@ -232,6 +232,7 @@ import { ref, onMounted, computed } from 'vue'
 import { usePdfTemplates } from '~/composables/usePdfTemplates'
 import type { PdfTemplateList } from '~/composables/usePdfTemplates'
 import { useI18n } from 'vue-i18n'
+import { navigateTo } from '#app'
 
 const { t } = useI18n()
 
