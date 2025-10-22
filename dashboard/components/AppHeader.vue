@@ -332,7 +332,7 @@
             class="flex items-center"
             :class="isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'"
           >
-            <!-- <ThemeToggle /> -->
+            <ThemeToggle />
             <LanguageToggle />
           </div>
         </nav>

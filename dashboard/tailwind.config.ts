@@ -7,6 +7,7 @@ import type { Config } from 'tailwindcss'
 // Shades are approximations to enable utilities like hover, ring, etc.
 
 export default <Partial<Config>>({
+  darkMode: 'class',
   content: [
     './components/**/*.{vue,js,ts}',
     './layouts/**/*.vue',
