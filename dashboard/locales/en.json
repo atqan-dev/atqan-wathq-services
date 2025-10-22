@@ -458,7 +458,7 @@
       "namePlaceholder": "Enter tenant name (English only)",
       "nameEnglishOnly": "Name must contain only English letters, numbers, and basic symbols (-, _, &)",
       "nameAr": "Arabic Name",
-      "nameArPlaceholder": "أدخل اسم المستأجر بالعربية",
+      "nameArPlaceholder": "أدخل اسم التطبيق بالعربية",
       "nameArHelp": "Arabic name for RTL display (optional)",
       "slug": "Slug",
       "slugPlaceholder": "tenant-slug",

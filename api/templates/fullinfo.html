@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تقرير السجل التجاري الكامل</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 100px 40px 100px 40px;
+    }
+    body {
+      font-family: "Tahoma", "Arial", sans-serif;
+      direction: rtl;
+      color: #222;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    header {
+      position: fixed;
+      top: -80px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      text-align: center;
+      border-bottom: 2px solid #004aad;
+      padding-bottom: 5px;
+    }
+
+    header img {
+      height: 40px;
+      vertical-align: middle;
+    }
+
+    header h1 {
+      display: inline-block;
+      margin: 0;
+      font-size: 18px;
+      color: #004aad;
+    }
+
+    footer {
+      position: fixed;
+      bottom: -80px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      text-align: center;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .content {
+      margin-top: 20px;
+    }
+
+    h2.section-title {
+      background-color: #004aad;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 15px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: right;
+      vertical-align: top;
+      font-size: 12px;
+    }
+
+    table th {
+      background-color: #f2f6ff;
+      color: #004aad;
+      width: 30%;
+      font-weight: bold;
+    }
+
+    .info-grid {
+      display: table;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .info-row {
+      display: table-row;
+    }
+
+    .info-cell {
+      display: table-cell;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      font-size: 12px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #004aad;
+      width: 30%;
+    }
+
+    .two-column {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .footer-text {
+      margin-top: 10px;
+    }
+
+    .page-number:after {
+      content: counter(page);
+    }
+
+    .highlight {
+      background-color: #fff3cd;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Saudi_Arabia_Logo.svg" alt="Logo">
+    <h1>تقرير السجل التجاري الكامل</h1>
+  </header>
+
+  <footer>
+    <div class="footer-text">
+      <span>تم إنشاء التقرير بواسطة نظام إدارة السجلات التجارية</span><br>
+      <span>صفحة <span class="page-number"></span></span>
+    </div>
+  </footer>
+
+  <main class="content">
+    <!-- معلومات أساسية -->
+    <section>
+      <h2 class="section-title">معلومات أساسية</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">الاسم التجاري</div><div class="info-cell" id="name"></div></div>
+        <div class="info-row"><div class="info-cell info-label">رقم السجل التجاري</div><div class="info-cell" id="crNumber"></div></div>
+        <div class="info-row"><div class="info-cell info-label">الرقم الوطني</div><div class="info-cell" id="crNationalNumber"></div></div>
+        <div class="info-row"><div class="info-cell info-label">رقم الإصدار</div><div class="info-cell" id="versionNo"></div></div>
+        <div class="info-row"><div class="info-cell info-label">نوع المنشأة</div><div class="info-cell" id="entityType"></div></div>
+        <div class="info-row"><div class="info-cell info-label">الشكل القانوني</div><div class="info-cell" id="legalForm"></div></div>
+        <div class="info-row"><div class="info-cell info-label">الحالة</div><div class="info-cell" id="status"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ الإصدار (ميلادي)</div><div class="info-cell" id="issueDateGregorian"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ الإصدار (هجري)</div><div class="info-cell" id="issueDateHijri"></div></div>
+        <div class="info-row"><div class="info-cell info-label">مدة الشركة (سنة)</div><div class="info-cell" id="companyDuration"></div></div>
+        <div class="info-row"><div class="info-cell info-label">رأس المال</div><div class="info-cell" id="crCapital"></div></div>
+        <div class="info-row"><div class="info-cell info-label">المدينة الرئيسية</div><div class="info-cell" id="headquarterCityName"></div></div>
+        <div class="info-row"><div class="info-cell info-label">الجنسية</div><div class="info-cell" id="partnersNationality"></div></div>
+      </div>
+    </section>
+
+    <!-- تواريخ مهمة -->
+    <section>
+      <h2 class="section-title">التواريخ المهمة</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">تاريخ التأكيد (ميلادي)</div><div class="info-cell" id="confirmationDateGregorian"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ التأكيد (هجري)</div><div class="info-cell" id="confirmationDateHijri"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ إعادة التفعيل (ميلادي)</div><div class="info-cell" id="reactivationDateGregorian"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ إعادة التفعيل (هجري)</div><div class="info-cell" id="reactivationDateHijri"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ التعليق (ميلادي)</div><div class="info-cell" id="suspensionDateGregorian"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ التعليق (هجري)</div><div class="info-cell" id="suspensionDateHijri"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ الحذف (ميلادي)</div><div class="info-cell" id="deletionDateGregorian"></div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ الحذف (هجري)</div><div class="info-cell" id="deletionDateHijri"></div></div>
+      </div>
+    </section>
+
+    <!-- معلومات الاتصال -->
+    <section>
+      <h2 class="section-title">معلومات الاتصال</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">رقم الهاتف</div><div class="info-cell" id="phoneNo"></div></div>
+        <div class="info-row"><div class="info-cell info-label">رقم الجوال</div><div class="info-cell" id="mobileNo"></div></div>
+        <div class="info-row"><div class="info-cell info-label">البريد الإلكتروني</div><div class="info-cell" id="email"></div></div>
+        <div class="info-row"><div class="info-cell info-label">الموقع الإلكتروني</div><div class="info-cell" id="websiteUrl"></div></div>
+      </div>
+    </section>
+
+    <!-- رأس المال -->
+    <section>
+      <h2 class="section-title">تفاصيل رأس المال</h2>
+      <div class="two-column">
+        <div class="col">
+          <h3 style="color: #004aad; margin-bottom: 10px;">رأس المال المدفوع</h3>
+          <div class="info-grid">
+            <div class="info-row"><div class="info-cell info-label">العملة</div><div class="info-cell" id="currencyName"></div></div>
+            <div class="info-row"><div class="info-cell info-label">نوع المساهمة</div><div class="info-cell" id="contributionTypeName"></div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال النقدي</div><div class="info-cell" id="cashCapital"></div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال العيني</div><div class="info-cell" id="inKindCapital"></div></div>
+            <div class="info-row"><div class="info-cell info-label">إجمالي المساهمة النقدية</div><div class="info-cell" id="totalCashContribution"></div></div>
+            <div class="info-row"><div class="info-cell info-label">إجمالي المساهمة العينية</div><div class="info-cell" id="totalInKindContribution"></div></div>
+          </div>
+        </div>
+        <div class="col">
+          <h3 style="color: #004aad; margin-bottom: 10px;">رأس المال السهمي</h3>
+          <div class="info-grid">
+            <div class="info-row"><div class="info-cell info-label">نوع رأس المال السهمي</div><div class="info-cell" id="stockTypeName"></div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال المعلن</div><div class="info-cell" id="announcedCapital"></div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال المدفوع</div><div class="info-cell" id="paidCapital"></div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال النقدي</div><div class="info-cell" id="stockCashCapital"></div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال العيني</div><div class="info-cell" id="stockInKindCapital"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- الأسهم -->
+    <section>
+      <h2 class="section-title">تفاصيل الأسهم</h2>
+      <table id="stocksTable">
+        <tr><th>عدد الأسهم</th><th>قيمة السهم</th><th>نوع السهم</th><th>الفئة</th></tr>
+      </table>
+    </section>
+
+    <!-- معلومات الترخيص -->
+    <section>
+      <h2 class="section-title">معلومات الترخيص</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">مرخص من</div><div class="info-cell" id="licenseBased"></div></div>
+        <div class="info-row"><div class="info-cell info-label">رقم الترخيص الوطني</div><div class="info-cell" id="licenseIssuerNationalNumber"></div></div>
+        <div class="info-row"><div class="info-cell info-label">اسم المرخص</div><div class="info-cell" id="licenseIssuerName"></div></div>
+      </div>
+    </section>
+
+    <!-- السنة المالية -->
+    <section>
+      <h2 class="section-title">السنة المالية</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">أول سنة مالية</div><div class="info-cell" id="isFirst"></div></div>
+        <div class="info-row"><div class="info-cell info-label">نوع التقويم</div><div class="info-cell" id="calendarTypeName"></div></div>
+        <div class="info-row"><div class="info-cell info-label">نهاية الشهر</div><div class="info-cell" id="endMonth"></div></div>
+        <div class="info-row"><div class="info-cell info-label">نهاية اليوم</div><div class="info-cell" id="endDay"></div></div>
+        <div class="info-row"><div class="info-cell info-label">نهاية السنة</div><div class="info-cell" id="endYear"></div></div>
+      </div>
+    </section>
+
+    <!-- التجارة الإلكترونية -->
+    <section>
+      <h2 class="section-title">التجارة الإلكترونية</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">متوفر</div><div class="info-cell" id="hasEcommerce"></div></div>
+        <div class="info-row"><div class="info-cell info-label">رابط المتجر</div><div class="info-cell" id="storeUrl"></div></div>
+        <div class="info-row"><div class="info-cell info-label">منصة المصادقة</div><div class="info-cell" id="authenticationPlatformUrl"></div></div>
+      </div>
+      <h3 style="color: #004aad; margin: 15px 0 10px 0;">أنشطة المتجر</h3>
+      <table id="storeActivitiesTable">
+        <tr><th>رقم النشاط</th><th>اسم النشاط</th></tr>
+      </table>
+    </section>
+
+    <!-- الأنشطة التجارية -->
+    <section>
+      <h2 class="section-title">الأنشطة التجارية</h2>
+      <table id="activitiesTable">
+        <tr><th>رقم النشاط</th><th>اسم النشاط</th></tr>
+      </table>
+    </section>
+
+    <!-- الشركاء -->
+    <section>
+      <h2 class="section-title">الشركاء</h2>
+      <table id="partnersTable">
+        <tr><th>الاسم</th><th>نوع الشريك</th><th>رقم الهوية</th><th>نوع الهوية</th><th>المساهمة النقدية</th><th>المساهمة العينية</th><th>إجمالي المساهمة</th></tr>
+      </table>
+    </section>
+
+    <!-- الإدارة -->
+    <section>
+      <h2 class="section-title">هيكل الإدارة</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">هيكل الإدارة</div><div class="info-cell" id="managementStructure"></div></div>
+      </div>
+      <h3 style="color: #004aad; margin: 15px 0 10px 0;">المديرون</h3>
+      <table id="managersTable">
+        <tr><th>الاسم</th><th>رقم الهوية</th><th>نوع الهوية</th><th>الجنسية</th><th>المناصب</th><th>مرخص</th></tr>
+      </table>
+    </section>
+  </main>
+
+  <script>
+    const data = JSON.parse(`REPLACE_JSON_DATA`);
+
+    // معلومات أساسية
+    document.getElementById('name').textContent = data.name || '';
+    document.getElementById('crNumber').textContent = data.crNumber || '';
+    document.getElementById('crNationalNumber').textContent = data.crNationalNumber || '';
+    document.getElementById('versionNo').textContent = data.versionNo || '';
+    document.getElementById('entityType').textContent = data.entityType ? `${data.entityType.name} (${data.entityType.formName})` : '';
+    document.getElementById('legalForm').textContent = data.entityType ? data.entityType.formName : '';
+    document.getElementById('status').textContent = data.status ? data.status.name : '';
+    document.getElementById('issueDateGregorian').textContent = data.issueDateGregorian || '';
+    document.getElementById('issueDateHijri').textContent = data.issueDateHijri || '';
+    document.getElementById('companyDuration').textContent = data.companyDuration || '';
+    document.getElementById('crCapital').textContent = data.crCapital ? data.crCapital.toLocaleString() : '';
+    document.getElementById('headquarterCityName').textContent = data.headquarterCityName || '';
+    document.getElementById('partnersNationality').textContent = data.PartnersNationalityName || '';
+
+    // التواريخ المهمة
+    document.getElementById('confirmationDateGregorian').textContent = data.confirmationDate?.gregorian || '';
+    document.getElementById('confirmationDateHijri').textContent = data.confirmationDate?.hijri || '';
+    document.getElementById('reactivationDateGregorian').textContent = data.reactivationDate?.gregorian || '';
+    document.getElementById('reactivationDateHijri').textContent = data.reactivationDate?.hijri || '';
+    document.getElementById('suspensionDateGregorian').textContent = data.suspensionDate?.gregorian || '';
+    document.getElementById('suspensionDateHijri').textContent = data.suspensionDate?.hijri || '';
+    document.getElementById('deletionDateGregorian').textContent = data.deletionDate?.gregorian || '';
+    document.getElementById('deletionDateHijri').textContent = data.deletionDate?.hijri || '';
+
+    // معلومات الاتصال
+    document.getElementById('phoneNo').textContent = data.contactInfo?.phoneNo || '';
+    document.getElementById('mobileNo').textContent = data.contactInfo?.mobileNo || '';
+    document.getElementById('email').textContent = data.contactInfo?.email || '';
+    document.getElementById('websiteUrl').textContent = data.contactInfo?.websiteUrl || '';
+
+    // رأس المال
+    document.getElementById('currencyName').textContent = data.capital?.currencyName || '';
+    document.getElementById('contributionTypeName').textContent = data.capital?.contributionCapital?.typeName || '';
+    document.getElementById('cashCapital').textContent = data.capital?.contributionCapital?.cashCapital ? data.capital.contributionCapital.cashCapital.toLocaleString() : '';
+    document.getElementById('inKindCapital').textContent = data.capital?.contributionCapital?.inKindCapital ? data.capital.contributionCapital.inKindCapital.toLocaleString() : '';
+    document.getElementById('totalCashContribution').textContent = data.capital?.contributionCapital?.totalCashContribution ? data.capital.contributionCapital.totalCashContribution.toLocaleString() : '';
+    document.getElementById('totalInKindContribution').textContent = data.capital?.contributionCapital?.totalInKindContribution ? data.capital.contributionCapital.totalInKindContribution.toLocaleString() : '';
+
+    // رأس المال السهمي
+    document.getElementById('stockTypeName').textContent = data.capital?.stockCapital?.typeName || '';
+    document.getElementById('announcedCapital').textContent = data.capital?.stockCapital?.announcedCapital ? data.capital.stockCapital.announcedCapital.toLocaleString() : '';
+    document.getElementById('paidCapital').textContent = data.capital?.stockCapital?.paidCapital ? data.capital.stockCapital.paidCapital.toLocaleString() : '';
+    document.getElementById('stockCashCapital').textContent = data.capital?.stockCapital?.cashCapital ? data.capital.stockCapital.cashCapital.toLocaleString() : '';
+    document.getElementById('stockInKindCapital').textContent = data.capital?.stockCapital?.inKindCapital ? data.capital.stockCapital.inKindCapital.toLocaleString() : '';
+
+    // الأسهم
+    const stocksTable = document.getElementById('stocksTable');
+    if (data.capital?.stockCapital?.stocks) {
+      data.capital.stockCapital.stocks.forEach(stock => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${stock.count || ''}</td>
+          <td>${stock.value || ''}</td>
+          <td>${stock.typeName || ''}</td>
+          <td>${stock.className || ''}</td>
+        `;
+        stocksTable.appendChild(row);
+      });
+    }
+
+    // معلومات الترخيص
+    document.getElementById('licenseBased').textContent = data.isLicenseBased ? 'نعم' : 'لا';
+    document.getElementById('licenseIssuerNationalNumber').textContent = data.licenseIssuerNationalNumber || '';
+    document.getElementById('licenseIssuerName').textContent = data.licenseIssuerName || '';
+
+    // السنة المالية
+    document.getElementById('isFirst').textContent = data.fiscalYear?.isFirst ? 'نعم' : 'لا';
+    document.getElementById('calendarTypeName').textContent = data.fiscalYear?.calendarTypeName || '';
+    document.getElementById('endMonth').textContent = data.fiscalYear?.endMonth || '';
+    document.getElementById('endDay').textContent = data.fiscalYear?.endDay || '';
+    document.getElementById('endYear').textContent = data.fiscalYear?.endYear || '';
+
+    // التجارة الإلكترونية
+    document.getElementById('hasEcommerce').textContent = data.hasEcommerce ? 'نعم' : 'لا';
+    document.getElementById('storeUrl').textContent = data.eCommerce?.eStore?.[0]?.storeUrl || '';
+    document.getElementById('authenticationPlatformUrl').textContent = data.eCommerce?.eStore?.[0]?.authenticationPlatformUrl || '';
+
+    // أنشطة المتجر
+    const storeActivitiesTable = document.getElementById('storeActivitiesTable');
+    if (data.eCommerce?.eStore?.[0]?.storeActivities) {
+      data.eCommerce.eStore[0].storeActivities.forEach(activity => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${activity.id}</td><td>${activity.name}</td>`;
+        storeActivitiesTable.appendChild(row);
+      });
+    }
+
+    // الأنشطة التجارية
+    const activitiesTable = document.getElementById('activitiesTable');
+    if (data.activities) {
+      data.activities.forEach(activity => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${activity.id}</td><td>${activity.name}</td>`;
+        activitiesTable.appendChild(row);
+      });
+    }
+
+    // الشركاء
+    const partnersTable = document.getElementById('partnersTable');
+    if (data.parties) {
+      data.parties.forEach(party => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${party.name || ''}</td>
+          <td>${party.typeName || ''}</td>
+          <td>${party.identity?.id || ''}</td>
+          <td>${party.identity?.typeName || ''}</td>
+          <td>${party.partnerShare?.cashContributionCount || 0}</td>
+          <td>${party.partnerShare?.inKindContributionCount || 0}</td>
+          <td>${party.partnerShare?.totalContributionCount || 0}</td>
+        `;
+        partnersTable.appendChild(row);
+      });
+    }
+
+    // الإدارة
+    document.getElementById('managementStructure').textContent = data.management?.structureName || '';
+
+    // المديرون
+    const managersTable = document.getElementById('managersTable');
+    if (data.management?.managers) {
+      data.management.managers.forEach(manager => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${manager.name || ''}</td>
+          <td>${manager.identity?.id || ''}</td>
+          <td>${manager.identity?.typeName || ''}</td>
+          <td>${manager.nationality?.name || ''}</td>
+          <td>${manager.positions?.map(p => p.name).join(', ') || ''}</td>
+          <td>${manager.isLicensed ? 'نعم' : 'لا'}</td>
+        `;
+        managersTable.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Service Header -->
       <div class="mb-8">
         <div class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">

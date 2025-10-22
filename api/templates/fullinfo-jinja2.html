@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تقرير السجل التجاري الكامل</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 100px 40px 100px 40px;
+    }
+    body {
+      font-family: "Tahoma", "Arial", sans-serif;
+      direction: rtl;
+      color: #222;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    header {
+      position: fixed;
+      top: -80px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      text-align: center;
+      border-bottom: 2px solid #004aad;
+      padding-bottom: 5px;
+    }
+
+    header img {
+      height: 40px;
+      vertical-align: middle;
+    }
+
+    header h1 {
+      display: inline-block;
+      margin: 0;
+      font-size: 18px;
+      color: #004aad;
+    }
+
+    footer {
+      position: fixed;
+      bottom: -80px;
+      left: 0;
+      right: 0;
+      height: 60px;
+      text-align: center;
+      border-top: 1px solid #ddd;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .content {
+      margin-top: 20px;
+    }
+
+    h2.section-title {
+      background-color: #004aad;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 15px;
+      margin-top: 30px;
+      margin-bottom: 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+
+    table th, table td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: right;
+      vertical-align: top;
+      font-size: 12px;
+    }
+
+    table th {
+      background-color: #f2f6ff;
+      color: #004aad;
+      width: 30%;
+      font-weight: bold;
+    }
+
+    .info-grid {
+      display: table;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .info-row {
+      display: table-row;
+    }
+
+    .info-cell {
+      display: table-cell;
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+      font-size: 12px;
+    }
+
+    .info-label {
+      font-weight: bold;
+      color: #004aad;
+      width: 30%;
+    }
+
+    .two-column {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 240px;
+    }
+
+    .footer-text {
+      margin-top: 10px;
+    }
+
+    .page-number:after {
+      content: counter(page);
+    }
+
+    .highlight {
+      background-color: #fff3cd;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Saudi_Arabia_Logo.svg" alt="Logo">
+    <h1>تقرير السجل التجاري الكامل</h1>
+  </header>
+
+  <footer>
+    <div class="footer-text">
+      <span>تم إنشاء التقرير بواسطة نظام إدارة السجلات التجارية</span><br>
+      <span>صفحة <span class="page-number"></span></span>
+    </div>
+  </footer>
+
+  <main class="content">
+    <!-- معلومات أساسية -->
+    <section>
+      <h2 class="section-title">معلومات أساسية</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">الاسم التجاري</div><div class="info-cell">{{ name or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">رقم السجل التجاري</div><div class="info-cell">{{ crNumber or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">الرقم الوطني</div><div class="info-cell">{{ crNationalNumber or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">رقم الإصدار</div><div class="info-cell">{{ versionNo or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">نوع المنشأة</div><div class="info-cell">{{ entityType.name + ' (' + entityType.formName + ')' if entityType else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">الشكل القانوني</div><div class="info-cell">{{ entityType.formName if entityType else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">الحالة</div><div class="info-cell">{{ status.name if status else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ الإصدار (ميلادي)</div><div class="info-cell">{{ issueDateGregorian or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ الإصدار (هجري)</div><div class="info-cell">{{ issueDateHijri or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">مدة الشركة (سنة)</div><div class="info-cell">{{ companyDuration or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">رأس المال</div><div class="info-cell">{{ "{:,.0f}".format(crCapital) if crCapital else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">المدينة الرئيسية</div><div class="info-cell">{{ headquarterCityName or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">الجنسية</div><div class="info-cell">{{ PartnersNationalityName or '' }}</div></div>
+      </div>
+    </section>
+
+    <!-- تواريخ مهمة -->
+    <section>
+      <h2 class="section-title">التواريخ المهمة</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">تاريخ التأكيد (ميلادي)</div><div class="info-cell">{{ confirmationDate.gregorian if confirmationDate else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ التأكيد (هجري)</div><div class="info-cell">{{ confirmationDate.hijri if confirmationDate else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ إعادة التفعيل (ميلادي)</div><div class="info-cell">{{ reactivationDate.gregorian if reactivationDate else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ إعادة التفعيل (هجري)</div><div class="info-cell">{{ reactivationDate.hijri if reactivationDate else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ التعليق (ميلادي)</div><div class="info-cell">{{ suspensionDate.gregorian if suspensionDate else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ التعليق (هجري)</div><div class="info-cell">{{ suspensionDate.hijri if suspensionDate else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ الحذف (ميلادي)</div><div class="info-cell">{{ deletionDate.gregorian if deletionDate else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">تاريخ الحذف (هجري)</div><div class="info-cell">{{ deletionDate.hijri if deletionDate else '' }}</div></div>
+      </div>
+    </section>
+
+    <!-- معلومات الاتصال -->
+    <section>
+      <h2 class="section-title">معلومات الاتصال</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">رقم الهاتف</div><div class="info-cell">{{ contactInfo.phoneNo if contactInfo else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">رقم الجوال</div><div class="info-cell">{{ contactInfo.mobileNo if contactInfo else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">البريد الإلكتروني</div><div class="info-cell">{{ contactInfo.email if contactInfo else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">الموقع الإلكتروني</div><div class="info-cell">{{ contactInfo.websiteUrl if contactInfo else '' }}</div></div>
+      </div>
+    </section>
+
+    <!-- رأس المال -->
+    <section>
+      <h2 class="section-title">تفاصيل رأس المال</h2>
+      <div class="two-column">
+        <div class="col">
+          <h3 style="color: #004aad; margin-bottom: 10px;">رأس المال المدفوع</h3>
+          <div class="info-grid">
+            <div class="info-row"><div class="info-cell info-label">العملة</div><div class="info-cell">{{ capital.currencyName if capital else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">نوع المساهمة</div><div class="info-cell">{{ capital.contributionCapital.typeName if capital and capital.contributionCapital else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال النقدي</div><div class="info-cell">{{ "{:,.0f}".format(capital.contributionCapital.cashCapital) if capital and capital.contributionCapital and capital.contributionCapital.cashCapital else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال العيني</div><div class="info-cell">{{ "{:,.0f}".format(capital.contributionCapital.inKindCapital) if capital and capital.contributionCapital and capital.contributionCapital.inKindCapital else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">إجمالي المساهمة النقدية</div><div class="info-cell">{{ "{:,.0f}".format(capital.contributionCapital.totalCashContribution) if capital and capital.contributionCapital and capital.contributionCapital.totalCashContribution else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">إجمالي المساهمة العينية</div><div class="info-cell">{{ "{:,.0f}".format(capital.contributionCapital.totalInKindContribution) if capital and capital.contributionCapital and capital.contributionCapital.totalInKindContribution else '' }}</div></div>
+          </div>
+        </div>
+        <div class="col">
+          <h3 style="color: #004aad; margin-bottom: 10px;">رأس المال السهمي</h3>
+          <div class="info-grid">
+            <div class="info-row"><div class="info-cell info-label">نوع رأس المال السهمي</div><div class="info-cell">{{ capital.stockCapital.typeName if capital and capital.stockCapital else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال المعلن</div><div class="info-cell">{{ "{:,.0f}".format(capital.stockCapital.announcedCapital) if capital and capital.stockCapital and capital.stockCapital.announcedCapital else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال المدفوع</div><div class="info-cell">{{ "{:,.0f}".format(capital.stockCapital.paidCapital) if capital and capital.stockCapital and capital.stockCapital.paidCapital else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال النقدي</div><div class="info-cell">{{ "{:,.0f}".format(capital.stockCapital.cashCapital) if capital and capital.stockCapital and capital.stockCapital.cashCapital else '' }}</div></div>
+            <div class="info-row"><div class="info-cell info-label">رأس المال العيني</div><div class="info-cell">{{ "{:,.0f}".format(capital.stockCapital.inKindCapital) if capital and capital.stockCapital and capital.stockCapital.inKindCapital else '' }}</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- الأسهم -->
+    <section>
+      <h2 class="section-title">تفاصيل الأسهم</h2>
+      <table>
+        <tr><th>عدد الأسهم</th><th>قيمة السهم</th><th>نوع السهم</th><th>الفئة</th></tr>
+        {% for stock in capital.stockCapital.stocks if capital and capital.stockCapital %}
+        <tr>
+          <td>{{ stock.count or '' }}</td>
+          <td>{{ stock.value or '' }}</td>
+          <td>{{ stock.typeName or '' }}</td>
+          <td>{{ stock.className or '' }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </section>
+
+    <!-- معلومات الترخيص -->
+    <section>
+      <h2 class="section-title">معلومات الترخيص</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">مرخص من</div><div class="info-cell">{{ 'نعم' if isLicenseBased else 'لا' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">رقم الترخيص الوطني</div><div class="info-cell">{{ licenseIssuerNationalNumber or '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">اسم المرخص</div><div class="info-cell">{{ licenseIssuerName or '' }}</div></div>
+      </div>
+    </section>
+
+    <!-- السنة المالية -->
+    <section>
+      <h2 class="section-title">السنة المالية</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">أول سنة مالية</div><div class="info-cell">{{ 'نعم' if fiscalYear.isFirst else 'لا' if fiscalYear else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">نوع التقويم</div><div class="info-cell">{{ fiscalYear.calendarTypeName if fiscalYear else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">نهاية الشهر</div><div class="info-cell">{{ fiscalYear.endMonth if fiscalYear else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">نهاية اليوم</div><div class="info-cell">{{ fiscalYear.endDay if fiscalYear else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">نهاية السنة</div><div class="info-cell">{{ fiscalYear.endYear if fiscalYear else '' }}</div></div>
+      </div>
+    </section>
+
+    <!-- التجارة الإلكترونية -->
+    <section>
+      <h2 class="section-title">التجارة الإلكترونية</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">متوفر</div><div class="info-cell">{{ 'نعم' if hasEcommerce else 'لا' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">رابط المتجر</div><div class="info-cell">{{ eCommerce.eStore[0].storeUrl if eCommerce and eCommerce.eStore and eCommerce.eStore[0] else '' }}</div></div>
+        <div class="info-row"><div class="info-cell info-label">منصة المصادقة</div><div class="info-cell">{{ eCommerce.eStore[0].authenticationPlatformUrl if eCommerce and eCommerce.eStore and eCommerce.eStore[0] else '' }}</div></div>
+      </div>
+      <h3 style="color: #004aad; margin: 15px 0 10px 0;">أنشطة المتجر</h3>
+      <table>
+        <tr><th>رقم النشاط</th><th>اسم النشاط</th></tr>
+        {% for activity in eCommerce.eStore[0].storeActivities if eCommerce and eCommerce.eStore and eCommerce.eStore[0] and eCommerce.eStore[0].storeActivities %}
+        <tr>
+          <td>{{ activity.id }}</td>
+          <td>{{ activity.name }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </section>
+
+    <!-- الأنشطة التجارية -->
+    <section>
+      <h2 class="section-title">الأنشطة التجارية</h2>
+      <table>
+        <tr><th>رقم النشاط</th><th>اسم النشاط</th></tr>
+        {% for activity in activities %}
+        <tr>
+          <td>{{ activity.id }}</td>
+          <td>{{ activity.name }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </section>
+
+    <!-- الشركاء -->
+    <section>
+      <h2 class="section-title">الشركاء</h2>
+      <table>
+        <tr><th>الاسم</th><th>نوع الشريك</th><th>رقم الهوية</th><th>نوع الهوية</th><th>المساهمة النقدية</th><th>المساهمة العينية</th><th>إجمالي المساهمة</th></tr>
+        {% for party in parties %}
+        <tr>
+          <td>{{ party.name or '' }}</td>
+          <td>{{ party.typeName or '' }}</td>
+          <td>{{ party.identity.id if party.identity else '' }}</td>
+          <td>{{ party.identity.typeName if party.identity else '' }}</td>
+          <td>{{ party.partnerShare.cashContributionCount if party.partnerShare else 0 }}</td>
+          <td>{{ party.partnerShare.inKindContributionCount if party.partnerShare else 0 }}</td>
+          <td>{{ party.partnerShare.totalContributionCount if party.partnerShare else 0 }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </section>
+
+    <!-- الإدارة -->
+    <section>
+      <h2 class="section-title">هيكل الإدارة</h2>
+      <div class="info-grid">
+        <div class="info-row"><div class="info-cell info-label">هيكل الإدارة</div><div class="info-cell">{{ management.structureName if management else '' }}</div></div>
+      </div>
+      <h3 style="color: #004aad; margin: 15px 0 10px 0;">المديرون</h3>
+      <table>
+        <tr><th>الاسم</th><th>رقم الهوية</th><th>نوع الهوية</th><th>الجنسية</th><th>المناصب</th><th>مرخص</th></tr>
+        {% for manager in management.managers if management %}
+        <tr>
+          <td>{{ manager.name or '' }}</td>
+          <td>{{ manager.identity.id if manager.identity else '' }}</td>
+          <td>{{ manager.identity.typeName if manager.identity else '' }}</td>
+          <td>{{ manager.nationality.name if manager.nationality else '' }}</td>
+          <td>{{ manager.positions | map(attribute='name') | join(', ') if manager.positions else '' }}</td>
+          <td>{{ 'نعم' if manager.isLicensed else 'لا' }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+    </section>
+  </main>
+</body>
+</html>

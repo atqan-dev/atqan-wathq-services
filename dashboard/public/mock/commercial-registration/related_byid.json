@@ -1,0 +1,41 @@
+{
+  "result": {
+    "count": 1,
+    "limit": 10,
+    "offset": 0
+  },
+  "name": "عبدالله محمد العتيبي",
+  "identity": {
+    "id": "1101552388",
+    "typeId": 1,
+    "typeName": "هوية وطنية"
+  },
+  "related": [
+    {
+      "crNationalNumber": "7001272475",
+      "name": "شركة اختبار للتجارة",
+      "isMain": false,
+      "status": {
+        "id": 1,
+        "name": "فعال"
+      },
+      "relation": {
+        "id": 2,
+        "name": "شريك"
+      },
+      "positions": [],
+      "parties": [
+        {
+          "typeId": 11,
+          "typeName": "جمعية خيرية",
+          "partnership": [
+            {
+              "id": 3,
+              "name": "مؤسس"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

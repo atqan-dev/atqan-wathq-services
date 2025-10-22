@@ -1,0 +1,24 @@
+{
+  "name": "السيد عبدالعزيز احمد خالد الثنيان",
+  "typeId": 11,
+  "typeName": "جمعية خيرية/ مؤسسة أهلية",
+  "identity": {
+    "id": "1101552388",
+    "typeId": 1,
+    "typeName": "هوية وطنية"
+  },
+  "partnership": [
+    {
+      "id": 8,
+      "name": "عضو"
+    }
+  ],
+  "partnerShare": {
+    "cashContributionCount": 250,
+    "inKindContributionCount": 250,
+    "totalContributionCount": 500
+  },
+  "nationality": null,
+  "licenseNo": null,
+  "crNumber": null
+}

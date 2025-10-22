@@ -1,0 +1,57 @@
+{
+  "crNationalNumber": "7001272475",
+  "crNumber": "1010711252",
+  "versionNo": 1,
+  "name": "شركة اختبار للتجارة",
+  "issueDateGregorian": "2002-10-05",
+  "headquarterCityName": "الرياض",
+  "contactInfo": {
+    "phoneNo": "011256398",
+    "mobileNo": "050111101",
+    "email": "TestEmail@mail.com"
+  },
+  "activities": [
+    {
+      "id": "161090",
+      "name": "أنشطة أخرى خاصة بصناعة نشر الأخشاب"
+    },
+    {
+      "id": "162231",
+      "name": "صناعة السلالم والدرابزينات"
+    }
+  ],
+  "parties": [
+    {
+      "name": "السيد عبدالعزيز احمد خالد الثنيان",
+      "typeName": "جمعية خيرية",
+      "identity": {
+        "id": "1101552388",
+        "typeName": "هوية وطنية"
+      },
+      "partnerShare": {
+        "totalContributionCount": 500
+      }
+    }
+  ],
+  "management": {
+    "structureName": "مجلس مديرين",
+    "managers": [
+      {
+        "name": "السيد عبدالعزيز احمد خالد الثنيان",
+        "identity": {
+          "id": "1101552388",
+          "typeName": "هوية وطنية"
+        },
+        "nationality": {
+          "name": "سعودي"
+        },
+        "positions": [
+          {
+            "name": "عضو"
+          }
+        ],
+        "isLicensed": true
+      }
+    ]
+  }
+}

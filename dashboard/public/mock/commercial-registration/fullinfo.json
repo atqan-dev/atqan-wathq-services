@@ -1,0 +1,179 @@
+{
+  "crNationalNumber": "7001272475",
+  "crNumber": "1010711252",
+  "versionNo": 1,
+  "name": "شركة اختبار للتجارة",
+  "nameLangId": 1,
+  "nameLangDesc": "العربية",
+  "crCapital": 150000,
+  "companyDuration": 99,
+  "isMain": false,
+  "issueDateGregorian": "2002-10-05",
+  "issueDateHijri": "28-07-1423",
+  "mainCrNationalNumber": null,
+  "mainCrNumber": null,
+  "inLiquidationProcess": false,
+  "hasEcommerce": true,
+  "headquarterCityId": 1,
+  "headquarterCityName": "الرياض",
+  "isLicenseBased": false,
+  "licenseIssuerNationalNumber": "123456789",
+  "licenseIssuerName": "xx",
+  "partnersNationalityId": 1,
+  "PartnersNationalityName": "السعودية",
+  "entityType": {
+    "id": 1,
+    "name": "شركة",
+    "formId": 1,
+    "formName": "ذات مسؤولية محدودة",
+    "characters": [
+      {
+        "id": 3,
+        "name": "غير ربحية خاصة"
+      }
+    ]
+  },
+  "status": {
+    "id": 1,
+    "name": "فعال"
+  },
+  "confirmationDate": {
+    "gregorian": "2003-10-05",
+    "hijri": "28-07-1424"
+  },
+  "reactivationDate": {
+    "gregorian": "2023-03-10",
+    "hijri": "1444-08-18"
+  },
+  "suspensionDate": {
+    "gregorian": "2022-12-05",
+    "hijri": "1444-04-11"
+  },
+  "deletionDate": {
+    "gregorian": "2024-07-20",
+    "hijri": "1445-01-13"
+  },
+  "contactInfo": {
+    "phoneNo": "011256398",
+    "mobileNo": "050111101",
+    "email": "TestEmail@mail.com",
+    "websiteUrl": "www.google.com"
+  },
+  "eCommerce": {
+    "eStore": [
+      {
+        "authenticationPlatformUrl": "www.google.com",
+        "storeUrl": "www.google.com",
+        "storeActivities": [
+          {
+            "id": "103062",
+            "name": "صناعة زبدة المكسرات"
+          }
+        ]
+      }
+    ]
+  },
+  "capital": {
+    "currencyId": 1,
+    "currencyName": "ريال سعودي",
+    "contributionCapital": {
+      "typeId": 1,
+      "typeName": "نقدي و عيني",
+      "cashCapital": 75000,
+      "inKindCapital": 75000,
+      "contributionValue": 100,
+      "totalCashContribution": 750,
+      "totalInKindContribution": 750
+    },
+    "stockCapital": {
+      "typeId": 1,
+      "typeName": "xx",
+      "capital": 12000,
+      "announcedCapital": 1244,
+      "paidCapital": 12333,
+      "cashCapital": 1111,
+      "inKindCapital": 111,
+      "stocks": [
+        {
+          "count": 11,
+          "value": 12,
+          "typeId": 1,
+          "typeName": "xx",
+          "classReferenceID": 1,
+          "className": "xx"
+        }
+      ]
+    }
+  },
+  "fiscalYear": {
+    "isFirst": true,
+    "calendarTypeId": 1,
+    "calendarTypeName": "ميلادي",
+    "endMonth": 12,
+    "endDay": 30,
+    "endYear": null
+  },
+  "parties": [
+    {
+      "name": "السيد عبدالعزيز احمد خالد الثنيان",
+      "typeId": 11,
+      "typeName": "جمعية خيرية/ مؤسسة أهلية",
+      "identity": {
+        "id": "1101552388",
+        "typeId": 1,
+        "typeName": "هوية وطنية"
+      },
+      "partnership": [
+        {
+          "id": 8,
+          "name": "عضو"
+        }
+      ],
+      "partnerShare": {
+        "cashContributionCount": 250,
+        "inKindContributionCount": 250,
+        "totalContributionCount": 500
+      },
+      "nationality": null,
+      "licenseNo": null,
+      "crNumber": null
+    }
+  ],
+  "management": {
+    "structureId": 3,
+    "structureName": "مجلس مديرين",
+    "managers": [
+      {
+        "name": "السيد عبدالعزيز احمد خالد الثنيان",
+        "typeId": 1,
+        "typeName": "سعودي",
+        "isLicensed": true,
+        "identity": {
+          "id": "1101552388",
+          "typeId": 1,
+          "typeName": "هوية وطنية"
+        },
+        "nationality": {
+          "id": 113,
+          "name": "سعودي"
+        },
+        "positions": [
+          {
+            "id": 8,
+            "name": "عضو"
+          }
+        ]
+      }
+    ]
+  },
+  "activities": [
+    {
+      "id": "161090",
+      "name": "أنشطة أخرى خاصة بصناعة نشر الأخشاب"
+    },
+    {
+      "id": "162231",
+      "name": "صناعة السلالم والدرابزينات"
+    }
+  ]
+}

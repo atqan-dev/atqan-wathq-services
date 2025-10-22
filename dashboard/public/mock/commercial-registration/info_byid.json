@@ -1,0 +1,43 @@
+{
+  "crNationalNumber": "7001272475",
+  "crNumber": "1010711252",
+  "versionNo": 1,
+  "name": "شركة اختبار للتجارة",
+  "duration": 99,
+  "isMain": false,
+  "issueDateGregorian": "2002-10-05",
+  "issueDateHijri": "28-07-1423",
+  "mainCrNationalNumber": null,
+  "mainCrNumber": null,
+  "inLiquidationProcess": false,
+  "hasEcommerce": true,
+  "headquarterCityId": 1,
+  "headquarterCityName": "الرياض",
+  "isLicenseBased": false,
+  "entityType": {
+    "id": 1,
+    "name": "شركة",
+    "formId": 1,
+    "formName": "ذات مسؤولية محدودة",
+    "characterList": [
+      {
+        "id": 3,
+        "name": "غير ربحية خاصة"
+      }
+    ]
+  },
+  "status": {
+    "id": 1,
+    "name": "فعال"
+  },
+  "activities": [
+    {
+      "id": "161090",
+      "name": "أنشطة أخرى خاصة بصناعة نشر الأخشاب"
+    },
+    {
+      "id": "162231",
+      "name": "صناعة السلالم والدرابزينات"
+    }
+  ]
+}

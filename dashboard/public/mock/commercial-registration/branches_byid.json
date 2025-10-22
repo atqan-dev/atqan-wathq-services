@@ -1,0 +1,19 @@
+{
+  "crNationalNumber": "7001272475",
+  "crNumber": "1010711252",
+  "versionNo": 1,
+  "name": "شركة اختبار للتجارة",
+  "isMain": false,
+  "mainCrNationalNumber": null,
+  "mainCrNumber": null,
+  "entityType": {
+    "formId": 1,
+    "formName": "ذات مسؤولية محدودة",
+    "characterList": [
+      {
+        "id": 3,
+        "name": "غير ربحية خاصة"
+      }
+    ]
+  }
+}
