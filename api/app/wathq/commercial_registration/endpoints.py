@@ -28,6 +28,10 @@ def get_wathq_client_for_tenant_user(
         service_slug="commercial-registration"
     )
     
+    # Fallback to system API key if tenant doesn't have a specific key
+    if not api_key:
+        api_key = settings.WATHQ_API_KEY
+    
     return WathqClient(
         api_key=api_key,
         db=db,
@@ -48,28 +52,64 @@ def get_wathq_client_for_management_user(
     )
 
 
+
+
 @router.get("/fullinfo/{cr_id}", response_model=schemas.FullInfo)
 async def get_full_info(
     cr_id: str,
     language: str = Query("ar", regex="^(ar|en)$"),
-    client: WathqClient = Depends(get_wathq_client_for_management_user)
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
-    """Retrieve all commercial registration data (management users only)."""
+    """Retrieve all commercial registration data (tenant users)."""
     try:
+        client = get_wathq_client_for_tenant_user(db=db, current_user=current_user)
         result = await client.get_full_info(cr_id, language)
         return result
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        error_msg = str(e)
+        # Check if it's an authentication error
+        if "401" in error_msg or "Unauthorized" in error_msg:
+            raise HTTPException(
+                status_code=401,
+                detail="WATHQ API authentication failed. Please verify your API key is valid and has the required permissions."
+            )
+        raise HTTPException(status_code=400, detail=error_msg)
+
+
+@router.get("/management/fullinfo/{cr_id}", response_model=schemas.FullInfo)
+async def get_full_info_management(
+    cr_id: str,
+    language: str = Query("ar", regex="^(ar|en)$"),
+    db: Session = Depends(deps.get_db),
+    current_user: ManagementUser = Depends(get_current_active_management_user)
+) -> Any:
+    """Retrieve all commercial registration data (management users)."""
+    try:
+        client = get_wathq_client_for_management_user(db=db, current_user=current_user)
+        result = await client.get_full_info(cr_id, language)
+        return result
+    except Exception as e:
+        error_msg = str(e)
+        # Check if it's an authentication error
+        if "401" in error_msg or "Unauthorized" in error_msg:
+            raise HTTPException(
+                status_code=401,
+                detail="WATHQ API authentication failed. Please verify your API key is valid and has the required permissions."
+            )
+        raise HTTPException(status_code=400, detail=error_msg)
 
 
 @router.get("/info/{cr_id}", response_model=schemas.BasicInfo)
 async def get_basic_info(
     cr_id: str,
     language: str = Query("ar", regex="^(ar|en)$"),
-    client: WathqClient = Depends(get_wathq_client_for_management_user)
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
-    """Retrieve basic commercial registration data (management users only)."""
+    """Retrieve basic commercial registration data (tenant users)."""
     try:
+        client = get_wathq_client_for_tenant_user(db=db, current_user=current_user)
         result = await client.get_basic_info(cr_id, language)
         return result
     except Exception as e:
@@ -80,10 +120,12 @@ async def get_basic_info(
 async def get_branches(
     cr_id: str,
     language: str = Query("ar", regex="^(ar|en)$"),
-    client: WathqClient = Depends(get_wathq_client_for_management_user)
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
-    """Retrieve all commercial registration branches (management users only)."""
+    """Retrieve all commercial registration branches (tenant users)."""
     try:
+        client = get_wathq_client_for_tenant_user(db=db, current_user=current_user)
         result = await client.get_branches(cr_id, language)
         return result
     except Exception as e:
@@ -94,10 +136,12 @@ async def get_branches(
 async def get_status(
     cr_id: str,
     language: str = Query("ar", regex="^(ar|en)$"),
-    client: WathqClient = Depends(get_wathq_client_for_management_user)
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
-    """Retrieve status of a commercial registration."""
+    """Retrieve status of a commercial registration (tenant users)."""
     try:
+        client = get_wathq_client_for_tenant_user(db=db, current_user=current_user)
         result = await client.get_status(cr_id, language)
         return result
     except Exception as e:
@@ -108,10 +152,12 @@ async def get_status(
 async def get_capital(
     cr_id: str,
     language: str = Query("ar", regex="^(ar|en)$"),
-    client: WathqClient = Depends(get_wathq_client_for_management_user)
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
-    """Retrieve capital details for commercial registration."""
+    """Retrieve capital details for commercial registration (tenant users)."""
     try:
+        client = get_wathq_client_for_tenant_user(db=db, current_user=current_user)
         result = await client.get_capital(cr_id, language)
         return result
     except Exception as e:
@@ -122,10 +168,12 @@ async def get_capital(
 async def get_managers(
     cr_id: str,
     language: str = Query("ar", regex="^(ar|en)$"),
-    client: WathqClient = Depends(get_wathq_client_for_management_user)
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
-    """Retrieve a list of managers and board of directors."""
+    """Retrieve a list of managers and board of directors (tenant users)."""
     try:
+        client = get_wathq_client_for_tenant_user(db=db, current_user=current_user)
         result = await client.get_managers(cr_id, language)
         return result
     except Exception as e:
@@ -136,10 +184,12 @@ async def get_managers(
 async def get_owners(
     cr_id: str,
     language: str = Query("ar", regex="^(ar|en)$"),
-    client: WathqClient = Depends(get_wathq_client_for_management_user)
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
 ) -> Any:
-    """Retrieve the owner of establishment and list of partners."""
+    """Retrieve the owner of establishment and list of partners (tenant users)."""
     try:
+        client = get_wathq_client_for_tenant_user(db=db, current_user=current_user)
         result = await client.get_owners(cr_id, language)
         return result
     except Exception as e:

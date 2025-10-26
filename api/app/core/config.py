@@ -111,7 +111,7 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str = os.getenv("FIRST_SUPERUSER_PASSWORD", "admin123")
 
     # Wathq API
-    WATHQ_API_KEY: str = os.getenv("WATHQ_API_KEY", "your-wathq-api-key-here")
+    WATHQ_API_KEY: str = os.getenv("WATHQ_API_KEY", "PnxjlQkR1Rfx3qVoPWWUXJUzaNKxNIj6")
 
     # File uploads
     UPLOADS_DIR: str = os.getenv("UPLOADS_DIR", "uploads")

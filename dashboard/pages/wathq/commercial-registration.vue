@@ -26,7 +26,7 @@
             <UInput
               v-model="liveForm.cr_number"
               :label="t('wathq.services.commercialRegistration.fields.crNumber')"
-              placeholder="1010000000"
+              placeholder="1010711252"
               required
             />
             <UInput
@@ -97,6 +97,18 @@ const endpoints = [
         placeholder: '1010000000',
         required: true,
         description: 'Commercial Registration ID'
+      },
+      {
+        key: 'language',
+        label: 'Language',
+        placeholder: 'ar',
+        required: false,
+        type: 'select' as const,
+        options: [
+          { value: 'ar' as const, label: 'Arabic' },
+          { value: 'en' as const, label: 'English' }
+        ] as const,
+        description: 'Response language'
       }
     ],
     category: 'Information'
@@ -113,6 +125,18 @@ const endpoints = [
         label: 'CR ID',
         placeholder: '1010000000',
         required: true
+      },
+      {
+        key: 'language',
+        label: 'Language',
+        placeholder: 'ar',
+        required: false,
+        type: 'select' as const,
+        options: [
+          { value: 'ar' as const, label: 'Arabic' },
+          { value: 'en' as const, label: 'English' }
+        ] as const,
+        description: 'Response language'
       }
     ],
     category: 'Information'

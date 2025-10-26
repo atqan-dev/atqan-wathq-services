@@ -53,8 +53,8 @@ class Owner(BaseModel):
 
 
 class Capital(BaseModel):
-    currencyId: int
-    currencyName: str
+    currencyId: Optional[int] = None
+    currencyName: Optional[str] = None
     capital: Optional[float] = None
     contributionCapital: Optional[dict] = None
     stockCapital: Optional[dict] = None

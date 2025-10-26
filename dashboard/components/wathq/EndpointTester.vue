@@ -192,6 +192,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useAuthStore } from '~/stores/auth'
 import { useI18n } from '~/composables/useI18n'
 import { useAlert } from '~/composables/useAlert'
 
@@ -234,6 +235,7 @@ const props = defineProps<Props>()
 
 const { t } = useI18n()
 const { success: showSuccess, error: showError } = useAlert()
+const authStore = useAuthStore()
 
 const selectedEndpoint = ref<string>('')
 const formData = ref<Record<string, any>>({})
@@ -286,26 +288,79 @@ async function handleSubmit() {
     isLoading.value = true
     const startTime = Date.now()
 
-    // Build URL with path parameters
-    let url = `${props.baseUrl}${selectedEndpointData.value.path}`
+    // Get auth token to check user type
+    const token = authStore.token
+    let isManagementUser = false
     
-    // Replace path parameters
+    // Debug: Check if token exists
+    if (!token) {
+      console.error('❌ No authentication token found. Please login first.')
+      showError('No authentication token. Please login first.')
+      isLoading.value = false
+      return
+    }
+    
+    if (token) {
+      try {
+        // Decode JWT to check if management user
+        const parts = token.split('.')
+        if (parts.length === 3) {
+          const payload = JSON.parse(atob(parts[1]))
+          isManagementUser = payload.is_management_user === true
+          console.log('✓ Token decoded successfully. Is management user:', isManagementUser)
+        }
+      } catch (e) {
+        console.warn('Could not decode token:', e)
+      }
+    }
+
+    // Build URL with path parameters
+    let path = selectedEndpointData.value.path
+    
+    // Add /management prefix for management users on applicable endpoints
+    if (isManagementUser && !path.startsWith('/lookup') && !path.startsWith('/management')) {
+      path = `/management${path}`
+    }
+    
+    let url = `${props.baseUrl}${path}`
+    const queryParams = new URLSearchParams()
+    
+    // Replace path parameters and collect query parameters
     selectedEndpointData.value.params.forEach(param => {
       if (formData.value[param.key]) {
-        url = url.replace(`{${param.key}}`, formData.value[param.key])
+        // Check if this is a path parameter (contains {})
+        if (path.includes(`{${param.key}}`)) {
+          url = url.replace(`{${param.key}}`, formData.value[param.key])
+        } else {
+          // Otherwise treat as query parameter
+          queryParams.append(param.key, formData.value[param.key])
+        }
       }
     })
+    
+    // Append query parameters to URL
+    if (queryParams.toString()) {
+      url += `?${queryParams.toString()}`
+    }
 
-    // Make request
+    console.log('📤 Sending request to:', url)
+    console.log('🔐 Authorization header:', token ? 'Bearer [token]' : 'None')
+
+    // Make request with auth token
     const res = await fetch(url, {
       method: selectedEndpointData.value.method,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
       }
     })
 
+    console.log('📥 Response status:', res.status)
+
     const duration = Date.now() - startTime
     const data = await res.json()
+
+    console.log('✓ Response received:', { status: res.status, data })
 
     response.value = {
       success: res.ok,
@@ -316,12 +371,16 @@ async function handleSubmit() {
     }
 
     if (res.ok) {
+      console.log('✅ Request successful')
       showSuccess(t('wathq.requestSuccess'))
     } else {
-      showError(t('wathq.requestFailed'))
+      console.error('❌ Request failed with status:', res.status)
+      console.error('Error details:', data)
+      showError(`${t('wathq.requestFailed')} (Status: ${res.status})`)
     }
   } catch (err: any) {
-    const duration = Date.now() - Date.now()
+    const duration = Date.now() - startTime
+    console.error('❌ Request error:', err)
     response.value = {
       success: false,
       error: err.message || 'Request failed',

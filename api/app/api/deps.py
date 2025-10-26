@@ -58,6 +58,13 @@ def get_current_user(
                 detail="Token tenant does not match request tenant",
             )
 
+    # Check if this is a management user token
+    if token_data.is_management_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This endpoint requires tenant user authentication. Management users should use the /management endpoints."
+        )
+
     user = db.query(User).filter(User.id == token_data.sub).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -111,6 +118,13 @@ def get_current_management_user(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
+        )
+
+    # Check if token is for a management user
+    if not token_data.is_management_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This endpoint requires management user authentication"
         )
 
     # Management users don't have tenant context

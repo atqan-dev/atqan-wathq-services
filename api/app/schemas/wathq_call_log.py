@@ -10,8 +10,9 @@ from pydantic import BaseModel
 
 
 class WathqCallLogBase(BaseModel):
-    tenant_id: int
-    user_id: int
+    tenant_id: Optional[int] = None  # Nullable for management users
+    user_id: Optional[int] = None  # Nullable for management users
+    management_user_id: Optional[int] = None  # For management user calls
     service_slug: str
     endpoint: str
     method: str = "POST"
