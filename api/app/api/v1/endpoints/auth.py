@@ -65,8 +65,16 @@ def login_for_access_token(
         expires_delta=access_token_expires,
     )
 
+    # Create refresh token
+    refresh_token = security.create_refresh_token(
+        subject=user.id,
+        tenant_id=tenant_id,
+        tenant_slug=tenant_slug,
+    )
+
     return {
         "access_token": access_token,
+        "refresh_token": refresh_token,
         "token_type": "bearer",
     }
 
@@ -158,13 +166,13 @@ def refresh_token(
     # In production, validate the refresh token first
     try:
         # Decode the refresh token to get user info
-        refresh_token = refresh_data.get("refresh_token")
-        if not refresh_token:
+        refresh_token_str = refresh_data.get("refresh_token")
+        if not refresh_token_str:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Refresh token required",
             )
-        payload = security.decode_token(refresh_token)
+        payload = security.decode_token(refresh_token_str)
         user_id = payload.get("sub")
         tenant_id = payload.get("tenant_id")
         tenant_slug = payload.get("tenant_slug")
@@ -192,8 +200,16 @@ def refresh_token(
             expires_delta=access_token_expires,
         )
         
+        # Create new refresh token
+        new_refresh_token = security.create_refresh_token(
+            subject=user.id,
+            tenant_id=tenant_id,
+            tenant_slug=tenant_slug,
+        )
+        
         return {
             "access_token": access_token,
+            "refresh_token": new_refresh_token,
             "token_type": "bearer",
         }
         

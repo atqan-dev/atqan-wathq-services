@@ -903,31 +903,6 @@ def create_user_for_tenant(
     return user
 
 
-@router.get("/tenants/{tenant_id}/users", response_model=list[schemas.User])
-def get_tenant_users_list(
-    tenant_id: int,
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(deps.get_db),
-    current_user: ManagementUser = Depends(get_current_active_management_user),
-) -> Any:
-    """
-    Get all users for a specific tenant.
-    """
-    # Check if tenant exists
-    tenant = crud.tenant.get(db, id=tenant_id)
-    if not tenant:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Tenant not found",
-        )
-
-    users = crud.user.get_users_by_tenant(
-        db, tenant_id=tenant_id, skip=skip, limit=limit
-    )
-    return users
-
-
 @router.put("/users/{user_id}/tenant", response_model=schemas.User)
 def update_user_tenant(
     *,
@@ -1194,3 +1169,32 @@ def update_tenant_service(
         db, db_obj=tenant_service, obj_in=tenant_service_in
     )
     return tenant_service
+
+
+@router.delete("/tenants/services/{service_id}", response_model=schemas.TenantService)
+def delete_tenant_service(
+    service_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: ManagementUser = Depends(get_current_active_management_user),
+) -> Any:
+    """
+    Delete a specific service for a specific tenant.
+    """
+    # Check if service is assigned to the tenant
+    tenant_service = crud.tenant_service.get(
+        db, id=service_id
+    )
+    if not tenant_service:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Service not assigned to this tenant",
+        )
+    # Delete tenant service
+    tenant_service = crud.tenant_service.remove(db, id=service_id)
+    return {
+        "message": "Service deleted successfully",
+        "service": tenant_service,
+        "tenant_id": tenant_service.tenant_id,
+        "service_id": tenant_service.service_id,
+    }
+        

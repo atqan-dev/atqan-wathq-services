@@ -11,6 +11,110 @@
       <p class="text-sm text-gray-600 dark:text-gray-400">{{ error }}</p>
     </div>
 
+    <!-- Create Profile Form (when profile doesn't exist) -->
+    <div v-else-if="!profile && !loading">
+      <UCard>
+        <template #header>
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Create Your Profile</h3>
+        </template>
+
+        <form @submit.prevent="createNewProfile" class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Fullname -->
+            <UFormGroup label="Full Name" required>
+              <UInput 
+                v-model="newProfileData.fullname" 
+                placeholder="Enter your full name"
+                required
+              />
+            </UFormGroup>
+
+            <!-- Email -->
+            <UFormGroup label="Email" required>
+              <UInput 
+                v-model="newProfileData.email" 
+                type="email"
+                placeholder="email@example.com"
+                required
+              />
+            </UFormGroup>
+
+            <!-- Mobile -->
+            <UFormGroup label="Mobile">
+              <UInput 
+                v-model="newProfileData.mobile" 
+                placeholder="01234567890"
+              />
+            </UFormGroup>
+
+            <!-- WhatsApp -->
+            <UFormGroup label="WhatsApp Number">
+              <UInput 
+                v-model="newProfileData.whatsapp_number" 
+                placeholder="01234567890"
+              />
+            </UFormGroup>
+
+            <!-- City -->
+            <UFormGroup label="City">
+              <UInput 
+                v-model="newProfileData.city" 
+                placeholder="Enter your city"
+              />
+            </UFormGroup>
+
+            <!-- Company Name -->
+            <UFormGroup label="Company Name">
+              <UInput 
+                v-model="newProfileData.company_name" 
+                placeholder="Enter company name"
+              />
+            </UFormGroup>
+
+            <!-- Commercial Registration -->
+            <UFormGroup label="Commercial Registration Number">
+              <UInput 
+                v-model="newProfileData.commercial_registration_number" 
+                placeholder="Enter registration number"
+              />
+            </UFormGroup>
+
+            <!-- Entity Number -->
+            <UFormGroup label="Entity Number">
+              <UInput 
+                v-model="newProfileData.entity_number" 
+                placeholder="Enter entity number"
+              />
+            </UFormGroup>
+
+            <!-- Address (Full Width) -->
+            <UFormGroup label="Address" class="md:col-span-2">
+              <UTextarea 
+                v-model="newProfileData.address" 
+                placeholder="Enter your full address"
+                :rows="3"
+              />
+            </UFormGroup>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex justify-end gap-3">
+            <UButton
+              type="submit"
+              :loading="updating"
+              :disabled="updating"
+            >
+              Create Profile
+            </UButton>
+          </div>
+
+          <div v-if="updateError" class="text-red-600 dark:text-red-400 text-sm">
+            {{ updateError }}
+          </div>
+        </form>
+      </UCard>
+    </div>
+
     <!-- Profile Content -->
     <div v-else-if="profile">
       <!-- Avatar and Header Section -->
@@ -244,7 +348,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { UserProfile } from '@/composables/useUserProfile'
+import type { UserProfile, UserProfileCreate } from '@/composables/useUserProfile'
 
 const props = defineProps<{
   profile: UserProfile | null
@@ -258,10 +362,22 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update': [updates: Partial<UserProfile>]
   'upload-avatar': [file: File]
+  'create': [profileData: UserProfileCreate]
 }>()
 
 const isEditing = ref(false)
 const editData = ref<Partial<UserProfile>>({})
+const newProfileData = ref<UserProfileCreate>({
+  fullname: '',
+  email: '',
+  address: '',
+  mobile: '',
+  city: '',
+  company_name: '',
+  commercial_registration_number: '',
+  entity_number: '',
+  whatsapp_number: ''
+})
 const avatarKey = ref(Date.now())
 
 // Computed property to add cache-busting timestamp to avatar URL
@@ -355,5 +471,10 @@ function handleAvatarUpload(event: Event) {
     // Reset input
     target.value = ''
   }
+}
+
+// Create new profile
+function createNewProfile() {
+  emit('create', newProfileData.value)
 }
 </script>

@@ -82,10 +82,74 @@ export function useNotifications() {
     }
   }
 
-  function getAuthToken(): string | null {
-    // Get token from localStorage (adjust based on your auth implementation)
-    const token = localStorage.getItem('auth_token')
+  async function getAuthToken(): Promise<string | null> {
+    // Get token from localStorage
+    let token = localStorage.getItem('auth_token')
+    
+    // Check if token is expired by decoding it
+    if (token) {
+      try {
+        // Decode JWT to check expiration
+        const parts = token.split('.')
+        if (parts.length === 3) {
+          const payload = JSON.parse(atob(parts[1]))
+          const expirationTime = payload.exp * 1000 // Convert to milliseconds
+          const currentTime = Date.now()
+          
+          // If token expires within 1 minute, refresh it
+          if (expirationTime - currentTime < 60000) {
+            console.log('[WebSocket] Token expiring soon, refreshing...')
+            token = await refreshAuthToken()
+          }
+        }
+      } catch (error) {
+        console.warn('[WebSocket] Failed to decode token:', error)
+      }
+    }
+    
     return token
+  }
+
+  async function refreshAuthToken(): Promise<string | null> {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token')
+      if (!refreshToken) {
+        console.warn('[WebSocket] No refresh token available')
+        return null
+      }
+
+      const response = await fetch('/api/v1/management/auth/refresh', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${refreshToken}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (!response.ok) {
+        console.error('[WebSocket] Token refresh failed:', response.statusText)
+        return null
+      }
+
+      const data = await response.json()
+      const newToken = data.access_token
+      const newRefreshToken = data.refresh_token
+
+      if (newToken) {
+        localStorage.setItem('auth_token', newToken)
+        // Update refresh token if provided
+        if (newRefreshToken) {
+          localStorage.setItem('refresh_token', newRefreshToken)
+        }
+        console.log('[WebSocket] Token refreshed successfully')
+        return newToken
+      }
+
+      return null
+    } catch (error) {
+      console.error('[WebSocket] Error refreshing token:', error)
+      return null
+    }
   }
 
   function getUserType(): string {
@@ -102,14 +166,14 @@ export function useNotifications() {
     return 'user'
   }
 
-  function connectWebSocket() {
+  async function connectWebSocket() {
     if (!ENABLE_WEBSOCKET) {
       console.log('[WebSocket] Disabled, using polling fallback')
       startPolling()
       return
     }
 
-    const token = getAuthToken()
+    const token = await getAuthToken()
     if (!token) {
       console.warn('[WebSocket] No auth token found, using polling')
       startPolling()

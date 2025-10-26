@@ -166,6 +166,52 @@ def clear_my_cache(
 
 # ============== MANAGEMENT USER ENDPOINTS ==============
 
+@management_router.get("/call", response_model=WathqServiceResponse)
+async def call_wathq_service_management_get(
+    *,
+    db: Session = Depends(deps.get_db),
+    service_slug: str = Query(..., description="Service slug to call"),
+    tenant_id: Optional[int] = Query(None, description="Tenant ID for context"),
+    force_refresh: bool = Query(False, description="Force refresh from external API"),
+    current_user: models.ManagementUser = Depends(deps.get_current_management_user),
+) -> Any:
+    """
+    Call a WATHQ service (for management users) - GET method.
+    Management users can call any service without tenant restrictions.
+    """
+    try:
+        # Create a pseudo-user for management context
+        pseudo_user = models.User(
+            id=current_user.id,
+            email=current_user.email,
+            tenant_id=tenant_id or 1,
+            is_superuser=True,
+            first_name=current_user.first_name,
+            last_name=current_user.last_name,
+            hashed_password="",
+            is_active=True
+        )
+        
+        # Call the service
+        result = await wathq_external_service.get_service_data(
+            db=db,
+            user=pseudo_user,
+            service_slug=service_slug,
+            params={},
+            force_refresh=force_refresh
+        )
+        
+        return result
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error calling WATHQ service: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error calling WATHQ service: {str(e)}"
+        )
+
+
 @management_router.post("/call", response_model=WathqServiceResponse)
 async def call_wathq_service_management(
     *,
@@ -175,27 +221,40 @@ async def call_wathq_service_management(
     current_user: models.ManagementUser = Depends(deps.get_current_management_user),
 ) -> Any:
     """
-    Call a WATHQ service (for management users).
+    Call a WATHQ service (for management users) - POST method.
     Management users can call any service without tenant restrictions.
     """
-    # Create a pseudo-user for management context
-    pseudo_user = models.User(
-        id=current_user.id,
-        email=current_user.email,
-        tenant_id=tenant_id,
-        is_superuser=True
-    )
-    
-    # Call the service
-    result = await wathq_external_service.get_service_data(
-        db=db,
-        user=pseudo_user,
-        service_slug=request.service_slug,
-        params=request.params,
-        force_refresh=request.force_refresh
-    )
-    
-    return result
+    try:
+        # Create a pseudo-user for management context
+        pseudo_user = models.User(
+            id=current_user.id,
+            email=current_user.email,
+            tenant_id=tenant_id or 1,
+            is_superuser=True,
+            first_name=current_user.first_name,
+            last_name=current_user.last_name,
+            hashed_password="",
+            is_active=True
+        )
+        
+        # Call the service
+        result = await wathq_external_service.get_service_data(
+            db=db,
+            user=pseudo_user,
+            service_slug=request.service_slug,
+            params=request.params,
+            force_refresh=request.force_refresh
+        )
+        
+        return result
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error calling WATHQ service: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error calling WATHQ service: {str(e)}"
+        )
 
 
 @management_router.post("/bulk", response_model=WathqBulkServiceResponse)

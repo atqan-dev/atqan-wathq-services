@@ -8,7 +8,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException as StarletteHTTPException
-
+import os
 from app.api.v1.api import api_router
 from app.core.config import settings
 from app.core.logging import setup_logging
@@ -59,6 +59,8 @@ def create_application() -> FastAPI:
     application.include_router(api_router, prefix=settings.API_V1_STR)
 
     # Mount static files for uploads
+    if not os.path.exists("uploads"):
+        os.makedirs("uploads")
     application.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
     # Root endpoint
