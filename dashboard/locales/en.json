@@ -686,6 +686,8 @@
     "copiedToClipboard": "Copied to clipboard",
     "copyFailed": "Failed to copy",
     "exportSuccess": "Response exported successfully",
+    "exportXlsSuccess": "Response exported to XLS successfully",
+    "exportXlsFailed": "Failed to export to XLS",
     "stats": {
       "totalRequests": "Total Requests",
       "successful": "Successful",
@@ -761,7 +763,8 @@
       "copy": "Copy",
       "copied": "Copied!",
       "export": "Export",
-      "exportJson": "Export JSON"
+      "exportJson": "Export JSON",
+      "exportXls": "Export XLS"
     },
     "metadata": {
       "status": "Status",

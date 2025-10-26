@@ -203,9 +203,12 @@ class WathqClient:
         """Get commercial registration owners."""
         return await self._make_request(f"/owners/{cr_id}", {"language": language})
     
-    async def get_related(self, identity_id: str, id_type: str, language: str = "ar") -> Dict[str, Any]:
+    async def get_related(self, identity_id: str, id_type: str, language: str = "ar", nationality: int = None) -> Dict[str, Any]:
         """Get related commercial registrations for an identity."""
-        return await self._make_request(f"/related/{identity_id}/{id_type}", {"language": language})
+        params = {"language": language}
+        if nationality is not None:
+            params["nationality"] = nationality
+        return await self._make_request(f"/related/{identity_id}/{id_type}", params)
     
     async def check_ownership(self, identity_id: str, id_type: str) -> Dict[str, Any]:
         """Check if identity owns a commercial registration."""

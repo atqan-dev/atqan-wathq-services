@@ -224,7 +224,7 @@ const endpoints = [
   {
     id: 'related',
     name: 'Get Related',
-    description: 'Get related commercial registrations',
+    description: 'Retrieve list of commercial registrations with their relation for a given ID',
     path: '/related/{identity_id}/{id_type}',
     method: 'GET' as const,
     params: [
@@ -233,14 +233,47 @@ const endpoints = [
         label: 'Identity ID',
         placeholder: '1234567890',
         required: true,
-        description: 'National ID or Iqama number'
+        description: 'Identification number (رقم هوية)'
       },
       {
         key: 'id_type',
         label: 'ID Type',
-        placeholder: '1',
+        placeholder: 'National_ID',
         required: true,
-        description: '1=National ID, 2=Iqama'
+        type: 'select' as const,
+        options: [
+          { value: 'National_ID', label: 'National ID' },
+          { value: 'Resident_ID', label: 'Resident ID' },
+          { value: 'Passport', label: 'Passport' },
+          { value: 'GCC_ID', label: 'GCC ID' },
+          { value: 'Endowment_Deed_No', label: 'Endowment Deed No' },
+          { value: 'License_No', label: 'License No' },
+          { value: 'CR_National_ID', label: 'CR National ID' },
+          { value: 'Foreign_CR_No', label: 'Foreign CR No' },
+          { value: 'National_Number', label: 'National Number' },
+          { value: 'Boarder_Number', label: 'Boarder Number' }
+        ] as const,
+        description: 'Identification type (نوع الهوية)'
+      },
+      {
+        key: 'nationality',
+        label: 'Nationality NIC Code',
+        placeholder: '682',
+        required: false,
+        type: 'number' as const,
+        description: 'Required for Passport, Foreign_CR_No. See lookup/nationalities for valid codes'
+      },
+      {
+        key: 'language',
+        label: 'Language',
+        placeholder: 'ar',
+        required: false,
+        type: 'select' as const,
+        options: [
+          { value: 'ar' as const, label: 'Arabic' },
+          { value: 'en' as const, label: 'English' }
+        ] as const,
+        description: 'Response language'
       }
     ],
     category: 'Relationships'

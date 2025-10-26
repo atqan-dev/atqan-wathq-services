@@ -40,7 +40,37 @@
       <form v-if="selectedEndpointData.params.length > 0" @submit.prevent="handleSubmit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div v-for="param in selectedEndpointData.params" :key="param.key">
+            <!-- Select Input -->
+            <USelect
+              v-if="param.type === 'select'"
+              v-model="formData[param.key]"
+              :label="param.label"
+              :placeholder="param.placeholder"
+              :options="param.options"
+              :required="param.required"
+            >
+              <template v-if="param.description" #help>
+                <span class="text-xs text-gray-500">{{ param.description }}</span>
+              </template>
+            </USelect>
+            
+            <!-- Number Input -->
             <UInput
+              v-else-if="param.type === 'number'"
+              v-model.number="formData[param.key]"
+              :label="param.label"
+              :placeholder="param.placeholder"
+              :required="param.required"
+              type="number"
+            >
+              <template v-if="param.description" #help>
+                <span class="text-xs text-gray-500">{{ param.description }}</span>
+              </template>
+            </UInput>
+            
+            <!-- Default Text Input -->
+            <UInput
+              v-else
               v-model="formData[param.key]"
               :label="param.label"
               :placeholder="param.placeholder"
@@ -124,6 +154,17 @@
               :title="t('wathq.actions.exportJson')"
             >
               {{ t('wathq.actions.export') }}
+            </UButton>
+            <UButton
+              size="sm"
+              color="blue"
+              variant="soft"
+              icon="i-heroicons-table-cells"
+              @click="exportToXls"
+              :title="t('wathq.actions.exportXls')"
+              :loading="isExportingXls"
+            >
+              {{ t('wathq.actions.exportXls') }}
             </UButton>
           </div>
         </div>
@@ -242,6 +283,7 @@ const formData = ref<Record<string, any>>({})
 const response = ref<Response | null>(null)
 const isLoading = ref(false)
 const copied = ref(false)
+const isExportingXls = ref(false)
 
 // Endpoint options for select
 const endpointOptions = computed(() => {
@@ -425,6 +467,78 @@ function exportResponse() {
   URL.revokeObjectURL(url)
   
   showSuccess(t('wathq.exportSuccess'))
+}
+
+// Export to XLS
+async function exportToXls() {
+  if (!response.value || !response.value.data) return
+
+  try {
+    isExportingXls.value = true
+    
+    // Import XLSX library dynamically
+    const XLSX = await import('xlsx')
+    
+    // Prepare data
+    const data = response.value.data
+    const flattenedData = flattenObject(data)
+    
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet([flattenedData])
+    
+    // Adjust column widths
+    const colWidths = Object.keys(flattenedData).map(key => ({
+      wch: Math.min(Math.max(key.length, 15), 50)
+    }))
+    ws['!cols'] = colWidths
+    
+    // Create workbook
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Response')
+    
+    // Generate filename
+    const filename = `${props.serviceType}-${selectedEndpoint.value}-${Date.now()}.xlsx`
+    
+    // Save file
+    XLSX.writeFile(wb, filename)
+    
+    showSuccess(t('wathq.exportXlsSuccess'))
+  } catch (err: any) {
+    console.error('XLS export error:', err)
+    showError(err.message || t('wathq.exportXlsFailed'))
+  } finally {
+    isExportingXls.value = false
+  }
+}
+
+// Flatten nested objects for XLS export
+function flattenObject(obj: any, prefix = ''): Record<string, any> {
+  const flattened: Record<string, any> = {}
+  
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const value = obj[key]
+      const newKey = prefix ? `${prefix}_${key}` : key
+      
+      if (value === null || value === undefined) {
+        flattened[newKey] = ''
+      } else if (typeof value === 'object') {
+        if (Array.isArray(value)) {
+          // For arrays, convert to JSON string
+          flattened[newKey] = JSON.stringify(value)
+        } else {
+          // For nested objects, flatten recursively
+          Object.assign(flattened, flattenObject(value, newKey))
+        }
+      } else if (typeof value === 'boolean') {
+        flattened[newKey] = value ? 'Yes' : 'No'
+      } else {
+        flattened[newKey] = value
+      }
+    }
+  }
+  
+  return flattened
 }
 
 // Get method color

@@ -682,6 +682,8 @@
     "copiedToClipboard": "تم النسخ إلى الحافظة",
     "copyFailed": "فشل النسخ",
     "exportSuccess": "تم تصدير الاستجابة بنجاح",
+    "exportXlsSuccess": "تم تصدير الاستجابة إلى XLS بنجاح",
+    "exportXlsFailed": "فشل التصدير إلى XLS",
     "stats": {
       "totalRequests": "إجمالي الطلبات",
       "successful": "ناجحة",
@@ -757,7 +759,8 @@
       "copy": "نسخ",
       "copied": "تم النسخ!",
       "export": "تصدير",
-      "exportJson": "تصدير JSON"
+      "exportJson": "تصدير JSON",
+      "exportXls": "تصدير XLS"
     },
     "metadata": {
       "status": "الحالة",
