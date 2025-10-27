@@ -18,14 +18,23 @@ def get_my_calls(
     db: Session = Depends(deps.get_db),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User | models.ManagementUser = Depends(deps.get_current_active_user_or_management),
 ) -> Any:
     """
     Get current user's WATHQ API calls.
+    Works for both tenant users and management users.
     """
-    calls = crud.wathq_call_log.get_by_user(
-        db=db, user_id=current_user.id, skip=skip, limit=limit
-    )
+    # Check if it's a management user
+    if isinstance(current_user, models.ManagementUser):
+        # Get calls made by this management user
+        calls = db.query(models.WathqCallLog).filter(
+            models.WathqCallLog.management_user_id == current_user.id
+        ).order_by(models.WathqCallLog.fetched_at.desc()).offset(skip).limit(limit).all()
+    else:
+        # Get calls made by this tenant user
+        calls = crud.wathq_call_log.get_by_user(
+            db=db, user_id=current_user.id, skip=skip, limit=limit
+        )
     return calls
 
 

@@ -3,7 +3,7 @@ Pydantic schemas for WATHQ offline data.
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -11,8 +11,9 @@ from pydantic import BaseModel
 
 class WathqOfflineDataBase(BaseModel):
     service_id: UUID
-    tenant_id: int
-    fetched_by: int
+    tenant_id: Optional[int] = None  # Nullable for management users
+    fetched_by: Optional[int] = None  # Nullable for management users
+    management_user_id: Optional[int] = None  # For management user requests
     full_external_url: str
     response_body: Dict[str, Any]
 
