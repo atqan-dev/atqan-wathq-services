@@ -787,5 +787,18 @@
       "requestData": "Request Data",
       "responseData": "Response Data"
     }
+  },
+  "notificationPermissionPrompt":{
+    "title":"Notification Permission",
+    "description":"Please grant notification permission to receive important updates and alerts",
+    "allow":"Allow",
+    "block":"Block",
+    "content":"Notification permission is required to receive important updates and alerts. Please grant permission to continue.",
+    "deploymentStatusUpdates":"Deployment Status Updates",
+    "systemAlertsAndWarnings":"System Alerts and Warnings",
+    "importantAppNotifications":"Important App Notifications",
+    "maybeLater":"May be later",
+    "allowNotifications":"Allow Notifications",
+    "neverShow":"Never Show"
   }
 }

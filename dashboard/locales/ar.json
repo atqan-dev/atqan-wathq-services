@@ -791,5 +791,19 @@
     "confirmPassword":"تأكيد كلمة المرور",
     "reset":"إعادة تعيين",
     "backToLogin":"العودة إلى تسجيل الدخول"
+  },
+  "notificationPermissionPrompt":{
+    "title":"صلاحية إالإشعارات",
+    "description":"من فضلك قم بقبول إشعارات التطبيق للاستفسار عن أي تحديثات أو إشعارات",
+    "allow":"السماح",
+    "block":"الرفض",
+    "content":"صلاحية الاشعارات مطلوبة لاستقبال الاشعارات من المتصفح.نرجو قبول الاشعارات",
+    "deploymentStatusUpdates":"اشعارات التطبيقات",
+    "systemAlertsAndWarnings":"اشعارات الاخطاء والملاحظات",
+    "importantAppNotifications":"اشعاارات النظام",
+    "maybeLater":"من الممكن لاحقا",
+    "allowNotifications":"السماح",
+    "neverShow":"لا تظهرها ابدا"
+ 
   }
 }
