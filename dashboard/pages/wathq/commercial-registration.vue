@@ -94,14 +94,14 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true,
         description: 'Commercial Registration ID'
       },
       {
         key: 'language',
         label: 'Language',
-        placeholder: 'ar',
+        placeholder: 'Choose Language',
         required: false,
         type: 'select' as const,
         options: [
@@ -123,8 +123,9 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
-        required: true
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID'
       },
       {
         key: 'language',
@@ -151,11 +152,12 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
-        required: true
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID'
       }
-    ],
-    category: 'Structure'
+      ],
+      category: 'Structure'
   },
   {
     id: 'status',
@@ -167,8 +169,9 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
-        required: true
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID'
       }
     ],
     category: 'Information'
@@ -183,8 +186,9 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
-        required: true
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID' 
       }
     ],
     category: 'Financial'
@@ -199,8 +203,9 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
-        required: true
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID'
       }
     ],
     category: 'People'
@@ -215,8 +220,9 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
-        required: true
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID'
       }
     ],
     category: 'People'
@@ -310,7 +316,7 @@ const endpoints = [
       {
         key: 'cr_number',
         label: 'CR Number',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],

@@ -37,7 +37,7 @@
       </div>
 
       <!-- Parameters Form -->
-      <form v-if="selectedEndpointData.params.length > 0" @submit.prevent="handleSubmit" class="space-y-4">
+      <UForm  v-if="selectedEndpointData.params.length > 0" @submit.prevent="handleSubmit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div v-for="param in selectedEndpointData.params" :key="param.key">
             <!-- Select Input -->
@@ -101,7 +101,7 @@
             {{ t('common.reset') }}
           </UButton>
         </div>
-      </form>
+      </UForm>
 
       <!-- No Parameters -->
       <div v-else>

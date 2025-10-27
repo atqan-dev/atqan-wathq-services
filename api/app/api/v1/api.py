@@ -20,6 +20,7 @@ from app.api.v1.endpoints import (
     users,
     wathq_export,
     wathq_external,
+    wathq_live,
     wathq_logs,
     wathq_offline,
     ws_notifications,
@@ -64,6 +65,7 @@ api_router.include_router(wathq_attorney.router, prefix="/wathq/attorney", tags=
 api_router.include_router(wathq_real_estate.router, prefix="/wathq/real-estate", tags=["wathq-real-estate"])
 api_router.include_router(wathq_spl_address.router, prefix="/wathq/spl-national-address", tags=["wathq-spl-national-address"])
 api_router.include_router(wathq_employee.router, prefix="/wathq/employee", tags=["wathq-employee"])
+api_router.include_router(wathq_live.router, prefix="/wathq/live", tags=["wathq-live"])
 api_router.include_router(wathq_logs.router, prefix="/wathq/logs", tags=["wathq-logs"])
 api_router.include_router(wathq_offline.router, prefix="/wathq/offline", tags=["wathq-offline"])
 api_router.include_router(wathq_export.router, prefix="/wathq/export", tags=["wathq-export"])
