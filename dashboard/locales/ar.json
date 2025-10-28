@@ -1,6 +1,7 @@
 {
   "title": "إدارة  API's نظام",
   "common": {
+    "reset": "إعادة تعيين",
     "loading": "جاري التحميل...",
     "error": "خطأ",
     "_locale": "ar",

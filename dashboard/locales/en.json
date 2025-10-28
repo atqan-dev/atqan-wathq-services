@@ -2,6 +2,7 @@
   "title": "Management WATHQ API's System",
   "_locale": "en",
   "common": {
+    "reset": "Reset",
     "loading": "Loading...",
     "errorStatus": "Error",
     "successStatus": "Success",
