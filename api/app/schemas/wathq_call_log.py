@@ -3,10 +3,10 @@ Pydantic schemas for WATHQ call logs.
 """
 
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class WathqCallLogBase(BaseModel):
@@ -17,8 +17,8 @@ class WathqCallLogBase(BaseModel):
     endpoint: str
     method: str = "POST"
     status_code: int
-    request_data: Optional[Dict[str, Any]] = None
-    response_body: Dict[str, Any]
+    request_data: Optional[Union[Dict[str, Any], List[Any]]] = None
+    response_body: Union[Dict[str, Any], List[Any]]
     duration_ms: Optional[int] = None
 
 
@@ -34,8 +34,7 @@ class WathqCallLogInDBBase(WathqCallLogBase):
     id: UUID
     fetched_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class WathqCallLog(WathqCallLogInDBBase):

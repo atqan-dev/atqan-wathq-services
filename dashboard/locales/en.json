@@ -799,6 +799,7 @@
     "importantAppNotifications":"Important App Notifications",
     "maybeLater":"May be later",
     "allowNotifications":"Allow Notifications",
-    "neverShow":"Never Show"
+    "neverShow":"Never Show",
+    "requesting":"Requesting"
   }
 }

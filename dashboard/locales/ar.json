@@ -231,6 +231,7 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "subtitle": "أتقن - لوحة التحكم الخاصة  ببوابة واثق الاستعلامية ",
+    "servicesHistoryError":"فشل في تحميل سجل الطلبات المتصلة",
     "refresh": "تحديث",
     "systemTenants": "تطبيقات نظام الاستعلامات",
     "viewAllTenants": "عرض جميع التطبيقات",
@@ -803,7 +804,8 @@
     "importantAppNotifications":"اشعاارات النظام",
     "maybeLater":"من الممكن لاحقا",
     "allowNotifications":"السماح",
-    "neverShow":"لا تظهرها ابدا"
+    "neverShow":"لا تظهرها ابدا",
+    "requesting":"طلب"
  
   }
 }
