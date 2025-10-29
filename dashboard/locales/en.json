@@ -707,6 +707,140 @@
         "fields": {
           "crNumber": "CR Number",
           "dateGregorian": "Date (Gregorian)"
+        },
+        "endpoints": {
+          "fullinfo": {
+            "name": "Get Full Info",
+            "description": "Retrieve complete commercial registration information"
+          },
+          "info": {
+            "name": "Get Basic Info",
+            "description": "Retrieve basic commercial registration information"
+          },
+          "branches": {
+            "name": "Get Branches",
+            "description": "Get all branches of the commercial registration"
+          },
+          "status": {
+            "name": "Get Status",
+            "description": "Check commercial registration status"
+          },
+          "capital": {
+            "name": "Get Capital",
+            "description": "Retrieve capital information"
+          },
+          "managers": {
+            "name": "Get Managers",
+            "description": "Get list of managers"
+          },
+          "owners": {
+            "name": "Get Owners",
+            "description": "Get list of owners"
+          },
+          "related": {
+            "name": "Get Related",
+            "description": "Retrieve list of commercial registrations with their relation for a given ID"
+          },
+          "owns": {
+            "name": "Check Ownership",
+            "description": "Check if identity owns any CR"
+          },
+          "crNationalNumber": {
+            "name": "Get CR National Number",
+            "description": "Get CR by national number"
+          },
+          "lookupStatus": {
+            "name": "Get Status Lookup",
+            "description": "Get status codes lookup table"
+          },
+          "lookupEntityType": {
+            "name": "Get Entity Type Lookup",
+            "description": "Get entity types lookup table"
+          },
+          "lookupCompanyForm": {
+            "name": "Get Company Form Lookup",
+            "description": "Get company forms lookup table"
+          },
+          "lookupCompanyCharacter": {
+            "name": "Get Company Character Lookup",
+            "description": "Get company characters lookup table"
+          },
+          "lookupRelation": {
+            "name": "Get Relation Lookup",
+            "description": "Get relations lookup table"
+          },
+          "lookupManagerPositions": {
+            "name": "Get Manager Positions Lookup",
+            "description": "Get manager positions lookup table"
+          },
+          "lookupIdentifierType": {
+            "name": "Get Identifier Type Lookup",
+            "description": "Get identifier types lookup table"
+          },
+          "lookupManagementStructure": {
+            "name": "Get Management Structure Lookup",
+            "description": "Get management structures lookup table"
+          },
+          "lookupPartnerType": {
+            "name": "Get Partner Type Lookup",
+            "description": "Get partner types lookup table"
+          },
+          "lookupPartnershipType": {
+            "name": "Get Partnership Type Lookup",
+            "description": "Get partnership types lookup table"
+          },
+          "lookupNationalities": {
+            "name": "Get Nationalities Lookup",
+            "description": "Get nationalities lookup table"
+          },
+          "lookupActivities": {
+            "name": "Get Activities Lookup",
+            "description": "Get activities lookup table"
+          },
+          "lookupCities": {
+            "name": "Get Cities Lookup",
+            "description": "Get cities lookup table"
+          },
+          "lookupCurrencies": {
+            "name": "Get Currencies Lookup",
+            "description": "Get currencies lookup table"
+          }
+        },
+        "params": {
+          "crId": "CR ID",
+          "crIdDescription": "Commercial Registration ID",
+          "crIdPlaceholder": "1010711252",
+          "language": "Language",
+          "languageDescription": "Response language",
+          "languagePlaceholder": "Choose Language",
+          "identityId": "Identity ID",
+          "identityIdDescription": "Identification number (رقم هوية)",
+          "identityIdPlaceholder": "1234567890",
+          "idType": "ID Type",
+          "idTypeDescription": "Identification type (نوع الهوية)",
+          "idTypePlaceholder": "National_ID",
+          "nationality": "Nationality NIC Code",
+          "nationalityDescription": "Required for Passport, Foreign_CR_No. See lookup/nationalities for valid codes",
+          "nationalityPlaceholder": "682",
+          "crNumber": "CR Number",
+          "crNumberDescription": "Commercial Registration Number",
+          "crNumberPlaceholder": "1010711252",
+          "idOptions": {
+            "nationalId": "National ID",
+            "residentId": "Resident ID",
+            "passport": "Passport",
+            "gccId": "GCC ID",
+            "endowmentDeedNo": "Endowment Deed No",
+            "licenseNo": "License No",
+            "crNationalId": "CR National ID",
+            "foreignCrNo": "Foreign CR No",
+            "nationalNumber": "National Number",
+            "borderNumber": "Boarder Number"
+          },
+          "languageOptions": {
+            "arabic": "Arabic",
+            "english": "English"
+          }
         }
       },
       "companyContract": {
