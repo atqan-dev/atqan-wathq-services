@@ -2,13 +2,10 @@
 PDF generation service using WeasyPrint for converting HTML/CSS to PDF.
 """
 
-import os
 import uuid
 from datetime import datetime
-from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, Optional
-from uuid import UUID
 
 from jinja2 import Template
 
@@ -51,7 +48,7 @@ class PdfGeneratorService:
         """
         try:
             # Try to import WeasyPrint
-            from weasyprint import HTML, CSS
+            from weasyprint import HTML
             from weasyprint.text.fonts import FontConfiguration
         except ImportError:
             # Fallback: Return HTML as is for preview

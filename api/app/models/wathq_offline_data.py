@@ -2,7 +2,7 @@
 WATHQ offline data storage model.
 """
 
-from sqlalchemy import Column, DateTime, Integer, String, Text, JSON, ForeignKey
+from sqlalchemy import Column, DateTime, Integer, Text, JSON, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func

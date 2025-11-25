@@ -9,7 +9,7 @@ import hashlib
 import json
 
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 
 from app.crud.base import CRUDBase
 from app.models.wathq_external_data import WathqExternalData

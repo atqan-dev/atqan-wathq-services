@@ -3,7 +3,7 @@ Route guards for authentication and authorization.
 """
 
 from functools import wraps
-from typing import Callable, Any
+from typing import Callable
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer

@@ -13,9 +13,7 @@
 </template>
 
 <script setup>
-definePageMeta({
-  middleware: 'guest'
-})
+
 // Auth layout for login/register pages
 useHead({
   title: 'Authentication'

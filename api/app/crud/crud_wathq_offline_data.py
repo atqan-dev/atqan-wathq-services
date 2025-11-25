@@ -2,7 +2,7 @@
 CRUD operations for WATHQ offline data.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any
 from uuid import UUID
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, desc

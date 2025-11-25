@@ -114,11 +114,13 @@
             </div>
           </template>
           <div class="h-64">
-            <BarChart
-              v-if="usersChartData.datasets && usersChartData.datasets.length > 0"
-              :labels="usersChartData.labels"
-              :datasets="usersChartData.datasets"
-            />
+            <ClientOnly>
+              <BarChart
+                v-if="usersChartData.datasets && usersChartData.datasets.length > 0"
+                :labels="usersChartData.labels"
+                :datasets="usersChartData.datasets"
+              />
+            </ClientOnly>
           </div>
         </UCard>
 
@@ -134,11 +136,13 @@
             </div>
           </template>
           <div class="h-64">
-            <BarChart
-              v-if="tenantsChartData.datasets && tenantsChartData.datasets.length > 0"
-              :labels="tenantsChartData.labels"
-              :datasets="tenantsChartData.datasets"
-            />
+            <ClientOnly>
+              <BarChart
+                v-if="tenantsChartData.datasets && tenantsChartData.datasets.length > 0"
+                :labels="tenantsChartData.labels"
+                :datasets="tenantsChartData.datasets"
+              />
+            </ClientOnly>
           </div>
         </UCard>
 
@@ -176,11 +180,13 @@
             </div>
           </template>
           <div class="h-64">
-            <LineChart
-              v-if="historyChartData.datasets && historyChartData.datasets.length > 0"
-              :labels="historyChartData.labels"
-              :datasets="historyChartData.datasets"
-            />
+            <ClientOnly>
+              <LineChart
+                v-if="historyChartData.datasets && historyChartData.datasets.length > 0"
+                :labels="historyChartData.labels"
+                :datasets="historyChartData.datasets"
+              />
+            </ClientOnly>
           </div>
         </UCard>
       </div>

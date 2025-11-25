@@ -1,4 +1,4 @@
-import { useToast } from '#imports'
+import { useToast } from '#ui/composables/useToast'
 import { useI18n } from '~/composables/useI18n'
 import type { NotificationColor } from '#ui/types'
 

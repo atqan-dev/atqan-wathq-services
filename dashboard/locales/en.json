@@ -2,6 +2,7 @@
   "title": "Management WATHQ API's System",
   "_locale": "en",
   "common": {
+    "reset": "Reset",
     "loading": "Loading...",
     "errorStatus": "Error",
     "successStatus": "Success",
@@ -39,6 +40,10 @@
     "browse": "Browse",
     "upload": "Upload",
     "download": "Download",
+    "copy": "Copy",
+    "copied": "Copied to clipboard",
+    "next": "Next",
+    "done": "Done",
     "success": "Success",
     "error": "Error",
     "showingResults": "Showing {count} results",
@@ -140,8 +145,45 @@
       "appearance": "Appearance",
       "language": "Language & Region",
       "notifications": "Notifications",
+      "security": "Security",
       "privacy": "Privacy & Security",
       "advanced": "Advanced"
+    },
+    "security": {
+      "title": "Security Settings",
+      "twoFactor": {
+        "sectionTitle": "Two-Factor Authentication",
+        "title": "Two-Factor Authentication",
+        "enabled": "Two-factor authentication is enabled",
+        "disabled": "Two-factor authentication is not enabled",
+        "enable": "Enable Two-Factor Authentication",
+        "disable": "Disable Two-Factor Authentication",
+        "verificationCode": "Verification Code",
+        "password": "Password",
+        "verify": "Verify",
+        "confirmDisable": "Disable 2FA",
+        "backupCodes": "Backup Codes",
+        "backupCodesRemaining": "{count} backup codes remaining",
+        "regenerate": "Regenerate Codes",
+        "regenerateTitle": "Regenerate Backup Codes",
+        "regenerateDesc": "This will invalidate all existing backup codes. You will need to save the new codes.",
+        "regenerateSuccess": "Backup codes regenerated successfully",
+        "newCodesGenerated": "New backup codes have been generated. Save them securely.",
+        "setupFailed": "Failed to setup two-factor authentication",
+        "enabledSuccess": "Two-factor authentication enabled successfully",
+        "disabledSuccess": "Two-factor authentication disabled successfully",
+        "disableWarning": "Disable Two-Factor Authentication",
+        "disableDesc": "Disabling two-factor authentication will make your account less secure. You will need to enter your password and current TOTP code to confirm.",
+        "setup": {
+          "step1Title": "Step 1: Scan QR Code",
+          "step1Desc": "Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)",
+          "step2Title": "Step 2: Verify Setup",
+          "step2Desc": "Enter the 6-digit code from your authenticator app to verify setup",
+          "step3Title": "Step 3: Save Backup Codes",
+          "step3Desc": "Save these backup codes in a secure location. Each code can only be used once.",
+          "manualEntry": "Can't scan? Enter this code manually:"
+        }
+      }
     },
     "appearance": {
       "title": "Appearance Settings",
@@ -227,7 +269,21 @@
     "username": "Username",
     "password": "Password",
     "login": "Login",
-    "logout": "Logout"
+    "logout": "Logout",
+    "success": "Login successful",
+    "welcomeBack": "Welcome back!",
+    "loginFailed": "Login failed",
+    "failedMessage": "Login failed. Please check your credentials.",
+    "twoFactor": {
+      "title": "Two-Factor Authentication",
+      "description": "Enter the 6-digit code from your authenticator app",
+      "placeholder": "000000",
+      "hint": "You can also use a backup code",
+      "verify": "Verify",
+      "invalidCode": "Invalid verification code",
+      "backupCode": "Backup Code",
+      "enterBackup": "Enter Backup Code"
+    }
   },
   "dashboard": {
     "title": "Dashboard",

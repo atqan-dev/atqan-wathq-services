@@ -10,11 +10,13 @@
     @refresh-offline="fetchOfflineRequests"
   >
     <template #test-form>
-      <EndpointTester
-        :endpoints="endpoints"
-        :base-url="baseUrl"
-        service-type="spl-national-address"
-      />
+      <ClientOnly>
+        <EndpointTester
+          :endpoints="endpoints"
+          :base-url="baseUrl"
+          service-type="spl-national-address"
+        />
+      </ClientOnly>
     </template>
 
     <template #live-requests>
@@ -70,7 +72,7 @@ const endpoints = [
       {
         key: 'cr_number',
         label: 'CR Number',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true,
         description: 'Commercial Registration Number'
       }

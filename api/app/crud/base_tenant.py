@@ -2,7 +2,7 @@
 Base CRUD operations with tenant filtering.
 """
 
-from typing import Any, Generic, TypeVar
+from typing import Any
 
 from sqlalchemy.orm import Session
 

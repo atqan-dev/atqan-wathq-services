@@ -2,7 +2,7 @@
 CRUD operations for notifications.
 """
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import List, Optional
 
 from sqlalchemy import and_, desc, func, or_

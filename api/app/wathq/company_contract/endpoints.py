@@ -4,9 +4,7 @@ FastAPI endpoints for Wathq Company Contract API.
 
 from typing import Any, List, Optional
 from fastapi import APIRouter, HTTPException, Query, Depends
-from sqlalchemy.orm import Session
 
-from app.api import deps
 from app.core.guards import require_management_user
 from app.wathq.company_contract.client import WathqCompanyContractClient
 from app.wathq.company_contract import schemas

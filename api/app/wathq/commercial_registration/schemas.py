@@ -2,7 +2,8 @@
 Pydantic schemas for Wathq Commercial Registration API responses.
 """
 
-from typing import List, Optional, Union
+from typing import List, Optional
+
 from pydantic import BaseModel
 
 
@@ -53,8 +54,8 @@ class Owner(BaseModel):
 
 
 class Capital(BaseModel):
-    currencyId: int
-    currencyName: str
+    currencyId: Optional[int] = None
+    currencyName: Optional[str] = None
     capital: Optional[float] = None
     contributionCapital: Optional[dict] = None
     stockCapital: Optional[dict] = None

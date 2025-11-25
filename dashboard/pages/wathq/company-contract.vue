@@ -11,11 +11,13 @@
   >
     <!-- Test API Form -->
     <template #test-form>
-      <EndpointTester
-        :endpoints="endpoints"
-        :base-url="baseUrl"
-        service-type="company-contract"
-      />
+      <ClientOnly>
+        <EndpointTester
+          :endpoints="endpoints"
+          :base-url="baseUrl"
+          service-type="company-contract"
+        />
+      </ClientOnly>
     </template>
 
     <!-- Live Requests -->
@@ -81,7 +83,7 @@ const endpoints = [
       {
         key: 'cr_national_number',
         label: 'CR National Number',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true,
         description: 'Commercial Registration National Number'
       }
@@ -98,7 +100,7 @@ const endpoints = [
       {
         key: 'cr_national_number',
         label: 'CR National Number',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],
@@ -114,7 +116,7 @@ const endpoints = [
       {
         key: 'cr_national_number',
         label: 'CR National Number',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       },
       {

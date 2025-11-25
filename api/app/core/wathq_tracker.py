@@ -8,7 +8,6 @@ from uuid import UUID
 from sqlalchemy.orm import Session
 
 from app.models.wathq_call_log import WathqCallLog
-from app.models.wathq_offline_data import WathqOfflineData
 from app.crud.crud_wathq_offline_data import wathq_offline_data
 
 

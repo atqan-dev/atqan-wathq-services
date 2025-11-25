@@ -6,7 +6,6 @@ import httpx
 from typing import Optional, Dict, Any
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
 from app.core.wathq_tracker import WathqCallTracker
 from app.core.wathq_utils import get_service_id_by_slug
 

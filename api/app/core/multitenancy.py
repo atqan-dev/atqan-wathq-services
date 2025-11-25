@@ -8,7 +8,6 @@ from contextvars import ContextVar
 from fastapi import HTTPException, Request, status
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 

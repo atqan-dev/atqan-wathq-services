@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
 
-from app import models, schemas
+from app import models
 from app.api import deps
 from app.crud.crud_wathq_external_data import wathq_external_data
 from app.services.wathq_external_service import wathq_external_service
@@ -51,8 +51,8 @@ async def call_wathq_service_tenant(
         tenant_service = db.query(models.service.TenantService).filter(
             models.service.TenantService.tenant_id == current_user.tenant_id,
             models.service.TenantService.service_id == service.id,
-            models.service.TenantService.is_active == True,
-            models.service.TenantService.is_approved == True
+            models.service.TenantService.is_active,
+            models.service.TenantService.is_approved
         ).first()
         
         if not tenant_service:

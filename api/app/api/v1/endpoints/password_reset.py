@@ -3,7 +3,7 @@ Password reset endpoints for management users.
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 import secrets
 import string
 
@@ -11,13 +11,10 @@ from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 
-from app import crud, schemas
 from app.api import deps
 from app.api.management_deps import get_current_active_management_user
 from app.core import security
-from app.core.config import settings
 from app.models.management_user import ManagementUser
-from app.db.session import SessionLocal
 
 router = APIRouter()
 

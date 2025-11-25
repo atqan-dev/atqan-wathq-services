@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.api import deps
 from app.core.guards import require_super_admin, require_management_user
-from app import crud, schemas
+from app import crud
 
 router = APIRouter()
 

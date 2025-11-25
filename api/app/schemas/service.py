@@ -5,7 +5,7 @@ Pydantic schemas for service operations with WATHQ integration.
 from datetime import datetime
 from decimal import Decimal
 from uuid import UUID
-from typing import Optional, List
+from typing import List
 
 from pydantic import BaseModel
 

@@ -1,15 +1,17 @@
 <template>
   <div class="container mx-auto py-8 px-4 max-w-7xl">
-    <UserProfile 
-      :profile="profile" 
-      :loading="loading" 
-      :error="error" 
-      :updating="updating" 
-      :updateError="updateError"
-      :uploadingAvatar="uploadingAvatar"
-      @update="handleUpdate"
-      @upload-avatar="handleAvatarUpload"
-    />
+    <ClientOnly>
+      <UserProfile
+        :profile="profile"
+        :loading="loading"
+        :error="error"
+        :updating="updating"
+        :updateError="updateError"
+        :uploadingAvatar="uploadingAvatar"
+        @update="handleUpdate"
+        @upload-avatar="handleAvatarUpload"
+      />
+    </ClientOnly>
   </div>
 </template>
 

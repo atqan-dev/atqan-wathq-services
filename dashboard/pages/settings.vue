@@ -230,6 +230,26 @@
               </div>
             </div>
 
+            <!-- Security Settings -->
+            <div v-if="activeSection === 'security'" class="p-6">
+              <div class="flex items-center mb-6">
+                <span class="w-6 h-6 mr-3">🔐</span>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                  {{ t('settings.security.title') }}
+                </h2>
+              </div>
+
+              <div class="space-y-6">
+                <!-- Two-Factor Authentication -->
+                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                  <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+                    {{ t('settings.security.twoFactor.sectionTitle') }}
+                  </h3>
+                  <TwoFactorSettings />
+                </div>
+              </div>
+            </div>
+
             <!-- Privacy Settings -->
             <div v-if="activeSection === 'privacy'" class="p-6">
               <div class="flex items-center mb-6">
@@ -426,6 +446,7 @@ const settingSections = [
   { id: 'appearance', title: 'settings.sections.appearance', icon: '🎨' },
   { id: 'language', title: 'settings.sections.language', icon: '🌍' },
   { id: 'notifications', title: 'settings.sections.notifications', icon: '🔔' },
+  { id: 'security', title: 'settings.sections.security', icon: '🔐' },
   { id: 'privacy', title: 'settings.sections.privacy', icon: '🛡️' },
   { id: 'advanced', title: 'settings.sections.advanced', icon: '⚙️' }
 ]

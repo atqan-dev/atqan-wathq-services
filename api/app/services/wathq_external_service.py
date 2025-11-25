@@ -5,8 +5,6 @@ Handles caching, external API calls, and data management.
 
 import httpx
 from typing import Optional, Dict, Any, List
-from datetime import datetime
-from uuid import UUID
 import logging
 
 from sqlalchemy.orm import Session

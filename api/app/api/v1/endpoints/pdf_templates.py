@@ -8,11 +8,9 @@ from uuid import UUID
 from fastapi import (
     APIRouter,
     Depends,
-    File,
     HTTPException,
     Query,
     Response,
-    UploadFile,
     status,
 )
 from sqlalchemy.orm import Session

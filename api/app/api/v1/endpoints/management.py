@@ -312,7 +312,7 @@ def read_current_management_user_profile(
     current_user: ManagementUser = Depends(get_current_active_management_user),
 ) -> Any:
     """Get current management user's profile (convenience endpoint)."""
-    
+
     profile = (
         db.query(ManagementUserProfile)
         .filter(ManagementUserProfile.management_user_id == current_user.id)
@@ -1168,7 +1168,7 @@ def approve_tenant_service(
     return tenant_service
 
 
-# PUT http://127.0.0.1:5501/api/v1/management/tenants/services/2
+# PUT http://127.0.0.1:4551/api/v1/management/tenants/services/2
 @router.put("/tenants/services/{service_id}", response_model=schemas.TenantService)
 def update_tenant_service(
     service_id: int,

@@ -2,11 +2,17 @@
 FastAPI application factory and configuration.
 """
 
+import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.errors import RateLimitExceeded
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.api.v1.api import api_router
@@ -17,6 +23,21 @@ from app.middleware.request_counter import RequestCounterMiddleware
 
 # Setup logging
 setup_logging()
+
+# Setup Sentry
+if settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=settings.SENTRY_DSN,
+        integrations=[
+            # FastAPIIntegration(),  # Commented out due to import issues
+            # SqlalchemyIntegration(),  # Commented out due to import issues
+        ],
+        environment=settings.ENVIRONMENT,
+        traces_sample_rate=1.0 if settings.DEBUG else 0.1,
+    )
+
+# Setup rate limiting
+limiter = Limiter(key_func=get_remote_address)
 
 
 def create_application() -> FastAPI:
@@ -49,9 +70,14 @@ def create_application() -> FastAPI:
             allowed_hosts=settings.ALLOWED_HOSTS,
         )
 
+    # Add rate limiting middleware
+    application.state.limiter = limiter
+    application.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    application.add_middleware(SlowAPIMiddleware)
+
     # Add tenant identification middleware
     application.middleware("http")(tenant_identification_middleware)
-    
+
     # Add request counter middleware
     application.add_middleware(RequestCounterMiddleware)
 

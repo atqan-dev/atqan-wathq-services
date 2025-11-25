@@ -59,9 +59,7 @@
 const { initializeDirection, isRTL } = useLanguage()
 const { isCollapsed, sidebarWidth, initializeSidebar } = useSidebar()
 
-definePageMeta({
-  middleware: 'auth'
-})
+
 
 // Initialize on mount
 onMounted(() => {

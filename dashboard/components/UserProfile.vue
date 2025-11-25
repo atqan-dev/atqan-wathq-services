@@ -262,7 +262,11 @@ const emit = defineEmits<{
 
 const isEditing = ref(false)
 const editData = ref<Partial<UserProfile>>({})
-const avatarKey = ref(Date.now())
+const avatarKey = ref(0)
+
+onMounted(() => {
+  avatarKey.value = Date.now()
+})
 
 // Computed property to add cache-busting timestamp to avatar URL
 const avatarUrlWithCacheBust = computed(() => {

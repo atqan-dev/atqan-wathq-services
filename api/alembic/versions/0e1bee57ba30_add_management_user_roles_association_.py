@@ -5,8 +5,6 @@ Revises: add_notifications_table
 Create Date: 2025-10-05 19:45:13.603058
 
 """
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.

@@ -3,9 +3,8 @@ CRUD operations for WATHQ call logs.
 """
 
 from typing import List, Optional
-from datetime import datetime
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, desc
+from sqlalchemy import desc
 
 from app.crud.base import CRUDBase
 from app.models.wathq_call_log import WathqCallLog

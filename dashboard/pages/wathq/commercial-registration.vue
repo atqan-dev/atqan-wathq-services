@@ -11,11 +11,13 @@
   >
     <!-- Test API Form -->
     <template #test-form>
-      <EndpointTester
-        :endpoints="endpoints"
-        :base-url="baseUrl"
-        service-type="commercial-registration"
-      />
+      <ClientOnly>
+        <EndpointTester
+          :endpoints="endpoints"
+          :base-url="baseUrl"
+          service-type="commercial-registration"
+        />
+      </ClientOnly>
     </template>
 
     <!-- Live Requests -->
@@ -26,7 +28,7 @@
             <UInput
               v-model="liveForm.cr_number"
               :label="t('wathq.services.commercialRegistration.fields.crNumber')"
-              placeholder="1010000000"
+              placeholder="1010711252"
               required
             />
             <UInput
@@ -47,18 +49,30 @@
           </UButton>
         </form>
 
-        <RequestLogsTable :requests="liveRequests" :is-loading="isLoading" />
+        <SimpleRequestLogsTable 
+          ref="liveRequestsTable"
+          type="live" 
+          service-type="commercial-registration" 
+        />
       </div>
     </template>
 
     <!-- Request Logs -->
     <template #request-logs>
-      <RequestLogsTable :requests="requests" :is-loading="isLoading" />
+      <SimpleRequestLogsTable 
+        ref="requestLogsTable"
+        type="logs" 
+        service-type="commercial-registration" 
+      />
     </template>
 
     <!-- Offline Requests -->
     <template #offline-requests>
-      <RequestLogsTable :requests="offlineRequests" :is-loading="isLoading" />
+      <SimpleRequestLogsTable 
+        ref="offlineRequestsTable"
+        type="offline" 
+        service-type="commercial-registration" 
+      />
     </template>
   </ServicePageLayout>
 </template>
@@ -68,7 +82,7 @@ import { ref, onMounted } from 'vue'
 import { useI18n } from '~/composables/useI18n'
 import { useWathqServices } from '~/composables/useWathqServices'
 import ServicePageLayout from '~/components/wathq/ServicePageLayout.vue'
-import RequestLogsTable from '~/components/wathq/RequestLogsTable.vue'
+import SimpleRequestLogsTable from '~/components/wathq/SimpleRequestLogsTable.vue'
 import EndpointTester from '~/components/wathq/EndpointTester.vue'
 import type { WathqTestResponse, CommercialRegistrationParams } from '~/types/wathq'
 
@@ -94,7 +108,7 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true,
         description: 'Commercial Registration ID'
       }
@@ -111,7 +125,7 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],
@@ -127,7 +141,7 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],
@@ -143,7 +157,7 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],
@@ -159,7 +173,7 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],
@@ -175,7 +189,7 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],
@@ -191,7 +205,7 @@ const endpoints = [
       {
         key: 'cr_id',
         label: 'CR ID',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],
@@ -253,7 +267,7 @@ const endpoints = [
       {
         key: 'cr_number',
         label: 'CR Number',
-        placeholder: '1010000000',
+        placeholder: '1010711252',
         required: true
       }
     ],
@@ -411,8 +425,9 @@ const liveForm = ref<CommercialRegistrationParams>({
 
 // State
 const testResult = ref<WathqTestResponse | null>(null)
-const liveRequests = ref<any[]>([])
-const offlineRequests = ref<any[]>([])
+const liveRequestsTable = ref()
+const requestLogsTable = ref()
+const offlineRequestsTable = ref()
 
 // Handlers
 async function handleTestApi() {
@@ -431,7 +446,10 @@ async function handleLiveRequest() {
       'query',
       liveForm.value
     )
-    liveRequests.value.unshift(result)
+    // Refresh the live requests table after successful request
+    if (liveRequestsTable.value) {
+      liveRequestsTable.value.refresh()
+    }
     liveForm.value = { cr_number: '', date_gregorian: '' }
   } catch (error) {
     console.error('Live request failed:', error)
@@ -444,30 +462,23 @@ function resetTestForm() {
 }
 
 async function fetchLiveRequests() {
-  try {
-    await fetchRequests({ service_type: 'commercial-registration', status: 'success' })
-    liveRequests.value = requests.value
-  } catch (error) {
-    console.log('Live requests not available yet')
-    liveRequests.value = []
+  // The new table component handles its own data fetching
+  if (liveRequestsTable.value) {
+    liveRequestsTable.value.refresh()
   }
 }
 
 async function fetchRequestLogs() {
-  try {
-    await fetchRequests({ service_type: 'commercial-registration' })
-  } catch (error) {
-    console.log('Request logs not available yet')
+  // The new table component handles its own data fetching
+  if (requestLogsTable.value) {
+    requestLogsTable.value.refresh()
   }
 }
 
 async function fetchOfflineRequests() {
-  try {
-    await fetchOffline('commercial-registration')
-    offlineRequests.value = requests.value
-  } catch (error) {
-    console.log('Offline requests not available yet')
-    offlineRequests.value = []
+  // The new table component handles its own data fetching
+  if (offlineRequestsTable.value) {
+    offlineRequestsTable.value.refresh()
   }
 }
 

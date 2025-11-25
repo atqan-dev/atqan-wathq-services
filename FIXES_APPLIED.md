@@ -72,10 +72,10 @@ Expected output: Migration runs successfully
 cd dashboard
 pnpm dev
 ```
-Expected output: Server starts on http://localhost:5501 without errors
+Expected output: Server starts on http://localhost:4551 without errors
 
 ### 3. Navigate to PDF Templates
-- URL: http://localhost:5501/pdf-templates
+- URL: http://localhost:4551/pdf-templates
 - Should see the PDF templates list page
 - Click "Create Template" to test the editor
 

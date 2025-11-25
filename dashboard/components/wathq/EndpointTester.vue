@@ -234,6 +234,8 @@ const props = defineProps<Props>()
 
 const { t } = useI18n()
 const { success: showSuccess, error: showError } = useAlert()
+const { authenticatedFetch } = useAuthenticatedFetch()
+const { fetchRequests } = useWathqServices()
 
 const selectedEndpoint = ref<string>('')
 const formData = ref<Record<string, any>>({})
@@ -296,30 +298,25 @@ async function handleSubmit() {
       }
     })
 
-    // Make request
-    const res = await fetch(url, {
-      method: selectedEndpointData.value.method,
-      headers: {
-        'Content-Type': 'application/json'
-      }
+    // Make request using authenticated fetch
+    const data = await authenticatedFetch(url, {
+      method: selectedEndpointData.value.method
     })
 
     const duration = Date.now() - startTime
-    const data = await res.json()
 
     response.value = {
-      success: res.ok,
+      success: true,
       data: data,
-      status_code: res.status,
+      status_code: 200,
       duration_ms: duration,
       timestamp: new Date().toISOString()
     }
 
-    if (res.ok) {
-      showSuccess(t('wathq.requestSuccess'))
-    } else {
-      showError(t('wathq.requestFailed'))
-    }
+    showSuccess(t('wathq.requestSuccess'))
+    
+    // Refresh stats to update the cards
+    await fetchRequests({ service_type: props.serviceType as any })
   } catch (err: any) {
     const duration = Date.now() - Date.now()
     response.value = {

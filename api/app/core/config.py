@@ -49,10 +49,10 @@ class Settings(BaseSettings):
 
     BACKEND_CORS_ORIGINS: list[str] = [
         "http://localhost",
-        "http://localhost:5501",
-        "http://127.0.0.1:5501",
-        "http://127.0.0.1:3000",
-        "http://localhost:3000",
+        "http://localhost:5551",
+        "http://127.0.0.1:5551",
+        "http://127.0.0.1:4551",
+        "http://localhost:4551",
         "http://localhost:3000",
         "http://localhost:4500",
         "http://127.0.0.1:4500",
@@ -111,7 +111,10 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str = os.getenv("FIRST_SUPERUSER_PASSWORD", "admin123")
 
     # Wathq API
-    WATHQ_API_KEY: str = os.getenv("WATHQ_API_KEY", "your-wathq-api-key-here")
+    WATHQ_API_KEY: str = os.getenv("WATHQ_API_KEY", "PnxjlQkR1Rfx3qVoPWWUXJUzaNKxNIj6")
+
+    # Sentry
+    SENTRY_DSN: str = os.getenv("SENTRY_DSN", "")
 
     # File uploads
     UPLOADS_DIR: str = os.getenv("UPLOADS_DIR", "uploads")

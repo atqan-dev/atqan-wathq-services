@@ -45,7 +45,7 @@
           />
           <div class="text-sm">
             <NuxtLink
-              to="/forgot-password"
+              to="/reset-password"
               class="font-medium text-primary-600 hover:text-primary-500"
             >
               {{ t("login.forgotPassword") }}

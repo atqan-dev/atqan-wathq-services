@@ -10,11 +10,13 @@
     @refresh-offline="fetchOfflineRequests"
   >
     <template #test-form>
-      <EndpointTester
-        :endpoints="endpoints"
-        :base-url="baseUrl"
-        service-type="real-estate"
-      />
+      <ClientOnly>
+        <EndpointTester
+          :endpoints="endpoints"
+          :base-url="baseUrl"
+          service-type="real-estate"
+        />
+      </ClientOnly>
     </template>
 
     <template #live-requests>

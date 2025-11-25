@@ -4,7 +4,6 @@ HTTP client for Wathq Company Contract API.
 
 import httpx
 from typing import Optional, Dict, Any
-from app.core.config import settings
 
 
 class WathqCompanyContractClient:

@@ -22,6 +22,12 @@ export interface AuthResponse {
   refresh_token?: string
 }
 
+export interface TOTPRequiredResponse {
+  requires_totp: boolean
+  temp_token: string
+  message: string
+}
+
 export interface UserResponse {
   id: number
   email: string
@@ -39,18 +45,26 @@ export const useAuthStore = defineStore('auth', {
     token: null as string | null,
     refreshToken: null as string | null,
     isLoading: false as boolean,
+    // TOTP state
+    totpRequired: false as boolean,
+    totpTempToken: null as string | null,
   }),
 
   getters: {
     isAuthenticated: (state) => {
       return !!state.user && !!state.token
     },
+    requiresTOTP: (state) => {
+      return state.totpRequired && !!state.totpTempToken
+    },
   },
 
   actions: {
-    async login(credentials: LoginCredentials): Promise<void> {
+    async login(credentials: LoginCredentials): Promise<{ requiresTOTP: boolean }> {
       try {
         this.isLoading = true
+        this.totpRequired = false
+        this.totpTempToken = null
         
         // Prepare form data for OAuth2 password flow
         const formData = new FormData()
@@ -61,66 +75,113 @@ export const useAuthStore = defineStore('auth', {
         formData.append('client_id', 'string')
         formData.append('client_secret', '********')
 
-        const response = await $fetch<AuthResponse>('/api/v1/management/auth/login', {
+        const response = await $fetch<AuthResponse | TOTPRequiredResponse>('/api/v1/management/auth/login', {
           method: 'POST',
           body: formData
         })
 
-        // Store tokens in Pinia state
-        this.token = response.access_token
-        this.refreshToken = response.refresh_token || null
-
-        // Get user information using the access token
-        const userResponse = await $fetch<UserResponse>('/api/v1/management/users/me', {
-          headers: {
-            Authorization: `Bearer ${response.access_token}`
-          }
-        })
-
-        // Convert UserResponse to User interface
-        this.user = {
-          id: userResponse.id,
-          email: userResponse.email,
-          first_name: userResponse.first_name,
-          last_name: userResponse.last_name,
-          is_active: userResponse.is_active,
-          is_super_admin: userResponse.is_super_admin,
-          created_at: userResponse.created_at,
-          updated_at: userResponse.updated_at
+        // Check if TOTP is required
+        if ('requires_totp' in response && response.requires_totp) {
+          this.totpRequired = true
+          this.totpTempToken = response.temp_token
+          return { requiresTOTP: true }
         }
 
-        // Store token in cookie for persistence
-        const tokenCookie = useCookie<string | null>('auth-token', {
-          default: () => null,
-          maxAge: 60 * 60 * 24 * 7, // 7 days
-          secure: true,
-          sameSite: 'strict'
-        })
-        tokenCookie.value = response.access_token
-
-        // Store refresh token if provided
-        if (response.refresh_token) {
-          const refreshCookie = useCookie<string | null>('refresh-token', {
-            default: () => null,
-            maxAge: 60 * 60 * 24 * 30, // 30 days
-            secure: true,
-            sameSite: 'strict'
-          })
-          refreshCookie.value = response.refresh_token
-        }
-
-        // Store user in localStorage for persistence
-        if (process.client) {
-          localStorage.setItem('auth-user', JSON.stringify(this.user))
-        }
-
+        // No TOTP required - complete login
+        const authResponse = response as AuthResponse
+        await this.completeLogin(authResponse)
+        return { requiresTOTP: false }
         
       } catch (error: any) {
-        
         throw error
       } finally {
         this.isLoading = false
       }
+    },
+
+    async verifyTOTP(code: string): Promise<void> {
+      if (!this.totpTempToken) {
+        throw new Error('No TOTP session active')
+      }
+
+      try {
+        this.isLoading = true
+
+        const response = await $fetch<AuthResponse>('/api/v1/management/auth/login/totp', {
+          method: 'POST',
+          body: {
+            temp_token: this.totpTempToken,
+            code
+          }
+        })
+
+        // Complete login with tokens
+        await this.completeLogin(response)
+
+        // Clear TOTP state
+        this.totpRequired = false
+        this.totpTempToken = null
+
+      } catch (error: any) {
+        throw error
+      } finally {
+        this.isLoading = false
+      }
+    },
+
+    async completeLogin(response: AuthResponse): Promise<void> {
+      // Store tokens in Pinia state
+      this.token = response.access_token
+      this.refreshToken = response.refresh_token || null
+
+      // Get user information using the access token
+      const userResponse = await $fetch<UserResponse>('/api/v1/management/users/me', {
+        headers: {
+          Authorization: `Bearer ${response.access_token}`
+        }
+      })
+
+      // Convert UserResponse to User interface
+      this.user = {
+        id: userResponse.id,
+        email: userResponse.email,
+        first_name: userResponse.first_name,
+        last_name: userResponse.last_name,
+        is_active: userResponse.is_active,
+        is_super_admin: userResponse.is_super_admin,
+        created_at: userResponse.created_at,
+        updated_at: userResponse.updated_at
+      }
+
+      // Store token in cookie for persistence
+      const tokenCookie = useCookie<string | null>('auth-token', {
+        default: () => null,
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+        secure: true,
+        sameSite: 'strict'
+      })
+      tokenCookie.value = response.access_token
+
+      // Store refresh token if provided
+      if (response.refresh_token) {
+        const refreshCookie = useCookie<string | null>('refresh-token', {
+          default: () => null,
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+          secure: true,
+          sameSite: 'strict'
+        })
+        refreshCookie.value = response.refresh_token
+      }
+
+      // Store user in localStorage for persistence
+      if (process.client) {
+        localStorage.setItem('auth-user', JSON.stringify(this.user))
+      }
+    },
+
+    cancelTOTP(): void {
+      this.totpRequired = false
+      this.totpTempToken = null
     },
 
     async logout(): Promise<void> {

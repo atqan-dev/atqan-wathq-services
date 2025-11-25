@@ -90,7 +90,7 @@ export function useNotifications() {
 
   function getUserType(): string {
     // Get user type from localStorage or auth store
-    const userStr = localStorage.getItem('user')
+    const userStr = localStorage.getItem('auth-user')
     if (userStr) {
       try {
         const user = JSON.parse(userStr)

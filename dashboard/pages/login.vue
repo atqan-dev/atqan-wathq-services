@@ -21,8 +21,8 @@
             <img :src="atqanLogo" alt="Atqan" class="w-46 h-46" />
           </div>
 
-          <!-- Form -->
-          <UForm :schema="schema" :state="formState" @submit="handleLogin">
+          <!-- Login Form -->
+          <UForm v-if="!showTOTP" :schema="schema" :state="formState" @submit="handleLogin">
             <div class="space-y-6">
               <!-- Username Field -->
               <UFormGroup :label="t('login.username')" name="username" required>
@@ -60,7 +60,7 @@
                 />
                 <div class="text-sm">
                   <NuxtLink
-                    to="/forgot-password"
+                    to="/reset-password"
                     class="font-medium text-accent hover:text-accent/80"
                   >
                     {{ t("login.forgotPassword") }}
@@ -107,6 +107,80 @@
               </div>
             </div>
           </UForm>
+
+          <!-- TOTP Verification Form -->
+          <div v-else class="space-y-6">
+            <!-- Back Button -->
+            <button
+              @click="cancelTOTP"
+              class="flex items-center text-sm text-gray-300 hover:text-white transition-colors"
+            >
+              <UIcon name="i-heroicons-arrow-left" class="w-4 h-4 mr-1" />
+              {{ t("common.back") }}
+            </button>
+
+            <!-- TOTP Header -->
+            <div class="text-center">
+              <div class="mx-auto w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-4">
+                <UIcon name="i-heroicons-shield-check" class="w-6 h-6 text-blue-400" />
+              </div>
+              <h2 class="text-xl font-semibold text-white mb-2">
+                {{ t("login.twoFactor.title") }}
+              </h2>
+              <p class="text-sm text-gray-300">
+                {{ t("login.twoFactor.description") }}
+              </p>
+            </div>
+
+            <!-- TOTP Code Input -->
+            <div>
+              <UInput
+                v-model="totpCode"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="8"
+                :placeholder="t('login.twoFactor.placeholder')"
+                :disabled="isLoading"
+                class="bg-white/10 dark:bg-gray-800/10 text-center text-2xl tracking-widest font-mono"
+                size="lg"
+                @keyup.enter="handleTOTPVerify"
+              />
+              <p class="mt-2 text-xs text-gray-400 text-center">
+                {{ t("login.twoFactor.hint") }}
+              </p>
+            </div>
+
+            <!-- Error Message -->
+            <div
+              v-if="error"
+              class="rounded-md bg-red-500/20 backdrop-blur-sm p-4 border border-red-500/30"
+            >
+              <div class="flex">
+                <UIcon
+                  name="i-heroicons-exclamation-triangle"
+                  class="w-5 h-5 text-red-400"
+                />
+                <div class="ml-3">
+                  <div class="text-sm text-red-200">
+                    {{ error }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Verify Button -->
+            <UButton
+              block
+              :loading="isLoading"
+              :disabled="isLoading || totpCode.length < 6"
+              size="lg"
+              @click="handleTOTPVerify"
+            >
+              <UIcon name="i-heroicons-check" class="w-5 h-5 mr-2" />
+              {{ t("login.twoFactor.verify") }}
+            </UButton>
+          </div>
         </div>
       </div>
     </div>
@@ -146,6 +220,8 @@ const formState = reactive({
 // UI state
 const isLoading = ref(false);
 const error = ref("");
+const showTOTP = ref(false);
+const totpCode = ref("");
 
 // Handle login
 const handleLogin = async () => {
@@ -153,14 +229,21 @@ const handleLogin = async () => {
     isLoading.value = true;
     error.value = "";
 
-    await authStore.login({
+    const result = await authStore.login({
       username: formState.username,
       password: formState.password,
     });
 
+    // Check if TOTP is required
+    if (result.requiresTOTP) {
+      showTOTP.value = true;
+      return;
+    }
+
+    // Login successful without TOTP
     toast.add({
-      title: "Login successful",
-      description: "Welcome back!",
+      title: t("login.success"),
+      description: t("login.welcomeBack"),
       color: "green",
     });
 
@@ -168,14 +251,46 @@ const handleLogin = async () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
     await router.push("/");
   } catch (err) {
-    error.value = err.message || "Login failed. Please check your credentials.";
+    error.value = err.message || t("login.failedMessage");
     toast.add({
-      title: "Login failed",
+      title: t("login.loginFailed"),
       description: error.value,
       color: "red",
     });
   } finally {
     isLoading.value = false;
   }
+};
+
+// Handle TOTP verification
+const handleTOTPVerify = async () => {
+  try {
+    isLoading.value = true;
+    error.value = "";
+
+    await authStore.verifyTOTP(totpCode.value);
+
+    toast.add({
+      title: t("login.success"),
+      description: t("login.welcomeBack"),
+      color: "green",
+    });
+
+    await nextTick();
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    await router.push("/");
+  } catch (err) {
+    error.value = err.data?.detail || err.message || t("login.twoFactor.invalidCode");
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+// Cancel TOTP and go back to login
+const cancelTOTP = () => {
+  showTOTP.value = false;
+  totpCode.value = "";
+  error.value = "";
+  authStore.cancelTOTP();
 };
 </script>

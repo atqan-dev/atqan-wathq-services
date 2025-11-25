@@ -154,16 +154,29 @@ export function useWathqServices() {
       error.value = null
 
       const params = new URLSearchParams()
-      if (filters?.service_type) params.append('service_type', filters.service_type)
-      if (filters?.status && filters.status !== 'all') params.append('status', filters.status)
-      if (filters?.date_from) params.append('date_from', filters.date_from)
-      if (filters?.date_to) params.append('date_to', filters.date_to)
+      params.append('limit', '100') // Default limit
       if (filters?.tenant_id) params.append('tenant_id', filters.tenant_id.toString())
-      if (filters?.search) params.append('search', filters.search)
+      if (filters?.status === 'error') params.append('only_failed', 'true')
 
-      const url = `${getBaseUrl()}/logs/my-calls?${params.toString()}`
-      const data = await authenticatedFetch<WathqApiRequest[]>(url)
-      requests.value = data
+      const url = `/api/v1/management/analytics/requests?${params.toString()}`
+      const apiData = await authenticatedFetch<any[]>(url)
+      
+      // Transform API response to match frontend interface
+      requests.value = apiData.map(item => ({
+        id: item.id,
+        service_type: item.service_name?.toLowerCase().replace(/\s+/g, '-') || 'unknown',
+        endpoint: item.endpoint,
+        method: item.method,
+        request_data: item.request_params || {},
+        response_data: {},
+        status_code: item.response_status,
+        duration_ms: item.response_time_ms,
+        is_success: item.is_successful,
+        error_message: item.error_message,
+        created_at: item.created_at,
+        tenant_id: item.tenant_name ? 1 : undefined, // Approximate mapping
+        user_id: item.user_email ? 1 : undefined // Approximate mapping
+      }))
 
       calculateStats()
       console.log('[WathqServices] Fetched requests:', requests.value.length)

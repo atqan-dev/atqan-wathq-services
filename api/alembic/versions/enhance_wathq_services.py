@@ -8,7 +8,6 @@ Create Date: 2024-01-01 12:00:00.000000
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
-import uuid
 
 # revision identifiers
 revision = 'enhance_wathq_services'

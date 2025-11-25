@@ -3,7 +3,6 @@ HTTP client for Wathq Real Estate API with tenant-specific keys and tracking.
 """
 
 import httpx
-from typing import Dict, Any
 from sqlalchemy.orm import Session
 
 from app.core.wathq_tracker import WathqCallTracker

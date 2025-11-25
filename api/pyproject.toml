@@ -33,4 +33,12 @@ dependencies = [
     "uvicorn[standard]>=0.27.0",
     "weasyprint>=62.0",
     "jinja2>=3.1.0",
+    "sentry-sdk[fastapi]>=1.40.0",
+    "python-json-logger>=2.0.7",
+    "slowapi>=0.1.9",
+    "aioredis>=2.0.0",
+    "gunicorn>=21.2.0",
+    "pyotp>=2.9.0",
+    "qrcode[pil]>=7.4.0",
+    "cryptography>=41.0.0",
 ]

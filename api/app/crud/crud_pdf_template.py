@@ -3,7 +3,7 @@ CRUD operations for PDF Template models with GrapesJS integration.
 """
 
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 from uuid import UUID
 
 from sqlalchemy import and_, desc, func, or_
@@ -265,7 +265,7 @@ class CRUDPdfTemplate(
                     grapesjs_html=version.grapesjs_html,
                     grapesjs_css=version.grapesjs_css,
                     data_mapping=version.data_mapping,
-                    change_description=f"Duplicated from original",
+                    change_description="Duplicated from original",
                     created_by=creator_id,
                 )
                 db.add(new_version)

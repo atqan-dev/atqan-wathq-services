@@ -10,12 +10,12 @@ export default defineNuxtConfig({
   // Server configuration
   devServer: {
     host: "localhost",
-    port: 5501,
+    port: 4551,
   },
   runtimeConfig: {
-    apiBaseUrl: process.env.NUXT_PRIVATE_API_BASE_URL || 'http://localhost:5500',
+    apiBaseUrl: process.env.NUXT_PRIVATE_API_BASE_URL || 'http://localhost:5551',
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:5500/api/v1',
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:5551/api/v1',
     },
   },
   // App configuration
@@ -31,6 +31,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@nuxt/devtools",
     "@pinia/nuxt",
+    "@nuxt/image",
   ],
   // UI configuration
   ui: {
@@ -38,7 +39,7 @@ export default defineNuxtConfig({
   },
   // Color mode configuration
   colorMode: {
-    preference: "system",
+    preference: "light",
     fallback: "light",
     classSuffix: '',
     classPrefix: '',
@@ -49,12 +50,19 @@ export default defineNuxtConfig({
   sourcemap: {
     client: true,
   },
+  // Image optimization
+  image: {
+    quality: 80,
+    format: ['webp', 'png', 'jpg'],
+  },
+
+
   // Vite configuration
   vite: {
     server: {
       proxy: {
         '/api': {
-          target: 'http://localhost:5500',
+          target: 'http://localhost:5551',
           changeOrigin: true,
           secure: false,
           ws: true,
@@ -85,12 +93,15 @@ export default defineNuxtConfig({
         propsDestructure: true,
       },
     },
+    build: {
+      chunkSizeWarningLimit: 1000,
+    },
   },
   // Nitro configuration for production
   nitro: {
     routeRules: {
       '/api/**': {
-        proxy: 'http://localhost:5500/api/**',
+        proxy: 'http://localhost:5551/api/**',
       },
     }
   },
