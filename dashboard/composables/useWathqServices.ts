@@ -250,7 +250,7 @@ export function useWathqServices() {
       isLoading.value = true
       error.value = null
 
-      const url = `${getBaseUrl()}/live/${serviceType}/${endpoint}`
+      const url = `${getBaseUrl()}/live/management/${serviceType}/${endpoint}`
       const data = await authenticatedFetch<WathqApiRequest>(url, {
         method: 'POST',
         body: JSON.stringify(parameters)

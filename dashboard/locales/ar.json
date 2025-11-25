@@ -280,6 +280,7 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "subtitle": "أتقن - لوحة التحكم الخاصة  ببوابة واثق الاستعلامية ",
+    "servicesHistoryError":"فشل في تحميل سجل الطلبات المتصلة",
     "refresh": "تحديث",
     "systemTenants": "تطبيقاتن نظام الاستعلامات",
     "viewAllTenants": "عرض جميع التطبيقات",
@@ -731,6 +732,8 @@
     "copiedToClipboard": "تم النسخ إلى الحافظة",
     "copyFailed": "فشل النسخ",
     "exportSuccess": "تم تصدير الاستجابة بنجاح",
+    "exportXlsSuccess": "تم تصدير الاستجابة إلى XLS بنجاح",
+    "exportXlsFailed": "فشل التصدير إلى XLS",
     "stats": {
       "totalRequests": "إجمالي الطلبات",
       "successful": "ناجحة",
@@ -749,6 +752,140 @@
         "fields": {
           "crNumber": "رقم السجل التجاري",
           "dateGregorian": "التاريخ (ميلادي)"
+        },
+        "endpoints": {
+          "fullinfo": {
+            "name": "الحصول على المعلومات الكاملة",
+            "description": "استرجاع معلومات السجل التجاري الكاملة"
+          },
+          "info": {
+            "name": "الحصول على المعلومات الأساسية",
+            "description": "استرجاع معلومات السجل التجاري الأساسية"
+          },
+          "branches": {
+            "name": "الحصول على الفروع",
+            "description": "الحصول على جميع فروع السجل التجاري"
+          },
+          "status": {
+            "name": "الحصول على الحالة",
+            "description": "التحقق من حالة السجل التجاري"
+          },
+          "capital": {
+            "name": "الحصول على رأس المال",
+            "description": "استرجاع معلومات رأس المال"
+          },
+          "managers": {
+            "name": "الحصول على المديرين",
+            "description": "الحصول على قائمة المديرين"
+          },
+          "owners": {
+            "name": "الحصول على المالكين",
+            "description": "الحصول على قائمة المالكين"
+          },
+          "related": {
+            "name": "الحصول على ذات الصلة",
+            "description": "استرجاع قائمة السجلات التجارية وعلاقتها برقم معين"
+          },
+          "owns": {
+            "name": "التحقق من الملكية",
+            "description": "التحقق من ملكية الهوية لأي سجل تجاري"
+          },
+          "crNationalNumber": {
+            "name": "الحصول على الرقم الوطني للسجل التجاري",
+            "description": "الحصول على السجل التجاري برقمه الوطني"
+          },
+          "lookupStatus": {
+            "name": "جدول بحث الحالات",
+            "description": "الحصول على جدول رموز الحالات"
+          },
+          "lookupEntityType": {
+            "name": "جدول بحث نوع الكيان",
+            "description": "الحصول على جدول أنواع الكيانات"
+          },
+          "lookupCompanyForm": {
+            "name": "جدول بحث شكل الشركة",
+            "description": "الحصول على جدول أشكال الشركات"
+          },
+          "lookupCompanyCharacter": {
+            "name": "جدول بحث طابع الشركة",
+            "description": "الحصول على جدول طوابع الشركات"
+          },
+          "lookupRelation": {
+            "name": "جدول بحث العلاقات",
+            "description": "الحصول على جدول العلاقات"
+          },
+          "lookupManagerPositions": {
+            "name": "جدول بحث مناصب المديرين",
+            "description": "الحصول على جدول مناصب المديرين"
+          },
+          "lookupIdentifierType": {
+            "name": "جدول بحث نوع المعرف",
+            "description": "الحصول على جدول أنواع المعرفات"
+          },
+          "lookupManagementStructure": {
+            "name": "جدول بحث الهيكل الإداري",
+            "description": "الحصول على جدول الهياكل الإدارية"
+          },
+          "lookupPartnerType": {
+            "name": "جدول بحث نوع الشريك",
+            "description": "الحصول على جدول أنواع الشركاء"
+          },
+          "lookupPartnershipType": {
+            "name": "جدول بحث نوع الشراكة",
+            "description": "الحصول على جدول أنواع الشراكات"
+          },
+          "lookupNationalities": {
+            "name": "جدول بحث الجنسيات",
+            "description": "الحصول على جدول الجنسيات"
+          },
+          "lookupActivities": {
+            "name": "جدول بحث الأنشطة",
+            "description": "الحصول على جدول الأنشطة"
+          },
+          "lookupCities": {
+            "name": "جدول بحث المدن",
+            "description": "الحصول على جدول المدن"
+          },
+          "lookupCurrencies": {
+            "name": "جدول بحث العملات",
+            "description": "الحصول على جدول العملات"
+          }
+        },
+        "params": {
+          "crId": "رقم السجل التجاري",
+          "crIdDescription": "رقم السجل التجاري",
+          "crIdPlaceholder": "1010711252",
+          "language": "اللغة",
+          "languageDescription": "لغة الاستجابة",
+          "languagePlaceholder": "اختر اللغة",
+          "identityId": "رقم الهوية",
+          "identityIdDescription": "رقم الهوية",
+          "identityIdPlaceholder": "1234567890",
+          "idType": "نوع الهوية",
+          "idTypeDescription": "نوع الهوية",
+          "idTypePlaceholder": "National_ID",
+          "nationality": "رمز الجنسية",
+          "nationalityDescription": "مطلوب للجواز وأرقام السجلات التجارية الأجنبية. انظر جدول الجنسيات للحصول على الرموز الصحيحة",
+          "nationalityPlaceholder": "682",
+          "crNumber": "رقم السجل التجاري",
+          "crNumberDescription": "رقم السجل التجاري",
+          "crNumberPlaceholder": "1010711252",
+          "idOptions": {
+            "nationalId": "الهوية الوطنية",
+            "residentId": "هوية المقيم",
+            "passport": "جواز السفر",
+            "gccId": "هوية دول مجلس التعاون",
+            "endowmentDeedNo": "رقم صك الوقف",
+            "licenseNo": "رقم الترخيص",
+            "crNationalId": "الرقم الوطني للسجل التجاري",
+            "foreignCrNo": "رقم السجل التجاري الأجنبي",
+            "nationalNumber": "الرقم الوطني",
+            "borderNumber": "رقم الحدود"
+          },
+          "languageOptions": {
+            "arabic": "العربية",
+            "english": "الإنجليزية"
+          }
         }
       },
       "companyContract": {
@@ -806,7 +943,8 @@
       "copy": "نسخ",
       "copied": "تم النسخ!",
       "export": "تصدير",
-      "exportJson": "تصدير JSON"
+      "exportJson": "تصدير JSON",
+      "exportXls": "تصدير XLS"
     },
     "metadata": {
       "status": "الحالة",
@@ -837,5 +975,20 @@
     "confirmPassword":"تأكيد كلمة المرور",
     "reset":"إعادة تعيين",
     "backToLogin":"العودة إلى تسجيل الدخول"
+  },
+  "notificationPermissionPrompt":{
+    "title":"صلاحية إالإشعارات",
+    "description":"من فضلك قم بقبول إشعارات التطبيق للاستفسار عن أي تحديثات أو إشعارات",
+    "allow":"السماح",
+    "block":"الرفض",
+    "content":"صلاحية الاشعارات مطلوبة لاستقبال الاشعارات من المتصفح.نرجو قبول الاشعارات",
+    "deploymentStatusUpdates":"اشعارات التطبيقات",
+    "systemAlertsAndWarnings":"اشعارات الاخطاء والملاحظات",
+    "importantAppNotifications":"اشعاارات النظام",
+    "maybeLater":"من الممكن لاحقا",
+    "allowNotifications":"السماح",
+    "neverShow":"لا تظهرها ابدا",
+    "requesting":"طلب"
+ 
   }
 }

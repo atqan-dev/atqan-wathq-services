@@ -20,7 +20,9 @@ from app.api.v1.endpoints import (
     tenants,
     totp,
     users,
+    wathq_export,
     wathq_external,
+    wathq_live,
     wathq_logs,
     wathq_offline,
     ws_notifications,
@@ -82,9 +84,13 @@ api_router.include_router(
 api_router.include_router(
     wathq_employee.router, prefix="/wathq/employee", tags=["wathq-employee"]
 )
+api_router.include_router(wathq_live.router, prefix="/wathq/live", tags=["wathq-live"])
 api_router.include_router(wathq_logs.router, prefix="/wathq/logs", tags=["wathq-logs"])
 api_router.include_router(
     wathq_offline.router, prefix="/wathq/offline", tags=["wathq-offline"]
+)
+api_router.include_router(
+    wathq_export.router, prefix="/wathq/export", tags=["wathq-export"]
 )
 
 # WATHQ External API endpoints - separate for tenant and management users

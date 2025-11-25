@@ -14,40 +14,31 @@ from app.api import deps
 router = APIRouter()
 
 
+# Routes are ordered from most specific to least specific
+# This ensures that specific paths like /my-data and /search match before the generic /{data_id}
+
 @router.get("/my-data", response_model=List[schemas.WathqOfflineData])
 def get_my_offline_data(
     db: Session = Depends(deps.get_db),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User | models.ManagementUser = Depends(deps.get_current_active_user_or_management),
 ) -> Any:
     """
-    Get offline WATHQ data for current user's tenant.
+    Get offline WATHQ data for current user.
+    Works for both tenant users and management users.
     """
-    offline_data = crud.wathq_offline_data.get_by_tenant(
-        db=db, tenant_id=current_user.tenant_id, skip=skip, limit=limit
-    )
-    return offline_data
-
-
-@router.get("/service/{service_id}", response_model=List[schemas.WathqOfflineData])
-def get_offline_data_by_service(
-    service_id: UUID,
-    db: Session = Depends(deps.get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    Get offline WATHQ data for specific service within current tenant.
-    """
-    offline_data = crud.wathq_offline_data.get_by_service_and_tenant(
-        db=db,
-        service_id=service_id,
-        tenant_id=current_user.tenant_id,
-        skip=skip,
-        limit=limit,
-    )
+    # Check if it's a management user
+    if isinstance(current_user, models.ManagementUser):
+        # Get data fetched by this management user
+        offline_data = db.query(models.WathqOfflineData).filter(
+            models.WathqOfflineData.management_user_id == current_user.id
+        ).order_by(models.WathqOfflineData.fetched_at.desc()).offset(skip).limit(limit).all()
+    else:
+        # Get data fetched by this tenant user
+        offline_data = crud.wathq_offline_data.get_by_tenant(
+            db=db, tenant_id=current_user.tenant_id, skip=skip, limit=limit
+        )
     return offline_data
 
 
@@ -57,18 +48,75 @@ def search_offline_data(
     db: Session = Depends(deps.get_db),
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=1000),
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User | models.ManagementUser = Depends(deps.get_current_active_user_or_management),
 ) -> Any:
     """
-    Search offline WATHQ data by URL pattern within current tenant.
+    Search offline WATHQ data by URL pattern.
+    Works for both tenant users and management users.
     """
-    offline_data = crud.wathq_offline_data.search_by_url_pattern(
-        db=db,
-        tenant_id=current_user.tenant_id,
-        url_pattern=url_pattern,
-        skip=skip,
-        limit=limit,
-    )
+    # Check if it's a management user
+    if isinstance(current_user, models.ManagementUser):
+        # Search data fetched by this management user
+        offline_data = db.query(models.WathqOfflineData).filter(
+            models.WathqOfflineData.management_user_id == current_user.id,
+            models.WathqOfflineData.full_external_url.ilike(f"%{url_pattern}%")
+        ).order_by(models.WathqOfflineData.fetched_at.desc()).offset(skip).limit(limit).all()
+    else:
+        # Search data for tenant user
+        offline_data = crud.wathq_offline_data.search_by_url_pattern(
+            db=db,
+            tenant_id=current_user.tenant_id,
+            url_pattern=url_pattern,
+            skip=skip,
+            limit=limit
+        )
+    return offline_data
+
+
+@router.get("/service/{service_identifier}", response_model=List[schemas.WathqOfflineData])
+def get_offline_data_by_service(
+    service_identifier: str,
+    db: Session = Depends(deps.get_db),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=1000),
+    current_user: models.User | models.ManagementUser = Depends(deps.get_current_active_user_or_management),
+) -> Any:
+    """
+    Get offline WATHQ data for specific service.
+    service_identifier can be either a UUID or a service slug (e.g., 'commercial-registration').
+    Works for both tenant users and management users.
+    """
+    from fastapi import HTTPException
+
+    # Try to parse as UUID first, otherwise treat as slug
+    service_id = None
+    try:
+        service_id = UUID(service_identifier)
+    except ValueError:
+        # Not a UUID, try to find by slug
+        service = db.query(models.Service).filter(
+            models.Service.slug == service_identifier
+        ).first()
+        if not service:
+            raise HTTPException(status_code=404, detail="Service not found")
+        service_id = service.id
+
+    # Check if it's a management user
+    if isinstance(current_user, models.ManagementUser):
+        # Get data fetched by this management user for the service
+        offline_data = db.query(models.WathqOfflineData).filter(
+            models.WathqOfflineData.management_user_id == current_user.id,
+            models.WathqOfflineData.service_id == service_id
+        ).order_by(models.WathqOfflineData.fetched_at.desc()).offset(skip).limit(limit).all()
+    else:
+        # Get data for tenant user
+        offline_data = crud.wathq_offline_data.get_by_service_and_tenant(
+            db=db,
+            service_id=service_id,
+            tenant_id=current_user.tenant_id,
+            skip=skip,
+            limit=limit
+        )
     return offline_data
 
 
@@ -78,80 +126,29 @@ def search_offline_data(
 def get_offline_data_by_service_slug(
     service_slug: str,
     db: Session = Depends(deps.get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    current_user: models.User = Depends(deps.get_current_active_user),
+    current_user: models.User | models.ManagementUser = Depends(deps.get_current_active_user_or_management),
 ) -> Any:
     """
-    Get offline WATHQ data for specific service by slug within current tenant.
+    Get specific offline WATHQ data by ID.
+    Works for both tenant users and management users.
     """
-    # First, find the service by slug
-    service = (
-        db.query(models.Service).filter(models.Service.slug == service_slug).first()
-    )
-    if not service:
-        raise HTTPException(
-            status_code=404, detail=f"Service with slug '{service_slug}' not found"
-        )
+    from fastapi import HTTPException
 
-    # Then get offline data for this service
-    offline_data = crud.wathq_offline_data.get_by_service_and_tenant(
-        db=db,
-        service_id=service.id,
-        tenant_id=current_user.tenant_id,
-        skip=skip,
-        limit=limit,
-    )
+    # Check if it's a management user
+    if isinstance(current_user, models.ManagementUser):
+        # Get data fetched by this management user
+        offline_data = db.query(models.WathqOfflineData).filter(
+            models.WathqOfflineData.id == data_id,
+            models.WathqOfflineData.management_user_id == current_user.id
+        ).first()
+    else:
+        # Get data for tenant user
+        offline_data = db.query(models.WathqOfflineData).filter(
+            models.WathqOfflineData.id == data_id,
+            models.WathqOfflineData.tenant_id == current_user.tenant_id
+        ).first()
+
+    if not offline_data:
+        raise HTTPException(status_code=404, detail="Offline data not found")
+
     return offline_data
-
-
-@router.get("/{identifier}")
-def get_offline_data_by_identifier(
-    identifier: str,
-    db: Session = Depends(deps.get_db),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(100, ge=1, le=1000),
-    current_user: models.User = Depends(deps.get_current_active_user),
-) -> Any:
-    """
-    Get offline WATHQ data by identifier - tries service slug first, then UUID.
-    """
-
-    # First, try to match as a service slug
-    service = db.query(models.Service).filter(models.Service.slug == identifier).first()
-    if service:
-        # Return list of offline data for this service
-        offline_data = crud.wathq_offline_data.get_by_service_and_tenant(
-            db=db,
-            service_id=service.id,
-            tenant_id=current_user.tenant_id,
-            skip=skip,
-            limit=limit,
-        )
-        return offline_data
-
-    # If not a service slug, try to parse as UUID
-    try:
-        data_uuid = UUID(identifier)
-
-        # Get specific offline data by UUID
-        offline_data = (
-            db.query(models.WathqOfflineData)
-            .filter(
-                models.WathqOfflineData.id == data_uuid,
-                models.WathqOfflineData.tenant_id == current_user.tenant_id,
-            )
-            .first()
-        )
-
-        if not offline_data:
-            raise HTTPException(status_code=404, detail="Offline data not found")
-
-        return offline_data
-
-    except ValueError:
-        # Not a valid UUID either
-        raise HTTPException(
-            status_code=404,
-            detail=f"No service with slug '{identifier}' found and '{identifier}' is not a valid UUID",
-        )

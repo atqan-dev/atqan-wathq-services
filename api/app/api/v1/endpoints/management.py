@@ -32,29 +32,38 @@ def get_management_stats(
     Get management dashboard statistics.
     Returns counts for tenants, users, online requests, and offline requests.
     """
-    from app.models.tenant import Tenant
-    from app.models.user import User
-    from app.models.wathq_call_log import WathqCallLog
-    from app.models.wathq_offline_data import WathqOfflineData
+    try:
+        from app.models.tenant import Tenant
+        from app.models.user import User
+        from app.models.wathq_call_log import WathqCallLog
+        from app.models.wathq_offline_data import WathqOfflineData
 
-    # Count all tenants
-    tenants_count = db.query(Tenant).count()
+        # Count all tenants
+        tenants_count = db.query(Tenant).count()
 
-    # Count all users across all tenants
-    users_count = db.query(User).count()
+        # Count all users across all tenants
+        users_count = db.query(User).count()
 
-    # Count all online requests (WATHQ call logs)
-    online_requests_count = db.query(WathqCallLog).count()
+        # Count all online requests (WATHQ call logs)
+        online_requests_count = db.query(WathqCallLog).count()
 
-    # Count all offline requests (WATHQ offline data)
-    offline_requests_count = db.query(WathqOfflineData).count()
+        # Count all offline requests (WATHQ offline data)
+        offline_requests_count = db.query(WathqOfflineData).count()
 
-    return {
-        "tenants_count": tenants_count,
-        "users_count": users_count,
-        "online_requests_count": online_requests_count,
-        "offline_requests_count": offline_requests_count,
-    }
+        return {
+            "tenants_count": tenants_count,
+            "users_count": users_count,
+            "online_requests_count": online_requests_count,
+            "offline_requests_count": offline_requests_count,
+        }
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching management stats: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching management stats: {str(e)}"
+        )
 
 
 # Management Users CRUD
@@ -669,8 +678,17 @@ def get_tenant_all_wathq_call_logs(
     """
     Get all WATHQ call logs for all tenants.
     """
-    call_logs = crud.wathq_call_log.get_all(db, skip=skip, limit=limit)
-    return call_logs
+    try:
+        call_logs = crud.wathq_call_log.get_all(db, skip=skip, limit=limit)
+        return call_logs
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching WATHQ call logs: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching WATHQ call logs: {str(e)}"
+        )
 
 
 @router.get(
@@ -685,8 +703,17 @@ def get_tenant_all_wathq_offline_data(
     """
     Get all WATHQ offline data for all tenants.
     """
-    offline_data = crud.wathq_offline_data.get_all(db, skip=skip, limit=limit)
-    return offline_data
+    try:
+        offline_data = crud.wathq_offline_data.get_all(db, skip=skip, limit=limit)
+        return offline_data
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching WATHQ offline data: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching WATHQ offline data: {str(e)}"
+        )
 
 
 @router.get("/tenants/{tenant_id}", response_model=schemas.Tenant)
@@ -901,31 +928,6 @@ def create_user_for_tenant(
     # Create user for the tenant
     user = crud.user.create(db, obj_in=user_in, tenant_id=tenant_id)
     return user
-
-
-@router.get("/tenants/{tenant_id}/users", response_model=list[schemas.User])
-def get_tenant_users_list(
-    tenant_id: int,
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(deps.get_db),
-    current_user: ManagementUser = Depends(get_current_active_management_user),
-) -> Any:
-    """
-    Get all users for a specific tenant.
-    """
-    # Check if tenant exists
-    tenant = crud.tenant.get(db, id=tenant_id)
-    if not tenant:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Tenant not found",
-        )
-
-    users = crud.user.get_users_by_tenant(
-        db, tenant_id=tenant_id, skip=skip, limit=limit
-    )
-    return users
 
 
 @router.put("/users/{user_id}/tenant", response_model=schemas.User)
@@ -1194,3 +1196,32 @@ def update_tenant_service(
         db, db_obj=tenant_service, obj_in=tenant_service_in
     )
     return tenant_service
+
+
+@router.delete("/tenants/services/{service_id}", response_model=schemas.TenantService)
+def delete_tenant_service(
+    service_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: ManagementUser = Depends(get_current_active_management_user),
+) -> Any:
+    """
+    Delete a specific service for a specific tenant.
+    """
+    # Check if service is assigned to the tenant
+    tenant_service = crud.tenant_service.get(
+        db, id=service_id
+    )
+    if not tenant_service:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Service not assigned to this tenant",
+        )
+    # Delete tenant service
+    tenant_service = crud.tenant_service.remove(db, id=service_id)
+    return {
+        "message": "Service deleted successfully",
+        "service": tenant_service,
+        "tenant_id": tenant_service.tenant_id,
+        "service_id": tenant_service.service_id,
+    }
+        

@@ -120,7 +120,8 @@ class WathqCallContext:
         )
         
         # Save offline data if successful and service_id provided
-        if status_code == 200 and service_id and full_url:
+        # Only save for tenant users (not management users who have None tenant_id)
+        if status_code == 200 and service_id and full_url and self.tenant_id and self.user_id:
             wathq_offline_data.create_offline_data(
                 db=self.db,
                 service_id=service_id,

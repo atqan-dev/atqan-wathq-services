@@ -39,6 +39,7 @@ export function useUserProfile() {
   const toast = useToast()
 
   const profile: Ref<UserProfile | null> = ref(null)
+  const profileExists = ref(true)
   const loading = ref(false)
   const error = ref<string | null>(null)
   const updating = ref(false)
@@ -55,16 +56,34 @@ export function useUserProfile() {
     try {
       const data = await authenticatedFetch<UserProfile>('/api/v1/management/users/me/profile')
       profile.value = data
+      profileExists.value = true
     } catch (err: any) {
-      const errorMsg = err.message || 'Failed to fetch user profile.'
-      error.value = errorMsg
-      if (!silent) {
-        toast.add({
-          title: 'Error',
-          description: errorMsg,
-          color: 'red',
-          icon: 'i-heroicons-exclamation-circle'
-        })
+      // Check if it's a 404 error (profile not found)
+      if (err.status === 404 || err.message?.includes('404')) {
+        profileExists.value = false
+        profile.value = null
+        error.value = null
+        if (!silent) {
+          toast.add({
+            title: 'Profile Not Found',
+            description: 'Please create your profile to get started.',
+            color: 'blue',
+            icon: 'i-heroicons-information-circle',
+            timeout: 3000
+          })
+        }
+      } else {
+        profileExists.value = true
+        const errorMsg = err.message || 'Failed to fetch user profile.'
+        error.value = errorMsg
+        if (!silent) {
+          toast.add({
+            title: 'Error',
+            description: errorMsg,
+            color: 'red',
+            icon: 'i-heroicons-exclamation-circle'
+          })
+        }
       }
     } finally {
       loading.value = false
@@ -197,6 +216,7 @@ export function useUserProfile() {
 
   return {
     profile,
+    profileExists,
     loading,
     error,
     fetchProfile,

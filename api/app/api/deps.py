@@ -58,6 +58,13 @@ def get_current_user(
                 detail="Token tenant does not match request tenant",
             )
 
+    # Check if this is a management user token
+    if token_data.is_management_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This endpoint requires tenant user authentication. Management users should use the /management endpoints."
+        )
+
     user = db.query(User).filter(User.id == token_data.sub).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -111,6 +118,13 @@ def get_current_management_user(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
+        )
+
+    # Check if token is for a management user
+    if not token_data.is_management_user:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This endpoint requires management user authentication"
         )
 
     # Management users don't have tenant context
@@ -176,3 +190,70 @@ def require_permission(user: User, permission_name: str) -> None:
             status_code=status.HTTP_403_FORBIDDEN,
             detail=f"Permission '{permission_name}' required"
         )
+
+
+def get_current_user_or_management(
+    db: Session = Depends(get_db), token: str = Depends(reusable_oauth2)
+) -> User | ManagementUser:
+    """
+    Get current authenticated user (tenant or management).
+    Accepts both tenant users and management users.
+    """
+    try:
+        payload = jwt.decode(
+            token.credentials, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
+        )
+        token_data = TokenPayload(**payload)
+    except (JWTError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+
+    # Check if this is a management user token
+    if token_data.is_management_user:
+        management_user = db.query(ManagementUser).filter(
+            ManagementUser.id == token_data.sub
+        ).first()
+        
+        if not management_user:
+            raise HTTPException(status_code=404, detail="Management user not found")
+        
+        if not management_user.is_active:
+            raise HTTPException(status_code=400, detail="Inactive management user")
+        
+        return management_user
+    
+    # Otherwise it's a tenant user
+    # Verify tenant context matches token
+    current_tenant = get_current_tenant()
+    if current_tenant.tenant_slug and token_data.tenant_slug:
+        if current_tenant.tenant_slug != token_data.tenant_slug:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Token tenant does not match request tenant",
+            )
+
+    user = db.query(User).filter(User.id == token_data.sub).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Additional tenant validation
+    if token_data.tenant_id and user.tenant_id != token_data.tenant_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User does not belong to the specified tenant",
+        )
+
+    return user
+
+
+def get_current_active_user_or_management(
+    current_user: User | ManagementUser = Depends(get_current_user_or_management),
+) -> User | ManagementUser:
+    """
+    Get current active user (tenant or management).
+    """
+    if not current_user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    return current_user

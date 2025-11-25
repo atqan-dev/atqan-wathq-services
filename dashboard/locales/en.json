@@ -76,7 +76,7 @@
     "running": "Running",
     "stopped": "Stopped",
     "actions": "Actions",
-    "tenant_id": "Tenant ID",
+    "tenant_id": "App ID",
     "user_id": "User ID",
     "service_slug": "Service Slug",
     "endpoint": "Endpoint",
@@ -99,8 +99,8 @@
     "full_external_url": "Full External URL",
     "response_body": "Response Body",
     "fetched_by": "Fetched By",
-    "editTenant": "Edit Tenant",
-    "editTenantDescription": "Edit tenant {name}",
+    "editTenant": "Edit  App",
+    "editTenantDescription": "Edit app {name}",
     "approve": "Approve",
     "reject": "Reject",
     "noResults": "No Results"
@@ -289,8 +289,8 @@
     "title": "Dashboard",
     "subtitle": "ATQAN Dashboard management wathq api's ",
     "refresh": "Refresh",
-    "systemTenants": "System Tenants",
-    "viewAllTenants": "View All Tenants",
+    "systemTenants": "System Apps",
+    "viewAllTenants": "View All Apps",
     "servicesHistoryError": "Failed to load services history",
     "servicesHistoryLoading": "Loading services history...",
     "servicesHistoryNoData": "No services history found",
@@ -307,15 +307,15 @@
     "systemWathqOfflineDataNoData": "No system wathq offline data found",
     "systemWathqOfflineDataTryAgain": "Try Again",
     "systemWathqOfflineDataError": "Failed to load system wathq offline data",
-    "tenantsError": "Failed to load tenants",
-    "tenantsLoading": "Loading tenants...",
-    "tenantsNoData": "No tenants found",
+    "tenantsError": "Failed to load Apps",
+    "tenantsLoading": "Loading apps...",
+    "tenantsNoData": "No apps found",
     "tenantsTryAgain": "Try Again",
     "wathqOfflineDataError": "Failed to load system wathq offline data",
     "stats": {
       "online_requests_count": "Online Requests Count",
       "offline_requests_count": "Offline Requests Count",
-      "tenants_count": "Tenants Count",
+      "tenants_count": "Apps Count",
       "users_count": "Users Count"
     },
     "charts": {
@@ -349,10 +349,10 @@
   },
   "nav": {
     "dashboard": "ATQAN API'S MS",
-    "tenants": "Tenants",
+    "tenants": "Apps",
     "wathqServices": "Wathq Services",
     "settings": "Settings",
-    "addTenant": "Add Tenant",
+    "addTenant": "Add  App",
     "addWathqService": "Add Wathq Service",
     "profile": "Profile",
     "resetPassword": "Reset Password",
@@ -361,8 +361,8 @@
   "sidebar": {
     "menu": "Menu",
     "home": "Home",
-    "tenants": "Tenants",
-    "tenantServices": "Tenant Services",
+    "tenants": "Apps",
+    "tenantServices": "App Services",
     "wathqServices": "Wathq Services",
     "metrics": "Metrics",
     "users": "Users",
@@ -376,7 +376,7 @@
     "title": "Analytics & Metrics",
     "subtitle": "System performance and usage analytics",
     "stats": {
-      "totalTenants": "Total Tenants",
+      "totalTenants": "Total Apps",
       "totalUsers": "Total Users",
       "onlineRequests": "Online Requests",
       "offlineRequests": "Offline Requests",
@@ -392,11 +392,11 @@
     },
     "charts": {
       "usersGrowth": "Users Growth",
-      "tenantsGrowth": "Tenants Growth",
+      "tenantsGrowth": "Apps Growth",
       "requestsOverview": "Requests Overview",
       "serviceHistory": "Service History",
       "users": "Users",
-      "tenants": "Tenants",
+      "tenants": "Apps",
       "online": "Online",
       "offline": "Offline",
       "serviceRequests": "Service Requests",
@@ -440,31 +440,31 @@
     "allCaughtUp": "All Caught Up"
   },
   "tenants": {
-    "title": "Tenants",
-    "subtitle": "Manage your organization tenants",
-    "list": "Tenants List",
-    "addTenant": "Add Tenant",
-    "editTenant": "Edit Tenant",
-    "deleteTenant": "Delete Tenant",
-    "createTenant": "Create Tenant",
-    "createTenantDescription": "Create a new tenant for your organization",
-    "editTenantDescription": "Update {name} tenant details",
-    "createFirstTenant": "Create Your First Tenant",
-    "noTenants": "No Tenants Yet",
-    "noTenantsMessage": "Get started by creating your first tenant",
+    "title": "Apps",
+    "subtitle": "Manage your organization Apps",
+    "list": "Apps List",
+    "addTenant": "Add  App",
+    "editTenant": "Edit  App",
+    "deleteTenant": "Delete  App",
+    "createTenant": "Create  App",
+    "createTenantDescription": "Create a new app for your organization",
+    "editTenantDescription": "Update {name} app details",
+    "createFirstTenant": "Create Your First  App",
+    "noTenants": "No apps Yet",
+    "noTenantsMessage": "Get started by creating your first  App",
     "confirmDelete": "Are you sure you want to delete {name}?",
-    "confirmActivate": "Are you sure you want to activate this tenant?",
-    "confirmDeactivate": "Are you sure you want to deactivate this tenant?",
-    "backToList": "Back to Tenants",
+    "confirmActivate": "Are you sure you want to activate this app?",
+    "confirmDeactivate": "Are you sure you want to deactivate this app?",
+    "backToList": "Back to Apps",
     "confirmDeleteMessage": "This action cannot be undone.",
-    "confirmDeleteButton": "Delete Tenant",
+    "confirmDeleteButton": "Delete  App",
     "confirmDeleteCancelButton": "Cancel",
-    "createTenantSuccess": "Tenant created successfully",
-    "createTenantError": "Failed to create tenant",
-    "updateTenantSuccess": "Tenant updated successfully",
-    "updateTenantError": "Failed to update tenant",
-    "deleteTenantSuccess": "Tenant deleted successfully",
-    "deleteTenantError": "Failed to delete tenant",
+    "createTenantSuccess": "App created successfully",
+    "createTenantError": "Failed to create  App",
+    "updateTenantSuccess": "App updated successfully",
+    "updateTenantError": "Failed to update  App",
+    "deleteTenantSuccess": "App deleted successfully",
+    "deleteTenantError": "Failed to delete  App",
     "services":{
       "table":{
         "service": "Service",
@@ -493,7 +493,7 @@
       "subtitle": "Manage your organization services"
     },
     "stats": {
-      "total": "Total Tenants",
+      "total": "Total Apps",
       "active": "Active",
       "inactive": "Inactive",
       "totalUsers": "Total Users"
@@ -507,11 +507,11 @@
       "actions": "Actions"
     },
     "form": {
-      "tenantDetails": "Tenant Details",
+      "tenantDetails": "App Details",
       "fillRequiredFields": "Fill in the required information below",
-      "updateDetails": "Update tenant information",
-      "name": "Tenant Name",
-      "namePlaceholder": "Enter tenant name (English only)",
+      "updateDetails": "Update app information",
+      "name": "App Name",
+      "namePlaceholder": "Enter app name (English only)",
       "nameEnglishOnly": "Name must contain only English letters, numbers, and basic symbols (-, _, &)",
       "nameAr": "Arabic Name",
       "nameArPlaceholder": "أدخل اسم التطبيق بالعربية",
@@ -520,7 +520,7 @@
       "slugPlaceholder": "tenant-slug",
       "slugHelp": "Auto-generated from name (lowercase, numbers, hyphens only)",
       "description": "Description",
-      "descriptionPlaceholder": "Brief description of this tenant",
+      "descriptionPlaceholder": "Brief description of this  App",
       "maxUsers": "Maximum Users",
       "maxUsersPlaceholder": "10",
       "logo": "Logo",
@@ -532,13 +532,13 @@
       "logoUploadFailed": "Failed to upload image. Please try again.",
       "existingLogo": "Current Logo",
       "isActive": "Active Status",
-      "create": "Create Tenant",
-      "update": "Update Tenant"
+      "create": "Create  App",
+      "update": "Update  App"
     },
     "assignService": {
-      "title": "Assign Service to Tenant",
+      "title": "Assign Service to  App",
       "button": "Assign Service",
-      "assigningTo": "Assigning service to tenant",
+      "assigningTo": "Assigning service to  App",
       "selectService": "Select Service",
       "noServices": "No services available",
       "requiresApproval": "Requires Approval",
@@ -560,7 +560,7 @@
   },
   "users": {
     "title": "Users",
-    "subtitle": "Manage all system users across tenants",
+    "subtitle": "Manage all system users across Apps",
     "list": "Users List",
     "allUsers": "All Users",
     "search": "Search users...",
@@ -568,7 +568,7 @@
     "editUser": "Edit User",
     "deleteUser": "Delete User",
     "createUser": "Create User",
-    "createUserDescription": "Create a new user for this tenant",
+    "createUserDescription": "Create a new user for this  App",
     "editUserDescription": "Update {name} user details",
     "createFirstUser": "Create Your First User",
     "noUsers": "No Users Yet",
@@ -610,7 +610,7 @@
     },
     "actions": {
       "viewDetails": "View Details",
-      "viewTenant": "View Tenant",
+      "viewTenant": "View  App",
       "edit": "Edit User",
       "delete": "Delete User",
       "activate": "Activate",
@@ -654,7 +654,7 @@
       "activeConnections": "Active Connections",
       "connectedUsers": "Connected Users",
       "managementUsers": "Management Users",
-      "connectedTenants": "Connected Tenants",
+      "connectedTenants": "Connected Apps",
       "messagesSent": "Messages Sent",
       "totalConnections": "Total Connections",
       "errorRate": "Error Rate",
@@ -662,14 +662,14 @@
     }
   },
   "tenantServices": {
-    "title": "Tenant Services",
-    "subtitle": "Manage tenant service subscriptions and usage",
+    "title": "App Services",
+    "subtitle": "Manage app service subscriptions and usage",
     "list": "Services List",
     "noServices": "No Services Found",
-    "noServicesMessage": "No tenant services are currently registered",
+    "noServicesMessage": "No app services are currently registered",
     "approveService": "Approve Service",
     "deleteService": "Delete Service",
-    "confirmApprove": "Are you sure you want to approve {name}? This will enable the service for the tenant.",
+    "confirmApprove": "Are you sure you want to approve {name}? This will enable the service for the app.",
     "confirmDelete": "Are you sure you want to delete {name}? This action cannot be undone.",
     "confirmActivate": "Are you sure you want to activate {name}?",
     "confirmDeactivate": "Are you sure you want to deactivate {name}?",
@@ -708,7 +708,7 @@
       "category": "By Category",
       "status": "By Status",
       "approval": "By Approval",
-      "tenant": "By Tenant"
+      "tenant": "By  App"
     },
     "sort": {
       "registeredAt": "Registration Date",
@@ -742,6 +742,8 @@
     "copiedToClipboard": "Copied to clipboard",
     "copyFailed": "Failed to copy",
     "exportSuccess": "Response exported successfully",
+    "exportXlsSuccess": "Response exported to XLS successfully",
+    "exportXlsFailed": "Failed to export to XLS",
     "stats": {
       "totalRequests": "Total Requests",
       "successful": "Successful",
@@ -760,6 +762,140 @@
         "fields": {
           "crNumber": "CR Number",
           "dateGregorian": "Date (Gregorian)"
+        },
+        "endpoints": {
+          "fullinfo": {
+            "name": "Get Full Info",
+            "description": "Retrieve complete commercial registration information"
+          },
+          "info": {
+            "name": "Get Basic Info",
+            "description": "Retrieve basic commercial registration information"
+          },
+          "branches": {
+            "name": "Get Branches",
+            "description": "Get all branches of the commercial registration"
+          },
+          "status": {
+            "name": "Get Status",
+            "description": "Check commercial registration status"
+          },
+          "capital": {
+            "name": "Get Capital",
+            "description": "Retrieve capital information"
+          },
+          "managers": {
+            "name": "Get Managers",
+            "description": "Get list of managers"
+          },
+          "owners": {
+            "name": "Get Owners",
+            "description": "Get list of owners"
+          },
+          "related": {
+            "name": "Get Related",
+            "description": "Retrieve list of commercial registrations with their relation for a given ID"
+          },
+          "owns": {
+            "name": "Check Ownership",
+            "description": "Check if identity owns any CR"
+          },
+          "crNationalNumber": {
+            "name": "Get CR National Number",
+            "description": "Get CR by national number"
+          },
+          "lookupStatus": {
+            "name": "Get Status Lookup",
+            "description": "Get status codes lookup table"
+          },
+          "lookupEntityType": {
+            "name": "Get Entity Type Lookup",
+            "description": "Get entity types lookup table"
+          },
+          "lookupCompanyForm": {
+            "name": "Get Company Form Lookup",
+            "description": "Get company forms lookup table"
+          },
+          "lookupCompanyCharacter": {
+            "name": "Get Company Character Lookup",
+            "description": "Get company characters lookup table"
+          },
+          "lookupRelation": {
+            "name": "Get Relation Lookup",
+            "description": "Get relations lookup table"
+          },
+          "lookupManagerPositions": {
+            "name": "Get Manager Positions Lookup",
+            "description": "Get manager positions lookup table"
+          },
+          "lookupIdentifierType": {
+            "name": "Get Identifier Type Lookup",
+            "description": "Get identifier types lookup table"
+          },
+          "lookupManagementStructure": {
+            "name": "Get Management Structure Lookup",
+            "description": "Get management structures lookup table"
+          },
+          "lookupPartnerType": {
+            "name": "Get Partner Type Lookup",
+            "description": "Get partner types lookup table"
+          },
+          "lookupPartnershipType": {
+            "name": "Get Partnership Type Lookup",
+            "description": "Get partnership types lookup table"
+          },
+          "lookupNationalities": {
+            "name": "Get Nationalities Lookup",
+            "description": "Get nationalities lookup table"
+          },
+          "lookupActivities": {
+            "name": "Get Activities Lookup",
+            "description": "Get activities lookup table"
+          },
+          "lookupCities": {
+            "name": "Get Cities Lookup",
+            "description": "Get cities lookup table"
+          },
+          "lookupCurrencies": {
+            "name": "Get Currencies Lookup",
+            "description": "Get currencies lookup table"
+          }
+        },
+        "params": {
+          "crId": "CR ID",
+          "crIdDescription": "Commercial Registration ID",
+          "crIdPlaceholder": "1010711252",
+          "language": "Language",
+          "languageDescription": "Response language",
+          "languagePlaceholder": "Choose Language",
+          "identityId": "Identity ID",
+          "identityIdDescription": "Identification number (رقم هوية)",
+          "identityIdPlaceholder": "1234567890",
+          "idType": "ID Type",
+          "idTypeDescription": "Identification type (نوع الهوية)",
+          "idTypePlaceholder": "National_ID",
+          "nationality": "Nationality NIC Code",
+          "nationalityDescription": "Required for Passport, Foreign_CR_No. See lookup/nationalities for valid codes",
+          "nationalityPlaceholder": "682",
+          "crNumber": "CR Number",
+          "crNumberDescription": "Commercial Registration Number",
+          "crNumberPlaceholder": "1010711252",
+          "idOptions": {
+            "nationalId": "National ID",
+            "residentId": "Resident ID",
+            "passport": "Passport",
+            "gccId": "GCC ID",
+            "endowmentDeedNo": "Endowment Deed No",
+            "licenseNo": "License No",
+            "crNationalId": "CR National ID",
+            "foreignCrNo": "Foreign CR No",
+            "nationalNumber": "National Number",
+            "borderNumber": "Boarder Number"
+          },
+          "languageOptions": {
+            "arabic": "Arabic",
+            "english": "English"
+          }
         }
       },
       "companyContract": {
@@ -817,7 +953,8 @@
       "copy": "Copy",
       "copied": "Copied!",
       "export": "Export",
-      "exportJson": "Export JSON"
+      "exportJson": "Export JSON",
+      "exportXls": "Export XLS"
     },
     "metadata": {
       "status": "Status",
@@ -840,5 +977,19 @@
       "requestData": "Request Data",
       "responseData": "Response Data"
     }
+  },
+  "notificationPermissionPrompt":{
+    "title":"Notification Permission",
+    "description":"Please grant notification permission to receive important updates and alerts",
+    "allow":"Allow",
+    "block":"Block",
+    "content":"Notification permission is required to receive important updates and alerts. Please grant permission to continue.",
+    "deploymentStatusUpdates":"Deployment Status Updates",
+    "systemAlertsAndWarnings":"System Alerts and Warnings",
+    "importantAppNotifications":"Important App Notifications",
+    "maybeLater":"May be later",
+    "allowNotifications":"Allow Notifications",
+    "neverShow":"Never Show",
+    "requesting":"Requesting"
   }
 }

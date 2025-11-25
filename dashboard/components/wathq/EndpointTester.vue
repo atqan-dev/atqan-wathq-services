@@ -37,10 +37,40 @@
       </div>
 
       <!-- Parameters Form -->
-      <form v-if="selectedEndpointData.params.length > 0" @submit.prevent="handleSubmit" class="space-y-4">
+      <UForm  v-if="selectedEndpointData.params.length > 0" @submit.prevent="handleSubmit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div v-for="param in selectedEndpointData.params" :key="param.key">
+            <!-- Select Input -->
+            <USelect
+              v-if="param.type === 'select'"
+              v-model="formData[param.key]"
+              :label="param.label"
+              :placeholder="param.placeholder"
+              :options="param.options"
+              :required="param.required"
+            >
+              <template v-if="param.description" #help>
+                <span class="text-xs text-gray-500">{{ param.description }}</span>
+              </template>
+            </USelect>
+            
+            <!-- Number Input -->
             <UInput
+              v-else-if="param.type === 'number'"
+              v-model.number="formData[param.key]"
+              :label="param.label"
+              :placeholder="param.placeholder"
+              :required="param.required"
+              type="number"
+            >
+              <template v-if="param.description" #help>
+                <span class="text-xs text-gray-500">{{ param.description }}</span>
+              </template>
+            </UInput>
+            
+            <!-- Default Text Input -->
+            <UInput
+              v-else
               v-model="formData[param.key]"
               :label="param.label"
               :placeholder="param.placeholder"
@@ -71,7 +101,7 @@
             {{ t('common.reset') }}
           </UButton>
         </div>
-      </form>
+      </UForm>
 
       <!-- No Parameters -->
       <div v-else>
@@ -124,6 +154,17 @@
               :title="t('wathq.actions.exportJson')"
             >
               {{ t('wathq.actions.export') }}
+            </UButton>
+            <UButton
+              size="sm"
+              color="blue"
+              variant="soft"
+              icon="i-heroicons-table-cells"
+              @click="exportToXls"
+              :title="t('wathq.actions.exportXls')"
+              :loading="isExportingXls"
+            >
+              {{ t('wathq.actions.exportXls') }}
             </UButton>
           </div>
         </div>
@@ -192,6 +233,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
+import { useAuthStore } from '~/stores/auth'
 import { useI18n } from '~/composables/useI18n'
 import { useAlert } from '~/composables/useAlert'
 
@@ -242,6 +284,7 @@ const formData = ref<Record<string, any>>({})
 const response = ref<Response | null>(null)
 const isLoading = ref(false)
 const copied = ref(false)
+const isExportingXls = ref(false)
 
 // Endpoint options for select
 const endpointOptions = computed(() => {
@@ -288,22 +331,71 @@ async function handleSubmit() {
     isLoading.value = true
     const startTime = Date.now()
 
-    // Build URL with path parameters
-    let url = `${props.baseUrl}${selectedEndpointData.value.path}`
+    // Get auth token to check user type
+    const token = authStore.token
+    let isManagementUser = false
     
-    // Replace path parameters
+    // Debug: Check if token exists
+    if (!token) {
+      console.error('❌ No authentication token found. Please login first.')
+      showError('No authentication token. Please login first.')
+      isLoading.value = false
+      return
+    }
+    
+    if (token) {
+      try {
+        // Decode JWT to check if management user
+        const parts = token.split('.')
+        if (parts.length === 3) {
+          const payload = JSON.parse(atob(parts[1]))
+          isManagementUser = payload.is_management_user === true
+          console.log('✓ Token decoded successfully. Is management user:', isManagementUser)
+        }
+      } catch (e) {
+        console.warn('Could not decode token:', e)
+      }
+    }
+
+    // Build URL with path parameters
+    let path = selectedEndpointData.value.path
+    
+    // Add /management prefix for management users on applicable endpoints
+    if (isManagementUser && !path.startsWith('/lookup') && !path.startsWith('/management')) {
+      path = `/management${path}`
+    }
+    
+    let url = `${props.baseUrl}${path}`
+    const queryParams = new URLSearchParams()
+    
+    // Replace path parameters and collect query parameters
     selectedEndpointData.value.params.forEach(param => {
       if (formData.value[param.key]) {
-        url = url.replace(`{${param.key}}`, formData.value[param.key])
+        // Check if this is a path parameter (contains {})
+        if (path.includes(`{${param.key}}`)) {
+          url = url.replace(`{${param.key}}`, formData.value[param.key])
+        } else {
+          // Otherwise treat as query parameter
+          queryParams.append(param.key, formData.value[param.key])
+        }
       }
     })
+    
+    // Append query parameters to URL
+    if (queryParams.toString()) {
+      url += `?${queryParams.toString()}`
+    }
 
     // Make request using authenticated fetch
     const data = await authenticatedFetch(url, {
       method: selectedEndpointData.value.method
     })
 
+    console.log('📥 Response status:', res.status)
+
     const duration = Date.now() - startTime
+
+    console.log('✓ Response received:', { status: res.status, data })
 
     response.value = {
       success: true,
@@ -318,7 +410,8 @@ async function handleSubmit() {
     // Refresh stats to update the cards
     await fetchRequests({ service_type: props.serviceType as any })
   } catch (err: any) {
-    const duration = Date.now() - Date.now()
+    const duration = Date.now() - startTime
+    console.error('❌ Request error:', err)
     response.value = {
       success: false,
       error: err.message || 'Request failed',
@@ -363,6 +456,78 @@ function exportResponse() {
   URL.revokeObjectURL(url)
   
   showSuccess(t('wathq.exportSuccess'))
+}
+
+// Export to XLS
+async function exportToXls() {
+  if (!response.value || !response.value.data) return
+
+  try {
+    isExportingXls.value = true
+    
+    // Import XLSX library dynamically
+    const XLSX = await import('xlsx')
+    
+    // Prepare data
+    const data = response.value.data
+    const flattenedData = flattenObject(data)
+    
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet([flattenedData])
+    
+    // Adjust column widths
+    const colWidths = Object.keys(flattenedData).map(key => ({
+      wch: Math.min(Math.max(key.length, 15), 50)
+    }))
+    ws['!cols'] = colWidths
+    
+    // Create workbook
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'Response')
+    
+    // Generate filename
+    const filename = `${props.serviceType}-${selectedEndpoint.value}-${Date.now()}.xlsx`
+    
+    // Save file
+    XLSX.writeFile(wb, filename)
+    
+    showSuccess(t('wathq.exportXlsSuccess'))
+  } catch (err: any) {
+    console.error('XLS export error:', err)
+    showError(err.message || t('wathq.exportXlsFailed'))
+  } finally {
+    isExportingXls.value = false
+  }
+}
+
+// Flatten nested objects for XLS export
+function flattenObject(obj: any, prefix = ''): Record<string, any> {
+  const flattened: Record<string, any> = {}
+  
+  for (const key in obj) {
+    if (obj.hasOwnProperty(key)) {
+      const value = obj[key]
+      const newKey = prefix ? `${prefix}_${key}` : key
+      
+      if (value === null || value === undefined) {
+        flattened[newKey] = ''
+      } else if (typeof value === 'object') {
+        if (Array.isArray(value)) {
+          // For arrays, convert to JSON string
+          flattened[newKey] = JSON.stringify(value)
+        } else {
+          // For nested objects, flatten recursively
+          Object.assign(flattened, flattenObject(value, newKey))
+        }
+      } else if (typeof value === 'boolean') {
+        flattened[newKey] = value ? 'Yes' : 'No'
+      } else {
+        flattened[newKey] = value
+      }
+    }
+  }
+  
+  return flattened
 }
 
 // Get method color

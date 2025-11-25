@@ -109,7 +109,7 @@ async def tenant_identification_middleware(request: Request, call_next):
     Middleware to identify and set tenant context for each request.
     """
     # Skip tenant identification for certain paths
-    skip_paths = ["/docs", "/openapi.json", "/redoc", "/health"]
+    skip_paths = ["/docs", "/openapi.json", "/redoc", "/health", "/api/v1/management"]
     if any(request.url.path.startswith(path) for path in skip_paths):
         response = await call_next(request)
         return response

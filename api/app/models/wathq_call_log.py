@@ -19,8 +19,9 @@ class WathqCallLog(Base):
     __tablename__ = "wathq_call_logs"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
-    tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=False, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    tenant_id = Column(Integer, ForeignKey("tenants.id"), nullable=True, index=True)  # Nullable for management users
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)  # Nullable for management users
+    management_user_id = Column(Integer, ForeignKey("management_users.id"), nullable=True, index=True)  # For management user calls
     service_slug = Column(String, nullable=False, index=True)  # e.g., 'commercial-registration'
     endpoint = Column(String, nullable=False)  # WATHQ endpoint called
     method = Column(String, nullable=False, default="POST")  # HTTP method
@@ -33,3 +34,4 @@ class WathqCallLog(Base):
     # Relationships
     tenant = relationship("Tenant")
     user = relationship("User")
+    management_user = relationship("ManagementUser")

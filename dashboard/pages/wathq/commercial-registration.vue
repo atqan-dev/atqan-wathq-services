@@ -100,9 +100,84 @@ const baseUrl = '/api/v1/wathq/commercial-registration'
 const endpoints = [
   {
     id: 'fullinfo',
-    name: 'Get Full Info',
-    description: 'Retrieve complete commercial registration information',
+    name: t('wathq.services.commercialRegistration.endpoints.fullinfo.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.fullinfo.description'),
     path: '/fullinfo/{cr_id}',
+    method: 'GET' as const,
+    params: [
+      {
+        key: 'cr_id',
+        label: 'CR ID',
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID'
+      },
+      {
+        key: 'language',
+        label: 'Language',
+        placeholder: 'Choose Language',
+        required: false,
+        type: 'select' as const,
+        options: [
+          { value: 'ar' as const, label: 'Arabic' },
+          { value: 'en' as const, label: 'English' }
+        ] as const,
+        description: 'Response language'
+      }
+    ],
+    category: 'Information'
+  },
+  {
+    id: 'info',
+    name: t('wathq.services.commercialRegistration.endpoints.info.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.info.description'),
+    path: '/info/{cr_id}',
+    method: 'GET' as const,
+    params: [
+      {
+        key: 'cr_id',
+        label: 'CR ID',
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID'
+      },
+      {
+        key: 'language',
+        label: 'Language',
+        placeholder: 'ar',
+        required: false,
+        type: 'select' as const,
+        options: [
+          { value: 'ar' as const, label: 'Arabic' },
+          { value: 'en' as const, label: 'English' }
+        ] as const,
+        description: 'Response language'
+      }
+    ],
+    category: 'Information'
+  },
+  {
+    id: 'branches',
+    name: t('wathq.services.commercialRegistration.endpoints.branches.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.branches.description'),
+    path: '/branches/{cr_id}',
+    method: 'GET' as const,
+    params: [
+      {
+        key: 'cr_id',
+        label: 'CR ID',
+        placeholder: '1010711252',
+        required: true,
+        description: 'Commercial Registration ID'
+      }
+      ],
+      category: 'Structure'
+  },
+  {
+    id: 'status',
+    name: t('wathq.services.commercialRegistration.endpoints.status.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.status.description'),
+    path: '/status/{cr_id}',
     method: 'GET' as const,
     params: [
       {
@@ -116,57 +191,9 @@ const endpoints = [
     category: 'Information'
   },
   {
-    id: 'info',
-    name: 'Get Basic Info',
-    description: 'Retrieve basic commercial registration information',
-    path: '/info/{cr_id}',
-    method: 'GET' as const,
-    params: [
-      {
-        key: 'cr_id',
-        label: 'CR ID',
-        placeholder: '1010711252',
-        required: true
-      }
-    ],
-    category: 'Information'
-  },
-  {
-    id: 'branches',
-    name: 'Get Branches',
-    description: 'Get all branches of the commercial registration',
-    path: '/branches/{cr_id}',
-    method: 'GET' as const,
-    params: [
-      {
-        key: 'cr_id',
-        label: 'CR ID',
-        placeholder: '1010711252',
-        required: true
-      }
-    ],
-    category: 'Structure'
-  },
-  {
-    id: 'status',
-    name: 'Get Status',
-    description: 'Check commercial registration status',
-    path: '/status/{cr_id}',
-    method: 'GET' as const,
-    params: [
-      {
-        key: 'cr_id',
-        label: 'CR ID',
-        placeholder: '1010711252',
-        required: true
-      }
-    ],
-    category: 'Information'
-  },
-  {
     id: 'capital',
-    name: 'Get Capital',
-    description: 'Retrieve capital information',
+    name: t('wathq.services.commercialRegistration.endpoints.capital.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.capital.description'),
     path: '/capital/{cr_id}',
     method: 'GET' as const,
     params: [
@@ -174,15 +201,16 @@ const endpoints = [
         key: 'cr_id',
         label: 'CR ID',
         placeholder: '1010711252',
-        required: true
+        required: true,
+        description: 'Commercial Registration ID' 
       }
     ],
     category: 'Financial'
   },
   {
     id: 'managers',
-    name: 'Get Managers',
-    description: 'Get list of managers',
+    name: t('wathq.services.commercialRegistration.endpoints.managers.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.managers.description'),
     path: '/managers/{cr_id}',
     method: 'GET' as const,
     params: [
@@ -190,15 +218,16 @@ const endpoints = [
         key: 'cr_id',
         label: 'CR ID',
         placeholder: '1010711252',
-        required: true
+        required: true,
+        description: 'Commercial Registration ID'
       }
     ],
     category: 'People'
   },
   {
     id: 'owners',
-    name: 'Get Owners',
-    description: 'Get list of owners',
+    name: t('wathq.services.commercialRegistration.endpoints.owners.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.owners.description'),
     path: '/owners/{cr_id}',
     method: 'GET' as const,
     params: [
@@ -206,15 +235,16 @@ const endpoints = [
         key: 'cr_id',
         label: 'CR ID',
         placeholder: '1010711252',
-        required: true
+        required: true,
+        description: 'Commercial Registration ID'
       }
     ],
     category: 'People'
   },
   {
     id: 'related',
-    name: 'Get Related',
-    description: 'Get related commercial registrations',
+    name: t('wathq.services.commercialRegistration.endpoints.related.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.related.description'),
     path: '/related/{identity_id}/{id_type}',
     method: 'GET' as const,
     params: [
@@ -223,22 +253,55 @@ const endpoints = [
         label: 'Identity ID',
         placeholder: '1234567890',
         required: true,
-        description: 'National ID or Iqama number'
+        description: 'Identification number (رقم هوية)'
       },
       {
         key: 'id_type',
         label: 'ID Type',
-        placeholder: '1',
+        placeholder: 'National_ID',
         required: true,
-        description: '1=National ID, 2=Iqama'
+        type: 'select' as const,
+        options: [
+          { value: 'National_ID', label: 'National ID' },
+          { value: 'Resident_ID', label: 'Resident ID' },
+          { value: 'Passport', label: 'Passport' },
+          { value: 'GCC_ID', label: 'GCC ID' },
+          { value: 'Endowment_Deed_No', label: 'Endowment Deed No' },
+          { value: 'License_No', label: 'License No' },
+          { value: 'CR_National_ID', label: 'CR National ID' },
+          { value: 'Foreign_CR_No', label: 'Foreign CR No' },
+          { value: 'National_Number', label: 'National Number' },
+          { value: 'Boarder_Number', label: 'Boarder Number' }
+        ] as const,
+        description: 'Identification type (نوع الهوية)'
+      },
+      {
+        key: 'nationality',
+        label: 'Nationality NIC Code',
+        placeholder: '682',
+        required: false,
+        type: 'number' as const,
+        description: 'Required for Passport, Foreign_CR_No. See lookup/nationalities for valid codes'
+      },
+      {
+        key: 'language',
+        label: 'Language',
+        placeholder: 'ar',
+        required: false,
+        type: 'select' as const,
+        options: [
+          { value: 'ar' as const, label: 'Arabic' },
+          { value: 'en' as const, label: 'English' }
+        ] as const,
+        description: 'Response language'
       }
     ],
     category: 'Relationships'
   },
   {
     id: 'owns',
-    name: 'Check Ownership',
-    description: 'Check if identity owns any CR',
+    name: t('wathq.services.commercialRegistration.endpoints.owns.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.owns.description'),
     path: '/owns/{identity_id}/{id_type}',
     method: 'GET' as const,
     params: [
@@ -259,8 +322,8 @@ const endpoints = [
   },
   {
     id: 'crNationalNumber',
-    name: 'Get CR National Number',
-    description: 'Get CR by national number',
+    name: t('wathq.services.commercialRegistration.endpoints.crNationalNumber.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.crNationalNumber.description'),
     path: '/crNationalNumber/{cr_number}',
     method: 'GET' as const,
     params: [
@@ -275,8 +338,8 @@ const endpoints = [
   },
   {
     id: 'lookup-status',
-    name: 'Get Status Lookup',
-    description: 'Get status codes lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupStatus.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupStatus.description'),
     path: '/lookup/status',
     method: 'GET' as const,
     params: [],
@@ -284,8 +347,8 @@ const endpoints = [
   },
   {
     id: 'lookup-entityType',
-    name: 'Get Entity Type Lookup',
-    description: 'Get entity types lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupEntityType.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupEntityType.description'),
     path: '/lookup/entityType',
     method: 'GET' as const,
     params: [],
@@ -293,8 +356,8 @@ const endpoints = [
   },
   {
     id: 'lookup-companyForm',
-    name: 'Get Company Form Lookup',
-    description: 'Get company forms lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupCompanyForm.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupCompanyForm.description'),
     path: '/lookup/companyForm',
     method: 'GET' as const,
     params: [],
@@ -302,8 +365,8 @@ const endpoints = [
   },
   {
     id: 'lookup-companyCharacter',
-    name: 'Get Company Character Lookup',
-    description: 'Get company characters lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupCompanyCharacter.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupCompanyCharacter.description'),
     path: '/lookup/companyCharacter',
     method: 'GET' as const,
     params: [],
@@ -311,8 +374,8 @@ const endpoints = [
   },
   {
     id: 'lookup-relation',
-    name: 'Get Relation Lookup',
-    description: 'Get relations lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupRelation.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupRelation.description'),
     path: '/lookup/relation',
     method: 'GET' as const,
     params: [],
@@ -320,8 +383,8 @@ const endpoints = [
   },
   {
     id: 'lookup-managerPositions',
-    name: 'Get Manager Positions Lookup',
-    description: 'Get manager positions lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupManagerPositions.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupManagerPositions.description'),
     path: '/lookup/managerPositions',
     method: 'GET' as const,
     params: [],
@@ -329,8 +392,8 @@ const endpoints = [
   },
   {
     id: 'lookup-identifierType',
-    name: 'Get Identifier Type Lookup',
-    description: 'Get identifier types lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupIdentifierType.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupIdentifierType.description'),
     path: '/lookup/identifierType',
     method: 'GET' as const,
     params: [],
@@ -338,8 +401,8 @@ const endpoints = [
   },
   {
     id: 'lookup-managementStructure',
-    name: 'Get Management Structure Lookup',
-    description: 'Get management structures lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupManagementStructure.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupManagementStructure.description'),
     path: '/lookup/managementStructure',
     method: 'GET' as const,
     params: [],
@@ -347,8 +410,8 @@ const endpoints = [
   },
   {
     id: 'lookup-partnerType',
-    name: 'Get Partner Type Lookup',
-    description: 'Get partner types lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupPartnerType.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupPartnerType.description'),
     path: '/lookup/partnerType',
     method: 'GET' as const,
     params: [],
@@ -356,8 +419,8 @@ const endpoints = [
   },
   {
     id: 'lookup-partnershipType',
-    name: 'Get Partnership Type Lookup',
-    description: 'Get partnership types lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupPartnershipType.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupPartnershipType.description'),
     path: '/lookup/partnershipType',
     method: 'GET' as const,
     params: [],
@@ -365,8 +428,8 @@ const endpoints = [
   },
   {
     id: 'lookup-nationalities',
-    name: 'Get Nationalities Lookup',
-    description: 'Get nationalities lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupNationalities.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupNationalities.description'),
     path: '/lookup/nationalities',
     method: 'GET' as const,
     params: [],
@@ -374,8 +437,8 @@ const endpoints = [
   },
   {
     id: 'lookup-activities',
-    name: 'Get Activities Lookup',
-    description: 'Get activities lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupActivities.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupActivities.description'),
     path: '/lookup/activities',
     method: 'GET' as const,
     params: [],
@@ -383,8 +446,8 @@ const endpoints = [
   },
   {
     id: 'lookup-cities',
-    name: 'Get Cities Lookup',
-    description: 'Get cities lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupCities.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupCities.description'),
     path: '/lookup/cities',
     method: 'GET' as const,
     params: [],
@@ -392,8 +455,8 @@ const endpoints = [
   },
   {
     id: 'lookup-currencies',
-    name: 'Get Currencies Lookup',
-    description: 'Get currencies lookup table',
+    name: t('wathq.services.commercialRegistration.endpoints.lookupCurrencies.name'),
+    description: t('wathq.services.commercialRegistration.endpoints.lookupCurrencies.description'),
     path: '/lookup/currencies',
     method: 'GET' as const,
     params: [],

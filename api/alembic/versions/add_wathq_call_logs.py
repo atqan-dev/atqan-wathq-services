@@ -20,8 +20,9 @@ def upgrade():
     # Create wathq_call_logs table
     op.create_table('wathq_call_logs',
         sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
-        sa.Column('tenant_id', sa.Integer(), nullable=False),
-        sa.Column('user_id', sa.Integer(), nullable=False),
+        sa.Column('tenant_id', sa.Integer(), nullable=True),
+        sa.Column('user_id', sa.Integer(), nullable=True),
+        sa.Column('management_user_id', sa.Integer(), nullable=True),
         sa.Column('service_slug', sa.String(), nullable=False),
         sa.Column('endpoint', sa.String(), nullable=False),
         sa.Column('method', sa.String(), nullable=False),
@@ -32,24 +33,39 @@ def upgrade():
         sa.Column('duration_ms', sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(['tenant_id'], ['tenants.id'], ),
         sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+        sa.ForeignKeyConstraint(['management_user_id'], ['management_users.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
     
     # Create indexes for better query performance
-    op.create_index(op.f('ix_wathq_call_logs_id'), 'wathq_call_logs', ['id'], unique=False)
-    op.create_index(op.f('ix_wathq_call_logs_tenant_id'), 'wathq_call_logs', ['tenant_id'], unique=False)
-    op.create_index(op.f('ix_wathq_call_logs_user_id'), 'wathq_call_logs', ['user_id'], unique=False)
-    op.create_index(op.f('ix_wathq_call_logs_service_slug'), 'wathq_call_logs', ['service_slug'], unique=False)
-    op.create_index(op.f('ix_wathq_call_logs_fetched_at'), 'wathq_call_logs', ['fetched_at'], unique=False)
+    op.create_index(op.f('ix_wathq_call_logs_id'), 'wathq_call_logs',
+                    ['id'], unique=False)
+    op.create_index(op.f('ix_wathq_call_logs_tenant_id'), 'wathq_call_logs',
+                    ['tenant_id'], unique=False)
+    op.create_index(op.f('ix_wathq_call_logs_user_id'), 'wathq_call_logs',
+                    ['user_id'], unique=False)
+    op.create_index(op.f('ix_wathq_call_logs_management_user_id'),
+                    'wathq_call_logs', ['management_user_id'], unique=False)
+    op.create_index(op.f('ix_wathq_call_logs_service_slug'),
+                    'wathq_call_logs', ['service_slug'], unique=False)
+    op.create_index(op.f('ix_wathq_call_logs_fetched_at'), 'wathq_call_logs',
+                    ['fetched_at'], unique=False)
 
 
 def downgrade():
     # Drop indexes
-    op.drop_index(op.f('ix_wathq_call_logs_fetched_at'), table_name='wathq_call_logs')
-    op.drop_index(op.f('ix_wathq_call_logs_service_slug'), table_name='wathq_call_logs')
-    op.drop_index(op.f('ix_wathq_call_logs_user_id'), table_name='wathq_call_logs')
-    op.drop_index(op.f('ix_wathq_call_logs_tenant_id'), table_name='wathq_call_logs')
-    op.drop_index(op.f('ix_wathq_call_logs_id'), table_name='wathq_call_logs')
-    
+    op.drop_index(op.f('ix_wathq_call_logs_fetched_at'),
+                  table_name='wathq_call_logs')
+    op.drop_index(op.f('ix_wathq_call_logs_service_slug'),
+                  table_name='wathq_call_logs')
+    op.drop_index(op.f('ix_wathq_call_logs_management_user_id'),
+                  table_name='wathq_call_logs')
+    op.drop_index(op.f('ix_wathq_call_logs_user_id'),
+                  table_name='wathq_call_logs')
+    op.drop_index(op.f('ix_wathq_call_logs_tenant_id'),
+                  table_name='wathq_call_logs')
+    op.drop_index(op.f('ix_wathq_call_logs_id'),
+                  table_name='wathq_call_logs')
+
     # Drop table
     op.drop_table('wathq_call_logs')

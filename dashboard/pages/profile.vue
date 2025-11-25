@@ -23,6 +23,7 @@ definePageMeta({
 
 import { onMounted } from 'vue'
 import { useUserProfile } from '@/composables/useUserProfile'
+import type { UserProfileCreate } from '@/composables/useUserProfile'
 import UserProfile from '@/components/UserProfile.vue'
 
 const { 
@@ -30,6 +31,7 @@ const {
   loading, 
   error, 
   fetchProfile, 
+  createProfile,
   updateProfile, 
   updating, 
   updateError,
@@ -61,6 +63,19 @@ async function handleAvatarUpload(file: File) {
   } catch (err: any) {
     // Error notification is handled in the composable
     console.error('Failed to upload avatar:', err)
+  }
+}
+
+// Handle profile creation
+async function handleCreate(profileData: UserProfileCreate) {
+  try {
+    await createProfile(profileData)
+    // Success notification is handled in the composable
+    // Refetch profile after creation
+    await fetchProfile()
+  } catch (err: any) {
+    // Error notification is handled in the composable
+    console.error('Failed to create profile:', err)
   }
 }
 </script>
