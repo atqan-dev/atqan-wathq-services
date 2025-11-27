@@ -944,7 +944,14 @@
       "copied": "تم النسخ!",
       "export": "تصدير",
       "exportJson": "تصدير JSON",
-      "exportXls": "تصدير XLS"
+      "exportXls": "تصدير XLS",
+      "exportPdf": "تصدير PDF",
+      "exportPdfSuccess": "تم تصدير PDF بنجاح",
+      "exportPdfError": "فشل في تصدير PDF",
+      "preview": "معاينة",
+      "previewPdf": "معاينة PDF",
+      "previewPdfError": "فشل في معاينة PDF",
+      "print": "طباعة"
     },
     "metadata": {
       "status": "الحالة",

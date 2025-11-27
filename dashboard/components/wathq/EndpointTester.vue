@@ -166,6 +166,38 @@
             >
               {{ t('wathq.actions.exportXls') }}
             </UButton>
+            <UButton
+              size="sm"
+              color="red"
+              variant="soft"
+              icon="i-heroicons-document-text"
+              @click="exportToPdf"
+              :title="t('wathq.actions.exportPdf')"
+              :loading="isExportingPdf"
+            >
+              {{ t('wathq.actions.exportPdf') }}
+            </UButton>
+            <UButton
+              size="sm"
+              color="purple"
+              variant="soft"
+              icon="i-heroicons-eye"
+              @click="previewPdf"
+              :title="t('wathq.actions.previewPdf')"
+              :loading="isPreviewingPdf"
+            >
+              {{ t('wathq.actions.preview') }}
+            </UButton>
+            <UButton
+              size="sm"
+              color="green"
+              variant="soft"
+              icon="i-heroicons-printer"
+              @click="printResponse"
+              :title="t('wathq.actions.print')"
+            >
+              {{ t('wathq.actions.print') }}
+            </UButton>
           </div>
         </div>
       </template>
@@ -209,7 +241,7 @@
           <div>
             <span class="text-gray-500 dark:text-gray-400">{{ t('wathq.metadata.size') }}:</span>
             <span class="ml-2 font-medium text-gray-900 dark:text-white">
-              {{ formatBytes(JSON.stringify(response.data).length) }}
+              {{ formatBytes(JSON.stringify(response.data || response.error || {})?.length || 0) }}
             </span>
           </div>
         </div>
@@ -278,6 +310,8 @@ const { t } = useI18n()
 const { success: showSuccess, error: showError } = useAlert()
 const { authenticatedFetch } = useAuthenticatedFetch()
 const { fetchRequests } = useWathqServices()
+const authStore = useAuthStore()
+const config = useRuntimeConfig()
 
 const selectedEndpoint = ref<string>('')
 const formData = ref<Record<string, any>>({})
@@ -285,6 +319,8 @@ const response = ref<Response | null>(null)
 const isLoading = ref(false)
 const copied = ref(false)
 const isExportingXls = ref(false)
+const isExportingPdf = ref(false)
+const isPreviewingPdf = ref(false)
 
 // Endpoint options for select
 const endpointOptions = computed(() => {
@@ -327,9 +363,10 @@ function resetForm() {
 async function handleSubmit() {
   if (!selectedEndpointData.value) return
 
+  const startTime = Date.now()
+  
   try {
     isLoading.value = true
-    const startTime = Date.now()
 
     // Get auth token to check user type
     const token = authStore.token
@@ -391,11 +428,9 @@ async function handleSubmit() {
       method: selectedEndpointData.value.method
     })
 
-    console.log('📥 Response status:', res.status)
-
     const duration = Date.now() - startTime
 
-    console.log('✓ Response received:', { status: res.status, data })
+    console.log('✓ Response received:', data)
 
     response.value = {
       success: true,
@@ -559,6 +594,297 @@ function formatBytes(bytes: number): string {
   const sizes = ['B', 'KB', 'MB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+}
+
+// Export to PDF
+async function exportToPdf() {
+  if (!response.value || !response.value.data) return
+
+  try {
+    isExportingPdf.value = true
+    
+    // Determine if this is a commercial registration response
+    const isCommercialRegistration = props.serviceType === 'commercial-registration'
+    
+    if (isCommercialRegistration && selectedEndpointData.value) {
+      // Extract CR ID from the endpoint path or form data
+      const crId = formData.value.cr_id || extractCrIdFromPath()
+      
+      if (crId) {
+        // Use the dedicated CR PDF export endpoint
+        const pdfUrl = `${config.public.apiBase}/wathq/pdf/commercial-registration/${crId}/pdf`
+        const queryParams = new URLSearchParams({
+          language: formData.value.language || 'ar',
+          include_full_info: 'true'
+        })
+        
+        const fullUrl = `${pdfUrl}?${queryParams.toString()}`
+        
+        // Add authentication header to the URL by creating a temporary form
+        const token = authStore.token
+        if (token) {
+          // Use fetch to download with authentication
+          const response = await fetch(fullUrl, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          
+          if (response.ok) {
+            const blob = await response.blob()
+            const url = window.URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = url
+            link.download = `commercial_registration_${crId}.pdf`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            window.URL.revokeObjectURL(url)
+          } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+          }
+        } else {
+          throw new Error('No authentication token available')
+        }
+      } else {
+        // Fallback to custom document PDF
+        await exportCustomPdf()
+      }
+    } else {
+      // For other services, create a custom PDF
+      await exportCustomPdf()
+    }
+    
+    showSuccess(t('wathq.actions.exportPdfSuccess'))
+  } catch (error) {
+    console.error('PDF export failed:', error)
+    showError(t('wathq.actions.exportPdfError'))
+  } finally {
+    isExportingPdf.value = false
+  }
+}
+
+// Export custom PDF for non-CR services
+async function exportCustomPdf() {
+  const pdfData = {
+    document_title: `${selectedEndpointData.value?.name || 'WATHQ Response'} - ${new Date().toLocaleDateString('ar-SA')}`,
+    main_content: `
+      <div class="response-section">
+        <h2>استجابة API</h2>
+        <p><strong>الخدمة:</strong> ${props.serviceType}</p>
+        <p><strong>النقطة النهائية:</strong> ${selectedEndpointData.value?.name}</p>
+        <p><strong>التاريخ:</strong> ${new Date().toLocaleDateString('ar-SA')}</p>
+        <p><strong>الوقت:</strong> ${new Date().toLocaleTimeString('ar-SA')}</p>
+      </div>
+      <div class="data-section">
+        <h3>البيانات المستلمة</h3>
+        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-size: 12px; line-height: 1.4; white-space: pre-wrap;">${JSON.stringify(response.value.data, null, 2)}</pre>
+      </div>
+    `,
+    show_signature: true,
+    signature_label_1: 'المسؤول',
+    signature_label_2: 'المستلم',
+    watermark_text: 'وثيقة رسمية'
+  }
+  
+  const pdfResponse = await authenticatedFetch('/api/v1/wathq/pdf/custom-document/pdf', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(pdfData)
+  })
+  
+  // Create download link
+  const blob = new Blob([pdfResponse], { type: 'application/pdf' })
+  const url = window.URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `wathq_response_${Date.now()}.pdf`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  window.URL.revokeObjectURL(url)
+}
+
+// Preview PDF
+async function previewPdf() {
+  if (!response.value || !response.value.data) return
+
+  try {
+    isPreviewingPdf.value = true
+    
+    const isCommercialRegistration = props.serviceType === 'commercial-registration'
+    
+    if (isCommercialRegistration && selectedEndpointData.value) {
+      const crId = formData.value.cr_id || extractCrIdFromPath()
+      
+      if (crId) {
+        // Use the dedicated CR preview endpoint
+        const previewUrl = `${config.public.apiBase}/wathq/pdf/preview/commercial-registration/${crId}`
+        const queryParams = new URLSearchParams({
+          language: formData.value.language || 'ar'
+        })
+        
+        const fullUrl = `${previewUrl}?${queryParams.toString()}`
+        
+        // Fetch HTML content with authentication
+        const token = authStore.token
+        if (token) {
+          const response = await fetch(fullUrl, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+          
+          if (response.ok) {
+            const htmlContent = await response.text()
+            
+            // Open preview in new window with the fetched content
+            const previewWindow = window.open('', '_blank', 'width=1024,height=768,scrollbars=yes,resizable=yes')
+            if (previewWindow) {
+              previewWindow.document.write(htmlContent)
+              previewWindow.document.close()
+            }
+          } else {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+          }
+        } else {
+          throw new Error('No authentication token available')
+        }
+      } else {
+        await previewCustomPdf()
+      }
+    } else {
+      await previewCustomPdf()
+    }
+  } catch (error) {
+    console.error('PDF preview failed:', error)
+    showError(t('wathq.actions.previewPdfError'))
+  } finally {
+    isPreviewingPdf.value = false
+  }
+}
+
+// Preview custom PDF
+async function previewCustomPdf() {
+  const pdfData = {
+    document_title: `${selectedEndpointData.value?.name || 'WATHQ Response'} - ${new Date().toLocaleDateString('ar-SA')}`,
+    main_content: `
+      <div class="response-section">
+        <h2>استجابة API</h2>
+        <p><strong>الخدمة:</strong> ${props.serviceType}</p>
+        <p><strong>النقطة النهائية:</strong> ${selectedEndpointData.value?.name}</p>
+        <p><strong>التاريخ:</strong> ${new Date().toLocaleDateString('ar-SA')}</p>
+        <p><strong>الوقت:</strong> ${new Date().toLocaleTimeString('ar-SA')}</p>
+      </div>
+      <div class="data-section">
+        <h3>البيانات المستلمة</h3>
+        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-size: 12px; line-height: 1.4; white-space: pre-wrap;">${JSON.stringify(response.value.data, null, 2)}</pre>
+      </div>
+    `,
+    show_signature: true,
+    signature_label_1: 'المسؤول',
+    signature_label_2: 'المستلم',
+    watermark_text: 'وثيقة رسمية'
+  }
+  
+  const htmlContent = await authenticatedFetch('/api/v1/wathq/pdf/preview/custom-document', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(pdfData)
+  })
+  
+  // Open preview in new window
+  const previewWindow = window.open('', '_blank', 'width=1024,height=768,scrollbars=yes,resizable=yes')
+  if (previewWindow) {
+    previewWindow.document.write(htmlContent)
+    previewWindow.document.close()
+  }
+}
+
+// Print response
+function printResponse() {
+  if (!response.value) return
+  
+  const printContent = `
+    <!DOCTYPE html>
+    <html dir="rtl" lang="ar">
+    <head>
+      <meta charset="UTF-8">
+      <title>WATHQ Response - ${selectedEndpointData.value?.name || 'API Response'}</title>
+      <style>
+        body { 
+          font-family: 'Tahoma', Arial, sans-serif; 
+          margin: 20px; 
+          line-height: 1.6;
+          direction: rtl;
+        }
+        .header { 
+          border-bottom: 2px solid #003366; 
+          padding-bottom: 10px; 
+          margin-bottom: 20px; 
+        }
+        .title { 
+          color: #003366; 
+          font-size: 24px; 
+          font-weight: bold; 
+        }
+        .meta { 
+          color: #666; 
+          font-size: 14px; 
+          margin: 10px 0; 
+        }
+        .content { 
+          background: #f9f9f9; 
+          padding: 15px; 
+          border-radius: 5px; 
+          font-family: monospace; 
+          white-space: pre-wrap; 
+          font-size: 12px;
+          direction: ltr;
+        }
+        @media print {
+          body { margin: 0; }
+          .no-print { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="title">${selectedEndpointData.value?.name || 'WATHQ API Response'}</div>
+        <div class="meta">الخدمة: ${props.serviceType}</div>
+        <div class="meta">التاريخ: ${new Date().toLocaleDateString('ar-SA')}</div>
+        <div class="meta">الوقت: ${new Date().toLocaleTimeString('ar-SA')}</div>
+      </div>
+      <div class="content">${JSON.stringify(response.value.data || response.value.error, null, 2)}</div>
+    </body>
+    </html>
+  `
+  
+  const printWindow = window.open('', '_blank')
+  if (printWindow) {
+    printWindow.document.write(printContent)
+    printWindow.document.close()
+    printWindow.focus()
+    printWindow.print()
+  }
+}
+
+// Helper function to extract CR ID from endpoint path
+function extractCrIdFromPath(): string | null {
+  if (!selectedEndpointData.value) return null
+  
+  const path = selectedEndpointData.value.path
+  const crIdMatch = path.match(/\{cr_id\}/)
+  
+  if (crIdMatch && formData.value.cr_id) {
+    return formData.value.cr_id
+  }
+  
+  return null
 }
 
 // Watch endpoint change

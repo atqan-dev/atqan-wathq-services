@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ document_title | default('وثيقة رسمية') }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+            @top-center {
+                content: element(header);
+            }
+            @bottom-center {
+                content: element(footer);
+            }
+        }
+
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* Header Styles - Fixed for all pages */
+        .header {
+            position: running(header);
+            height: 120px;
+            background: linear-gradient(to left, #1e3a8a 0%, #1e3a8a 70%, #f59e0b 70%, #f59e0b 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            page-break-inside: avoid;
+        }
+
+        .logo-section {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            text-align: center;
+            min-width: 280px;
+        }
+
+        .logo-img {
+            height: 60px;
+            width: auto;
+            margin-bottom: 8px;
+        }
+
+        .company-name-ar {
+            font-size: 16px;
+            color: #1e3a8a;
+            font-weight: bold;
+            margin-bottom: 3px;
+            line-height: 1.3;
+        }
+
+        .company-name-en {
+            font-size: 10px;
+            color: #666;
+            line-height: 1.2;
+        }
+
+        .header-decoration {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 30%;
+            background: #f59e0b;
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+        }
+
+        /* Content Area */
+        .content {
+            padding: 140px 60px 100px 60px;
+            min-height: calc(100vh - 240px);
+            position: relative;
+        }
+
+        /* Page break handling */
+        .page-break {
+            page-break-before: always;
+        }
+
+        .no-break {
+            page-break-inside: avoid;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            right: 50%;
+            top: 50%;
+            transform: translate(50%, -50%);
+            font-size: 180px;
+            font-weight: bold;
+            color: rgba(245, 158, 11, 0.08);
+            z-index: 0;
+            white-space: nowrap;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Document Title */
+        .document-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 3px solid #f59e0b;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            page-break-after: avoid;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin: 30px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f59e0b;
+            page-break-after: avoid;
+        }
+
+        /* Content Text Styles */
+        .content-text {
+            line-height: 2;
+            font-size: 16px;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .content-text p {
+            margin-bottom: 15px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-right: 5px solid #f59e0b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            page-break-inside: auto;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px 12px;
+            text-align: right;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table th {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        .data-table tr:hover {
+            background: #e2e8f0;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border: 2px solid #1e3a8a;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            page-break-inside: avoid;
+        }
+
+        .info-box-title {
+            color: #1e3a8a;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f59e0b;
+            padding-bottom: 8px;
+        }
+
+        .info-item {
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #1e3a8a;
+            min-width: 150px;
+        }
+
+        .info-value {
+            flex: 1;
+            text-align: left;
+            padding-right: 20px;
+        }
+
+        /* Signature Section */
+        .signature-section {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+            page-break-inside: avoid;
+        }
+
+        .signature-box {
+            width: 200px;
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 3px solid #1e3a8a;
+            margin-top: 60px;
+            padding-top: 15px;
+            font-weight: bold;
+            color: #1e3a8a;
+            font-size: 16px;
+        }
+
+        /* Footer Styles - Fixed for all pages */
+        .footer {
+            position: running(footer);
+            height: 80px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e3a8a 70%, #f59e0b 70%, #f59e0b 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 40px;
+            color: white;
+            font-size: 13px;
+            page-break-inside: avoid;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-icon {
+            width: 24px;
+            height: 24px;
+            background: #f59e0b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        /* Page numbering */
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e3a8a;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Lists */
+        .styled-list {
+            margin: 20px 0;
+            padding-right: 30px;
+        }
+
+        .styled-list li {
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+
+        /* Responsive adjustments for print */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* Multi-column layout option */
+        .two-column {
+            column-count: 2;
+            column-gap: 30px;
+            column-rule: 1px solid #e5e7eb;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .status-inactive {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header - Will repeat on every page -->
+    <div class="header">
+        <div class="header-decoration"></div>
+        <div class="logo-section">
+            {% if logo_base64 %}
+            <img src="data:image/png;base64,{{ logo_base64 }}" alt="شعار الشركة" class="logo-img">
+            {% elif logo_url %}
+            <img src="{{ logo_url }}" alt="شعار الشركة" class="logo-img">
+            {% endif %}
+            <div class="company-name-ar">{{ company_name_ar | default('شركة مجموعة توثيق العدل') }}</div>
+            <div class="company-name-en">{{ company_name_en | default('Notarization Justice Group for Real Estate Development and Investment Company') }}</div>
+        </div>
+    </div>
+
+    <!-- Watermark -->
+    {% if show_watermark %}
+    <div class="watermark">{{ watermark_text | default('وثيقة رسمية') }}</div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="content-wrapper">
+            <!-- Document Title -->
+            {% if document_title %}
+            <h1 class="document-title">{{ document_title }}</h1>
+            {% endif %}
+
+            <!-- Main Content Area -->
+            <div class="content-text">
+                {{ main_content | safe }}
+            </div>
+
+            <!-- Data Table -->
+            {% if show_table and table_data %}
+            <div class="no-break">
+                {% if table_title %}
+                <h2 class="section-title">{{ table_title }}</h2>
+                {% endif %}
+                <table class="data-table">
+                    {% if table_headers %}
+                    <thead>
+                        <tr>
+                            {% for header in table_headers %}
+                            <th>{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    {% endif %}
+                    <tbody>
+                        {% for row in table_data %}
+                        <tr>
+                            {% for cell in row %}
+                            <td>{{ cell }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Info Boxes -->
+            {% if info_boxes %}
+            {% for box in info_boxes %}
+            <div class="info-box no-break">
+                <div class="info-box-title">{{ box.title }}</div>
+                {% for item in box.items %}
+                <div class="info-item">
+                    <span class="info-label">{{ item.label }}</span>
+                    <span class="info-value">{{ item.value }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Custom Sections -->
+            {% if sections %}
+            {% for section in sections %}
+            <div class="{% if section.page_break %}page-break{% endif %} {% if section.no_break %}no-break{% endif %}">
+                {% if section.title %}
+                <h2 class="section-title">{{ section.title }}</h2>
+                {% endif %}
+                <div class="content-text">
+                    {{ section.content | safe }}
+                </div>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Signature Section -->
+            {% if show_signature %}
+            <div class="signature-section no-break">
+                <div class="signature-box">
+                    <div class="signature-line">{{ signature_label_1 | default('المدير العام') }}</div>
+                </div>
+                <div class="signature-box">
+                    <div class="signature-line">{{ signature_label_2 | default('المستلم') }}</div>
+                </div>
+                {% if signature_label_3 %}
+                <div class="signature-box">
+                    <div class="signature-line">{{ signature_label_3 }}</div>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Page Number -->
+            {% if show_page_numbers %}
+            <div class="page-number">{{ page_number | default('01') }}</div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer - Will repeat on every page -->
+    <div class="footer">
+        <div class="footer-item">
+            <div class="footer-icon">📞</div>
+            <span>{{ phone_number | default('0112322022') }}</span>
+        </div>
+        <div class="footer-item">
+            <div class="footer-icon">✉</div>
+            <span>{{ email | default('info@tawthiq.com.sa') }}</span>
+        </div>
+        <div class="footer-item">
+            <div class="footer-icon">📍</div>
+            <span>{{ location | default('المملكة العربية السعودية - الرياض') }}</span>
+        </div>
+        {% if website %}
+        <div class="footer-item">
+            <div class="footer-icon">🌐</div>
+            <span>{{ website }}</span>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ document_title | default('توثيق العدل') }}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #ffffff;
+            color: #333;
+            position: relative;
+        }
+
+        /* Header Styles */
+        .header {
+            position: relative;
+            height: 100px;
+            background: linear-gradient(to right, #003366 0%, #003366 52%, #f39c12 52%, #f39c12 100%);
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .logo-container {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .logo-img {
+            height: 70px;
+            width: auto;
+        }
+
+        .company-name {
+            font-size: 18px;
+            color: #003366;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .company-name-en {
+            font-size: 9px;
+            color: #666;
+            text-align: center;
+            margin-top: 2px;
+        }
+
+        /* Content Area */
+        .content {
+            padding: 60px 80px;
+            min-height: calc(100vh - 250px);
+            position: relative;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            right: 50%;
+            top: 50%;
+            transform: translate(50%, -50%);
+            font-size: 200px;
+            font-weight: bold;
+            color: rgba(243, 156, 18, 0.05);
+            z-index: 0;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        .content-text {
+            position: relative;
+            z-index: 1;
+            line-height: 2;
+            font-size: 16px;
+            text-align: right;
+        }
+
+        .content-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #003366;
+            margin-bottom: 30px;
+            text-align: center;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 15px;
+        }
+
+        /* Footer Styles */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: linear-gradient(135deg, #003366 0%, #003366 52%, #f39c12 52%, #f39c12 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 40px;
+            color: white;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+
+        .footer-icon {
+            width: 20px;
+            height: 20px;
+            background: #f39c12;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #003366;
+        }
+
+        /* Decorative wave pattern at footer */
+        .wave-pattern {
+            position: absolute;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            height: 100px;
+            opacity: 0.1;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120"><path d="M0,50 Q300,10 600,50 T1200,50 L1200,120 L0,120 Z" fill="%23003366"/></svg>');
+            background-repeat: repeat-x;
+            background-size: 100% 100%;
+            pointer-events: none;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: right;
+            border: 1px solid #ddd;
+        }
+
+        .data-table th {
+            background: #003366;
+            color: white;
+            font-weight: bold;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* Signature Section */
+        .signature-section {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature-box {
+            width: 200px;
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 2px solid #003366;
+            margin-top: 50px;
+            padding-top: 10px;
+            font-weight: bold;
+            color: #003366;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo-container">
+            {% if logo_base64 %}
+            <img src="data:image/png;base64,{{ logo_base64 }}" alt="Logo" class="logo-img">
+            {% else %}
+            <img src="{{ logo_url | default('logo.png') }}" alt="Logo" class="logo-img">
+            {% endif %}
+            <div class="company-name">{{ company_name_ar | default('شركة مجموعة توثيق العدل') }}</div>
+            <div class="company-name-en">{{ company_name_en | default('Notarization Justice Group for Real Estate Development and Investment Company') }}</div>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Watermark -->
+        <div class="watermark">{{ watermark_text | default('توثيق') }}</div>
+
+        <!-- Main Content -->
+        <div class="content-text">
+            {% if content_title %}
+            <h1 class="content-title">{{ content_title }}</h1>
+            {% endif %}
+
+            {{ main_content | safe }}
+
+            {% if show_table and table_data %}
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        {% for header in table_headers %}
+                        <th>{{ header }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in table_data %}
+                    <tr>
+                        {% for cell in row %}
+                        <td>{{ cell }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            {% if show_signature %}
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div class="signature-line">{{ signature_label_1 | default('المدير') }}</div>
+                </div>
+                <div class="signature-box">
+                    <div class="signature-line">{{ signature_label_2 | default('المستلم') }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Wave Pattern -->
+    <div class="wave-pattern"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-item">
+            <div class="footer-icon">📞</div>
+            <span>{{ phone_number | default('0112322022') }}</span>
+        </div>
+        <div class="footer-item">
+            <div class="footer-icon">✉</div>
+            <span>{{ email | default('info@tawthiq.com.sa') }}</span>
+        </div>
+        <div class="footer-item">
+            <div class="footer-icon">📍</div>
+            <span>{{ location | default('Saudi Arabia - Riyadh') }}</span>
+        </div>
+    </div>
+</body>
+</html>
