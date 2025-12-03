@@ -118,6 +118,17 @@ class WathqPDFData(BaseModel):
     )
     website: Optional[str] = Field(default=None, description="Website URL")
 
+    # WATHQ data for modern template
+    wathq_data: Optional[Dict[str, Any]] = Field(
+        default=None, description="Raw WATHQ API response data"
+    )
+    show_raw_data: Optional[bool] = Field(
+        default=False, description="Show raw JSON data in document"
+    )
+    raw_json_data: Optional[Dict[str, Any]] = Field(
+        default=None, description="Raw JSON data for debugging"
+    )
+
     # PDF generation options
     pdf_options: Optional[Dict[str, Any]] = Field(
         default={

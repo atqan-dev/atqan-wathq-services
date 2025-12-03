@@ -92,9 +92,10 @@ definePageMeta({
 })
 
 const { t } = useI18n()
+const config = useRuntimeConfig()
 
 // Base URL for API
-const baseUrl = '/api/v1/wathq/commercial-registration'
+const baseUrl = `${config.public.apiBase}/wathq/commercial-registration`
 
 // Endpoint definitions
 const endpoints = [

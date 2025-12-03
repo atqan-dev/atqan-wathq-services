@@ -56,9 +56,10 @@ import type { WathqTestResponse, RealEstateParams } from '~/types/wathq'
 definePageMeta({ middleware: ['auth'] })
 
 const { t } = useI18n()
+const config = useRuntimeConfig()
 
 // Base URL for API
-const baseUrl = '/api/v1/wathq/real-estate'
+const baseUrl = `${config.public.apiBase}/wathq/real-estate`
 
 // Endpoint definitions
 const endpoints = [

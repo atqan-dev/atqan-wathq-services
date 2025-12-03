@@ -56,9 +56,10 @@ import type { WathqTestResponse, EmployeeParams } from '~/types/wathq'
 definePageMeta({ middleware: ['auth'] })
 
 const { t } = useI18n()
+const config = useRuntimeConfig()
 
 // Base URL for API
-const baseUrl = '/api/v1/wathq/employee'
+const baseUrl = `${config.public.apiBase}/wathq/employee`
 
 // Endpoint definitions
 const endpoints = [

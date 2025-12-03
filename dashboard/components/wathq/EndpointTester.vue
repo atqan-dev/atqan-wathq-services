@@ -611,11 +611,12 @@ async function exportToPdf() {
       const crId = formData.value.cr_id || extractCrIdFromPath()
       
       if (crId) {
-        // Use the dedicated CR PDF export endpoint
+        // Use the dedicated CR PDF export endpoint with new template
         const pdfUrl = `${config.public.apiBase}/wathq/pdf/commercial-registration/${crId}/pdf`
         const queryParams = new URLSearchParams({
           language: formData.value.language || 'ar',
-          include_full_info: 'true'
+          include_full_info: 'true',
+          template: 'wathq-modern-template.html'
         })
         
         const fullUrl = `${pdfUrl}?${queryParams.toString()}`
@@ -676,18 +677,16 @@ async function exportCustomPdf() {
         <p><strong>التاريخ:</strong> ${new Date().toLocaleDateString('ar-SA')}</p>
         <p><strong>الوقت:</strong> ${new Date().toLocaleTimeString('ar-SA')}</p>
       </div>
-      <div class="data-section">
-        <h3>البيانات المستلمة</h3>
-        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-size: 12px; line-height: 1.4; white-space: pre-wrap;">${JSON.stringify(response.value.data, null, 2)}</pre>
-      </div>
     `,
+    wathq_data: response.value?.data || {},
     show_signature: true,
+    show_watermark: true,
     signature_label_1: 'المسؤول',
     signature_label_2: 'المستلم',
-    watermark_text: 'وثيقة رسمية'
+    watermark_text: 'وثق'
   }
   
-  const pdfResponse = await authenticatedFetch('/api/v1/wathq/pdf/custom-document/pdf', {
+  const pdfResponse = await authenticatedFetch('/api/v1/wathq/pdf/custom-document/pdf?template=wathq-modern-template.html', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -720,10 +719,11 @@ async function previewPdf() {
       const crId = formData.value.cr_id || extractCrIdFromPath()
       
       if (crId) {
-        // Use the dedicated CR preview endpoint
+        // Use the dedicated CR preview endpoint with new template
         const previewUrl = `${config.public.apiBase}/wathq/pdf/preview/commercial-registration/${crId}`
         const queryParams = new URLSearchParams({
-          language: formData.value.language || 'ar'
+          language: formData.value.language || 'ar',
+          template: 'wathq-modern-template.html'
         })
         
         const fullUrl = `${previewUrl}?${queryParams.toString()}`
@@ -778,18 +778,16 @@ async function previewCustomPdf() {
         <p><strong>التاريخ:</strong> ${new Date().toLocaleDateString('ar-SA')}</p>
         <p><strong>الوقت:</strong> ${new Date().toLocaleTimeString('ar-SA')}</p>
       </div>
-      <div class="data-section">
-        <h3>البيانات المستلمة</h3>
-        <pre style="background: #f5f5f5; padding: 15px; border-radius: 5px; font-size: 12px; line-height: 1.4; white-space: pre-wrap;">${JSON.stringify(response.value.data, null, 2)}</pre>
-      </div>
     `,
+    wathq_data: response.value?.data || {},
     show_signature: true,
+    show_watermark: true,
     signature_label_1: 'المسؤول',
     signature_label_2: 'المستلم',
-    watermark_text: 'وثيقة رسمية'
+    watermark_text: 'وثق'
   }
   
-  const htmlContent = await authenticatedFetch('/api/v1/wathq/pdf/preview/custom-document', {
+  const htmlContent = await authenticatedFetch('/api/v1/wathq/pdf/preview/custom-document?template=wathq-modern-template.html', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

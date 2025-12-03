@@ -27,7 +27,7 @@ class WathqPDFService:
         self.env = Environment(
             loader=FileSystemLoader(self.templates_dir), autoescape=True
         )
-        self.default_template = "wathq-document-template.html"
+        self.default_template = "wathq-modern-template.html"
 
     def load_template(self, template_name: Optional[str] = None) -> Template:
         """Load Jinja2 template from file"""
@@ -181,10 +181,23 @@ class WathqPDFService:
                     )
             return str(value)
 
+        # Add logo as base64
+        logo_path = self.templates_dir / "assets" / "header_logo_after_colored.png"
+        logo_base64 = None
+        if logo_path.exists():
+            try:
+                logo_base64 = PDFHelper.image_to_base64(
+                    str(logo_path), resize=(200, 80)
+                )
+            except Exception:
+                pass  # Continue without logo if conversion fails
+
         return WathqCommercialRegistrationPDF(
             main_content=main_content,
             info_boxes=info_boxes if info_boxes else None,
             show_signature=True,
+            logo_base64=logo_base64,
+            wathq_data=cr_data,  # Include raw WATHQ data for modern template
             cr_number=safe_str(cr_data.get("cr_number")),
             company_name=safe_str(cr_data.get("company_name")),
             establishment_date=safe_str(cr_data.get("establishment_date")),
@@ -301,6 +314,121 @@ class WathqPDFService:
             sections=sections,
             **kwargs,
         )
+
+    def create_wathq_data_pdf(
+        self,
+        wathq_data: Dict[str, Any],
+        document_title: str = "وثيقة وثق",
+        template_name: str = "wathq-modern-template.html",
+        **kwargs,
+    ) -> WathqPDFData:
+        """Create PDF data model for WATHQ live/offline data using modern template"""
+
+        # Extract main content from WATHQ data
+        main_content_parts = []
+
+        # Add document description if available
+        if wathq_data.get("description"):
+            main_content_parts.append(f"<p>{wathq_data['description']}</p>")
+
+        # Add service information
+        if wathq_data.get("service_name"):
+            main_content_parts.append(
+                f"<div class='highlight-box'><strong>الخدمة:</strong> "
+                f"{wathq_data['service_name']}</div>"
+            )
+
+        # Add timestamp
+        from datetime import datetime
+
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        main_content_parts.append(
+            f"<p><strong>تاريخ الإنشاء:</strong> {current_time}</p>"
+        )
+
+        # Create main content
+        main_content = (
+            "\n".join(main_content_parts) if main_content_parts else "<p>بيانات وثق</p>"
+        )
+
+        # Add logo as base64
+        logo_path = self.templates_dir / "assets" / "header_logo_after_colored.png"
+        logo_base64 = None
+        if logo_path.exists():
+            try:
+                logo_base64 = PDFHelper.image_to_base64(
+                    str(logo_path), resize=(200, 80)
+                )
+            except Exception:
+                pass  # Continue without logo if conversion fails
+
+        # Prepare template variables
+        template_vars = {
+            "document_title": document_title,
+            "main_content": main_content,
+            "wathq_data": wathq_data,
+            "logo_base64": logo_base64,
+            "show_watermark": kwargs.get("show_watermark", True),
+            "watermark_text": kwargs.get("watermark_text", "وثق"),
+            "show_signature": kwargs.get("show_signature", True),
+            "show_raw_data": kwargs.get("show_raw_data", False),
+            "raw_json_data": (
+                wathq_data if kwargs.get("show_raw_data", False) else None
+            ),
+            **kwargs,
+        }
+
+        return WathqPDFData(**template_vars)
+
+    def generate_wathq_pdf_bytes(
+        self,
+        wathq_data: Dict[str, Any],
+        document_title: str = "وثيقة وثق",
+        template_name: str = "wathq-modern-template.html",
+        **kwargs,
+    ) -> bytes:
+        """Generate PDF bytes directly from WATHQ data"""
+        pdf_data = self.create_wathq_data_pdf(
+            wathq_data, document_title, template_name, **kwargs
+        )
+        return self.generate_pdf_bytes(pdf_data, template_name)
+
+    def generate_wathq_pdf_response(
+        self,
+        wathq_data: Dict[str, Any],
+        document_title: str = "وثيقة وثق",
+        filename: Optional[str] = None,
+        template_name: str = "wathq-modern-template.html",
+        **kwargs,
+    ) -> Response:
+        """Generate PDF response directly from WATHQ data"""
+        pdf_bytes = self.generate_wathq_pdf_bytes(
+            wathq_data, document_title, template_name, **kwargs
+        )
+
+        filename = filename or f"{document_title.replace(' ', '_')}.pdf"
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Content-Length": str(len(pdf_bytes)),
+            },
+        )
+
+    def preview_wathq_html(
+        self,
+        wathq_data: Dict[str, Any],
+        document_title: str = "وثيقة وثق",
+        template_name: str = "wathq-modern-template.html",
+        **kwargs,
+    ) -> str:
+        """Generate HTML preview for WATHQ data"""
+        pdf_data = self.create_wathq_data_pdf(
+            wathq_data, document_title, template_name, **kwargs
+        )
+        return self.preview_html(pdf_data, template_name)
 
 
 # Global service instance

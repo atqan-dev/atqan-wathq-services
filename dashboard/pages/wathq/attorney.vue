@@ -56,9 +56,10 @@ import type { WathqTestResponse, AttorneyParams } from '~/types/wathq'
 definePageMeta({ middleware: ['auth'] })
 
 const { t } = useI18n()
+const config = useRuntimeConfig()
 
 // Base URL for API
-const baseUrl = '/api/v1/wathq/attorney'
+const baseUrl = `${config.public.apiBase}/wathq/attorney`
 
 // Endpoint definitions
 const endpoints = [

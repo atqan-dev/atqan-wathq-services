@@ -56,9 +56,10 @@ import type { WathqTestResponse, NationalAddressParams } from '~/types/wathq'
 definePageMeta({ middleware: ['auth'] })
 
 const { t } = useI18n()
+const config = useRuntimeConfig()
 
 // Base URL for API
-const baseUrl = '/api/v1/wathq/spl-national-address'
+const baseUrl = `${config.public.apiBase}/wathq/spl-national-address`
 
 // Endpoint definitions
 const endpoints = [

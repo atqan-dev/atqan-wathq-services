@@ -67,9 +67,10 @@ import type { WathqTestResponse, CompanyContractParams } from '~/types/wathq'
 definePageMeta({ middleware: ['auth'] })
 
 const { t } = useI18n()
+const config = useRuntimeConfig()
 
 // Base URL for API
-const baseUrl = '/api/v1/wathq/company-contract'
+const baseUrl = `${config.public.apiBase}/wathq/company-contract`
 
 // Endpoint definitions
 const endpoints = [
