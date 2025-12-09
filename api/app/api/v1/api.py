@@ -17,6 +17,7 @@ from app.api.v1.endpoints import (
     request_analytics,
     roles,
     services,
+    template_tester,
     tenants,
     totp,
     users,
@@ -117,4 +118,9 @@ api_router.include_router(
 # PDF Templates endpoints - for management users only
 api_router.include_router(
     pdf_templates.router, prefix="/pdf-templates", tags=["pdf-templates"]
+)
+
+# Template Tester endpoints - for testing HTML templates
+api_router.include_router(
+    template_tester.router, prefix="/templates", tags=["template-tester"]
 )

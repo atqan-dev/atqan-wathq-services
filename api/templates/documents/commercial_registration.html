@@ -1,0 +1,165 @@
+{% extends "pdf_base.html" %}
+
+{% block title %}فاتورة - {{ invoice_number|default('12345') }}{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .document-title {
+        font-size: 18pt;
+        font-weight: bold;
+        color: #003366;
+        text-align: center;
+        margin-bottom: 10mm;
+        padding-bottom: 3mm;
+        border-bottom: 2px solid #d4941f;
+    }
+    
+    .invoice-details {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8mm;
+        padding: 5mm;
+        background: #f9f9f9;
+        border-radius: 2mm;
+    }
+    
+    .detail-group h3 {
+        color: #003366;
+        font-size: 12pt;
+        margin-bottom: 3mm;
+    }
+    
+    .detail-group p {
+        font-size: 11pt;
+        margin: 2mm 0;
+        color: #333;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 5mm 0;
+    }
+    
+    table th, table td {
+        border: 1px solid #003366;
+        padding: 3mm;
+        text-align: right;
+    }
+    
+    table th {
+        background-color: #003366;
+        color: white;
+        font-weight: bold;
+    }
+    
+    table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+    
+    .total-section {
+        margin-top: 8mm;
+        text-align: left;
+        padding: 5mm;
+        background: #003366;
+        color: white;
+        border-radius: 2mm;
+    }
+    
+    .total-section h3 {
+        font-size: 16pt;
+        margin-bottom: 2mm;
+    }
+    
+    .total-amount {
+        font-size: 20pt;
+        font-weight: bold;
+        color: #d4941f;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="document-title">فاتورة رقم {{ invoice_number|default('12345') }}</h1>
+
+<div class="invoice-details">
+    <div class="detail-group">
+        <h3>معلومات الفاتورة</h3>
+        <p><strong>رقم الفاتورة:</strong> {{ invoice_number|default('12345') }}</p>
+        <p><strong>التاريخ:</strong> {{ invoice_date|default('2024-12-04') }}</p>
+        <p><strong>تاريخ الاستحقاق:</strong> {{ due_date|default('2024-12-20') }}</p>
+    </div>
+    
+    <div class="detail-group">
+        <h3>معلومات العميل</h3>
+        <p><strong>اسم العميل:</strong> {{ customer_name|default('عميل تجريبي') }}</p>
+        <p><strong>رقم الهاتف:</strong> {{ customer_phone|default('0501234567') }}</p>
+        <p><strong>العنوان:</strong> {{ customer_address|default('الرياض، المملكة العربية السعودية') }}</p>
+    </div>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>البند</th>
+            <th>الوصف</th>
+            <th>الكمية</th>
+            <th>السعر</th>
+            <th>المجموع</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if items %}
+            {% for item in items %}
+            <tr>
+                <td>{{ loop.index }}</td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price|currency }}</td>
+                <td>{{ (item.quantity * item.price)|currency }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td>1</td>
+                <td>خدمات استشارية عقارية</td>
+                <td>1</td>
+                <td>25,000.00 ريال</td>
+                <td>25,000.00 ريال</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>رسوم إدارية</td>
+                <td>1</td>
+                <td>5,000.00 ريال</td>
+                <td>5,000.00 ريال</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>خدمات توثيق</td>
+                <td>2</td>
+                <td>10,000.00 ريال</td>
+                <td>20,000.00 ريال</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<div class="total-section">
+    <h3>المجموع الكلي</h3>
+    <div class="total-amount">{{ total|default('50,000.00') }} ريال سعودي</div>
+</div>
+
+<div style="margin-top: 10mm; padding: 5mm; border: 1px solid #ddd; border-radius: 2mm;">
+    <h4 style="color: #003366; margin-bottom: 3mm;">ملاحظات:</h4>
+    <p style="color: #666; line-height: 1.6;">
+        {{ notes|default('يرجى سداد المبلغ خلال المدة المحددة. في حالة وجود أي استفسارات، يرجى التواصل معنا على الأرقام الموضحة أدناه.') }}
+    </p>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    console.log('Invoice template loaded');
+</script>
+{% endblock %}

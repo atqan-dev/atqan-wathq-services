@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
+            font-size: 14px;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Header Section */
+        .header {
+            position: relative;
+            height: 120px;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        /* Header blue line */
+        .header-top-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: #1e3a8a;
+        }
+
+        /* Header colored section */
+        .header-colored-section {
+            position: absolute;
+            top: 8px;
+            right: 0;
+            width: 35%;
+            height: 112px;
+            background: #f59e0b;
+        }
+
+        /* Logo and text container */
+        .header-content {
+            position: relative;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding: 20px 40px;
+        }
+
+        .logo-container {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .logo-img {
+            height: 80px;
+            width: auto;
+        }
+
+        .company-text {
+            text-align: right;
+            color: #1e3a8a;
+        }
+
+        .company-name-ar {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        .company-name-en {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.2;
+        }
+
+        /* Main content area */
+        .content {
+            padding: 40px 60px;
+            min-height: calc(100vh - 200px);
+            position: relative;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            right: 50%;
+            top: 50%;
+            transform: translate(50%, -50%) rotate(-15deg);
+            font-size: 200px;
+            font-weight: bold;
+            color: rgba(245, 158, 11, 0.05);
+            z-index: 0;
+            white-space: nowrap;
+            pointer-events: none;
+            user-select: none;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Document Title */
+        .document-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 15px;
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin: 25px 0 15px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #f59e0b;
+        }
+
+        /* Content Text Styles */
+        .content-text {
+            line-height: 1.8;
+            font-size: 15px;
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .content-text p {
+            margin-bottom: 12px;
+        }
+
+        .highlight-box {
+            background: #fef3c7;
+            border-right: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table th {
+            background: #1e3a8a;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f8fafc;
+        }
+
+        .info-box-title {
+            color: #1e3a8a;
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #f59e0b;
+            padding-bottom: 5px;
+        }
+
+        .info-item {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #1e3a8a;
+            min-width: 140px;
+        }
+
+        .info-value {
+            flex: 1;
+            text-align: left;
+            padding-right: 15px;
+        }
+
+        /* Signature Section */
+        .signature-section {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .signature-box {
+            width: 180px;
+            text-align: center;
+        }
+
+        .signature-line {
+            border-top: 2px solid #1e3a8a;
+            margin-top: 50px;
+            padding-top: 10px;
+            font-weight: bold;
+            color: #1e3a8a;
+            font-size: 14px;
+        }
+
+        /* Footer Section */
+        .footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        /* Footer colored line */
+        .footer-colored-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(to right, #1e3a8a 70%, #f59e0b 70%);
+        }
+
+        .footer-content {
+            position: relative;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 40px;
+            color: #1e3a8a;
+            font-size: 12px;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-icon {
+            width: 20px;
+            height: 20px;
+            background: #f59e0b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: white;
+        }
+
+        /* Page break handling */
+        .page-break {
+            page-break-before: always;
+        }
+
+        .no-break {
+            page-break-inside: avoid;
+        }
+
+        /* Print optimizations */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            
+            .no-print {
+                display: none;
+            }
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-pending {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .status-inactive {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Two column layout for data */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+
+        /* JSON data display */
+        .json-data {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .json-key {
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+
+        .json-value {
+            color: #059669;
+        }
+
+        .json-string {
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <div class="header-top-line"></div>
+        <div class="header-colored-section"></div>
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="company-text">
+                    <div class="company-name-ar">شركة مجموعة توثيق العدل</div>
+                    <div class="company-name-en">Notarization Justice Group</div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Watermark -->
+    
+    <div class="watermark">وثق</div>
+    
+
+    <!-- Main Content -->
+    <div class="content">
+        <div class="content-wrapper">
+            <!-- Document Title -->
+            
+            <h1 class="document-title">Test Document</h1>
+            
+
+            <!-- Main Content Area -->
+            <div class="content-text">
+                <p>Test content</p>
+            </div>
+
+            <!-- WATHQ Data Display -->
+            
+            <div class="section-title">بيانات وثق</div>
+            <div class="two-column">
+                
+                
+                <div class="info-item">
+                    <span class="info-label">Test Field</span>
+                    <span class="info-value">
+                        
+                            test_value
+                        
+                    </span>
+                </div>
+                
+                
+            </div>
+            
+
+            <!-- Data Table -->
+            
+
+            <!-- Info Boxes -->
+            
+
+            <!-- Custom Sections -->
+            
+
+            <!-- Raw JSON Data Display (for debugging/development) -->
+            
+
+            <!-- Commercial Registration Specific Fields -->
+            
+
+            
+
+            <!-- Signature Section -->
+            
+            <div class="signature-section no-break">
+                <div class="signature-box">
+                    <div class="signature-line">المدير العام</div>
+                </div>
+                <div class="signature-box">
+                    <div class="signature-line">المستلم</div>
+                </div>
+                
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-item">
+                <div class="footer-icon">📞</div>
+                <span>0112322022</span>
+            </div>
+            <div class="footer-item">
+                <div class="footer-icon">✉</div>
+                <span>info@tawthiq.com.sa</span>
+            </div>
+            <div class="footer-item">
+                <div class="footer-icon">📍</div>
+                <span>المملكة العربية السعودية - الرياض</span>
+            </div>
+            
+        </div>
+        <div class="footer-colored-line"></div>
+    </div>
+</body>
+</html>

@@ -2,29 +2,30 @@
 FastAPI application factory and configuration.
 """
 
+import logging
+import os
+
 import sentry_sdk
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
 from starlette.exceptions import HTTPException as StarletteHTTPException
-import os
+
 from app.api.v1.api import api_router
 from app.core.config import settings
 from app.core.logging import setup_logging
 from app.core.multitenancy import tenant_identification_middleware
-from app.middleware.request_counter import RequestCounterMiddleware
-from app.db.session import SessionLocal
 from app.crud.crud_management_user_profile import management_user_profile
+from app.db.session import SessionLocal
+from app.middleware.request_counter import RequestCounterMiddleware
 from app.models.management_user import ManagementUser
 from app.schemas.management_user_profile import ManagementUserProfileCreate
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +97,18 @@ def create_application() -> FastAPI:
         os.makedirs("uploads")
     application.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
+    # Mount static files for templates assets
+    templates_assets_path = os.path.join("templates", "assets")
+    if os.path.exists(templates_assets_path):
+        application.mount(
+            "/assets", StaticFiles(directory=templates_assets_path), name="assets"
+        )
+
+    # Mount static files for images
+    static_images_path = os.path.join("static", "images")
+    if os.path.exists(static_images_path):
+        application.mount("/static", StaticFiles(directory="static"), name="static")
+
     # Startup event to initialize default management user profiles
     @application.on_event("startup")
     async def startup_event():
@@ -105,28 +118,33 @@ def create_application() -> FastAPI:
             try:
                 # Get all management users without a profile
                 all_management_users = db.query(ManagementUser).all()
-                
+
                 for mgmt_user in all_management_users:
                     # Check if profile exists
-                    existing_profile = management_user_profile.get_by_management_user_id(
-                        db, 
-                        management_user_id=mgmt_user.id
+                    existing_profile = (
+                        management_user_profile.get_by_management_user_id(
+                            db, management_user_id=mgmt_user.id
+                        )
                     )
-                    
+
                     # If no profile exists, create one
                     if not existing_profile:
                         profile_data = ManagementUserProfileCreate(
                             management_user_id=mgmt_user.id,
                             fullname=f"{mgmt_user.first_name} {mgmt_user.last_name}",
                             email=mgmt_user.email,
-                            is_active=mgmt_user.is_active
+                            is_active=mgmt_user.is_active,
                         )
                         management_user_profile.create(db, obj_in=profile_data)
-                        logger.info(f"Created default profile for management user {mgmt_user.email}")
+                        logger.info(
+                            f"Created default profile for management user {mgmt_user.email}"
+                        )
             finally:
                 db.close()
         except Exception as e:
-            logger.error(f"Error initializing management user profiles: {str(e)}", exc_info=True)
+            logger.error(
+                f"Error initializing management user profiles: {str(e)}", exc_info=True
+            )
 
     # Root endpoint
     @application.get("/")

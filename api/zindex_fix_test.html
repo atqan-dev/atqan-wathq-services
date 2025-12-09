@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ document_title | default('وثيقة رسمية') }}</title>
+    <title>شهادة السجل التجاري</title>
     <style>
         * {
             margin: 0;
@@ -52,6 +52,7 @@
             width: 35%;
             height: 112px;
             background: #f59e0b;
+            z-index: 1;
         }
 
         /* Logo and text container */
@@ -60,41 +61,51 @@
             height: 100%;
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             padding: 20px 40px;
-        }
-
-        .logo-container {
-            position: absolute;
-            right: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            align-items: center;
-            gap: 20px;
             z-index: 10;
         }
 
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 15;
+            max-width: 55%;
+            background: white;
+            padding-right: 20px;
+        }
+
         .logo-img {
-            height: 80px;
+            height: 60px;
             width: auto;
+            flex-shrink: 0;
         }
 
         .company-text {
-            text-align: right;
+            text-align: left;
             color: #1e3a8a;
+            flex: 1;
+            min-width: 0;
         }
 
         .company-name-ar {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .company-name-en {
             font-size: 11px;
             color: #666;
             line-height: 1.2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Main content area */
@@ -392,156 +403,83 @@
         <div class="header-colored-section"></div>
         <div class="header-content">
             <div class="logo-container">
+                
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==" alt="شعار الشركة" class="logo-img">
+                
                 <div class="company-text">
-                    <div class="company-name-ar">{{ company_name_ar | default('شركة مجموعة توثيق العدل') }}</div>
-                    <div class="company-name-en">{{ company_name_en | default('Notarization Justice Group for Real Estate Development and Investment Company') }}</div>
+                    <div class="company-name-ar">شركة مجموعة توثيق العدل</div>
+                    <div class="company-name-en">Notarization Justice Group for Real Estate Development and Investment Company</div>
                 </div>
-                {% if logo_base64 %}
-                <img src="data:image/png;base64,{{ logo_base64 }}" alt="شعار الشركة" class="logo-img">
-                {% elif logo_url %}
-                <img src="{{ logo_url }}" alt="شعار الشركة" class="logo-img">
-                {% endif %}
             </div>
         </div>
     </div>
 
     <!-- Watermark -->
-    {% if show_watermark %}
-    <div class="watermark">{{ watermark_text | default('وثيقة رسمية') }}</div>
-    {% endif %}
+    
+    <div class="watermark">وثق</div>
+    
 
     <!-- Main Content -->
     <div class="content">
         <div class="content-wrapper">
             <!-- Document Title -->
-            {% if document_title %}
-            <h1 class="document-title">{{ document_title }}</h1>
-            {% endif %}
+            
+            <h1 class="document-title">شهادة السجل التجاري</h1>
+            
 
             <!-- Main Content Area -->
             <div class="content-text">
-                {{ main_content | safe }}
+                <p>Test content</p>
             </div>
 
             <!-- WATHQ Data Display -->
-            {% if wathq_data %}
+            
             <div class="section-title">بيانات وثق</div>
             <div class="two-column">
-                {% for key, value in wathq_data.items() %}
-                {% if value is not none and value != '' %}
+                
+                
                 <div class="info-item">
-                    <span class="info-label">{{ key | replace('_', ' ') | title }}</span>
+                    <span class="info-label">Cr Number</span>
                     <span class="info-value">
-                        {% if value is mapping %}
-                            {{ value | tojson }}
-                        {% elif value is iterable and value is not string %}
-                            {{ value | join(', ') }}
-                        {% else %}
-                            {{ value }}
-                        {% endif %}
+                        
+                            1010711252
+                        
                     </span>
                 </div>
-                {% endif %}
-                {% endfor %}
+                
+                
             </div>
-            {% endif %}
+            
 
             <!-- Data Table -->
-            {% if show_table and table_data %}
-            <div class="no-break">
-                {% if table_title %}
-                <h2 class="section-title">{{ table_title }}</h2>
-                {% endif %}
-                <table class="data-table">
-                    {% if table_headers %}
-                    <thead>
-                        <tr>
-                            {% for header in table_headers %}
-                            <th>{{ header }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    {% endif %}
-                    <tbody>
-                        {% for row in table_data %}
-                        <tr>
-                            {% for cell in row %}
-                            <td>{{ cell }}</td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% endif %}
+            
 
             <!-- Info Boxes -->
-            {% if info_boxes %}
-            {% for box in info_boxes %}
-            <div class="info-box no-break">
-                <div class="info-box-title">{{ box.title }}</div>
-                {% for item in box.items %}
-                <div class="info-item">
-                    <span class="info-label">{{ item.label }}</span>
-                    <span class="info-value">{{ item.value }}</span>
-                </div>
-                {% endfor %}
-            </div>
-            {% endfor %}
-            {% endif %}
+            
 
             <!-- Custom Sections -->
-            {% if sections %}
-            {% for section in sections %}
-            <div class="{% if section.page_break %}page-break{% endif %} {% if section.no_break %}no-break{% endif %}">
-                {% if section.title %}
-                <h2 class="section-title">{{ section.title }}</h2>
-                {% endif %}
-                <div class="content-text">
-                    {{ section.content | safe }}
-                </div>
-            </div>
-            {% endfor %}
-            {% endif %}
+            
 
             <!-- Raw JSON Data Display (for debugging/development) -->
-            {% if show_raw_data and raw_json_data %}
-            <div class="section-title">البيانات الخام (JSON)</div>
-            <div class="json-data">
-                <pre>{{ raw_json_data | tojson(indent=2) }}</pre>
-            </div>
-            {% endif %}
+            
 
             <!-- Commercial Registration Specific Fields -->
-            {% if cr_number %}
-            <div class="highlight-box">
-                <strong>رقم السجل التجاري:</strong> {{ cr_number }}
-            </div>
-            {% endif %}
+            
 
-            {% if company_name %}
-            <div class="info-item">
-                <span class="info-label">اسم الشركة:</span>
-                <span class="info-value">{{ company_name }}</span>
-            </div>
-            {% endif %}
+            
 
             <!-- Signature Section -->
-            {% if show_signature %}
+            
             <div class="signature-section no-break">
                 <div class="signature-box">
-                    <div class="signature-line">{{ signature_label_1 | default('المدير العام') }}</div>
+                    <div class="signature-line">المدير العام</div>
                 </div>
                 <div class="signature-box">
-                    <div class="signature-line">{{ signature_label_2 | default('المستلم') }}</div>
+                    <div class="signature-line">المستلم</div>
                 </div>
-                {% if signature_label_3 %}
-                <div class="signature-box">
-                    <div class="signature-line">{{ signature_label_3 }}</div>
-                </div>
-                {% endif %}
+                
             </div>
-            {% endif %}
+            
         </div>
     </div>
 
@@ -550,22 +488,17 @@
         <div class="footer-content">
             <div class="footer-item">
                 <div class="footer-icon">📞</div>
-                <span>{{ phone_number | default('0112322022') }}</span>
+                <span>0112322022</span>
             </div>
             <div class="footer-item">
                 <div class="footer-icon">✉</div>
-                <span>{{ email | default('info@tawthiq.com.sa') }}</span>
+                <span>info@tawthiq.com.sa</span>
             </div>
             <div class="footer-item">
                 <div class="footer-icon">📍</div>
-                <span>{{ location | default('المملكة العربية السعودية - الرياض') }}</span>
+                <span>المملكة العربية السعودية - الرياض</span>
             </div>
-            {% if website %}
-            <div class="footer-item">
-                <div class="footer-icon">🌐</div>
-                <span>{{ website }}</span>
-            </div>
-            {% endif %}
+            
         </div>
         <div class="footer-colored-line"></div>
     </div>
