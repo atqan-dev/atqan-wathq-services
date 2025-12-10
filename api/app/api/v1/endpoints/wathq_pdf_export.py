@@ -155,8 +155,19 @@ async def export_commercial_registration_pdf(
 
         # Generate and return PDF
         filename = f"commercial_registration_{cr_id}.pdf"
+
+        # For commercial registration, always use the dedicated template
+        # Ignore generic template requests that aren't compatible
+        if template and template in [
+            "wathq_modern_template.html",
+            "wathq-modern-template.html",
+        ]:
+            template_name = "commercial_registration_pdf.html"
+        else:
+            template_name = template or "commercial_registration_pdf.html"
+
         return pdf_service.generate_pdf_response(
-            pdf_data, filename=filename, template_name=template
+            pdf_data, filename=filename, template_name=template_name
         )
 
     except Exception as e:
@@ -210,8 +221,16 @@ async def preview_commercial_registration_html(
         pdf_data = pdf_service.create_commercial_registration_pdf(cr_data)
 
         # Generate HTML preview
-        html_content = pdf_service.preview_html(pdf_data, template_name=template)
+        # For commercial registration, always use the dedicated template
+        if template and template in [
+            "wathq_modern_template.html",
+            "wathq-modern-template.html",
+        ]:
+            template_name = "commercial_registration_pdf.html"
+        else:
+            template_name = template or "commercial_registration_pdf.html"
 
+        html_content = pdf_service.preview_html(pdf_data, template_name=template_name)
         return Response(content=html_content, media_type="text/html")
 
     except Exception as e:

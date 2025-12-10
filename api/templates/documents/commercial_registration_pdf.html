@@ -3,86 +3,397 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ document_title | default('وثيقة رسمية') }}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>{{ document_title | default('السجل التجاري') }}</title>
     <style>
-        body { 
-            margin: 0; 
-            padding: 40px; 
-            background: #f3f4f6; 
-            display: flex; 
-            justify-content: center; 
-            font-family: 'Inter', 'Tahoma', 'Arial', sans-serif;
-            -webkit-print-color-adjust: exact;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .page {
-            width: 210mm;
-            height: 297mm;
-            background: #ffffff;
-            position: relative;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            overflow: hidden;
-            margin: auto;
-            opacity: 65%;
-        }
-        .footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 20%;
-    z-index: 10;
-}
-        .element { 
-            position: absolute; 
-            box-sizing: border-box; 
-            display: flex; 
-            overflow: hidden; 
-        }
-        .content {
-    position: absolute;
-    top: 140px; /* header height */
-    left: 20px;
-    right: 20px;
-    bottom: 20%; /* reserve space for footer */
-    overflow: hidden;
-}
-        @media print {
-            body { padding: 0; background: white; }
-            .page { box-shadow: none; margin: 0; }
-             @page {
-        size: A4;
-        margin: 0;
-    }
-            #print-area, #print-area * {
-    visibility: visible;
-  }
-            #print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            }
-            .footer {
-        position: fixed;
-        bottom: 0;
-        height: 20%;
-    }
 
-    .content {
-        position: fixed;
-        top: 140px; 
-        bottom: 20%;
-    }
+        @page {
+            size: A4;
+            margin: 0;
         }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { padding: 4px; }
+
+        body {
+            font-family: 'Tahoma', 'Arial', sans-serif;
+            background: #ffffff;
+            color: #333;
+            line-height: 1.6;
+            font-size: 14px;
+            position: relative;
+            min-height: 100vh;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Header Section - Fixed at top */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: #ffffff;
+            display: grid;
+            grid-template-rows: 8px 1fr;
+            grid-template-columns: 1fr;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .header-top-line {
+            grid-row: 1;
+            grid-column: 1;
+            background: #004173;
+        }
+
+        .header-content {
+            grid-row: 2;
+            grid-column: 1;
+            display: grid;
+            grid-template-columns: 65% 35%;
+            align-items: center;
+            padding: 0;
+            position: relative;
+            height: 100%;
+        }
+
+        .header-colored-section {
+            grid-column: 1;
+            height: 100%;
+            background: linear-gradient(to right, #004173 70%, #d98a04 30%);
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            grid-column: 2;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: white;
+            padding: 20px;
+            z-index: 10;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .header-colored-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-img {
+            height: 50px;
+            width: auto;
+            flex-shrink: 0;
+        }
+
+        .company-text {
+            text-align: right;
+            color: #004173;
+            flex: 1;
+            min-width: 0;
+            direction: rtl;
+        }
+
+        .company-name-ar {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            line-height: 1.2;
+            color: #004173;
+        }
+
+        .company-name-en {
+            font-size: 9px;
+            color: #d98a04;
+            line-height: 1.2;
+            font-weight: 500;
+        }
+
+        /* Main content area */
+        .content {
+            padding: 20px 40px;
+            margin-top: 120px;
+            margin-bottom: 80px;
+            min-height: calc(100vh - 200px);
+            position: relative;
+        }
+
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: fixed;
+            right: 50%;
+            top: 50%;
+            transform: translate(50%, -50%) rotate(-15deg);
+            z-index: 0;
+            opacity: 0.1;
+            height: 50%;
+            width: auto;
+        }
+
+        /* Document Title */
+        .document-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #004173;
+            margin-bottom: 30px;
+            padding: 15px;
+            border-bottom: 3px solid #d98a04;
+        }
+
+        /* Table Sections */
+        .table-section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #004173 0%, #0056a3 100%);
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 0;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            color: #004173;
+            font-weight: bold;
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 2px solid #e9ecef;
+            font-size: 14px;
+            width: 30%;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #333;
+            font-size: 13px;
+            word-wrap: break-word;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .data-table tr:hover {
+            background: #e3f2fd;
+        }
+
+        /* Nested table styling */
+        .nested-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 5px 0;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .nested-table th {
+            background: #e9ecef;
+            color: #495057;
+            padding: 8px 10px;
+            font-size: 12px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nested-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-deleted {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        /* Empty value styling */
+        .empty-value {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Footer Section - Fixed at bottom */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: #ffffff;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .footer-colored-line {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(to right, #004173 70%, #d98a04 70%);
+        }
+
+        .footer-content {
+            position: relative;
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 40px;
+            color: #004173;
+            font-size: 12px;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-icon {
+            width: 16px;
+            height: 16px;
+            fill: #d98a04;
+            flex-shrink: 0;
+        }
+
+        
+
+        /* Print optimizations */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .no-print {
+                display: none;
+            }
+
+            .table-section {
+                page-break-inside: avoid;
+            }
+
+            .header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 120px;
+                z-index: 1000;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 80px;
+                z-index: 1000;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .content {
+                margin-top: 140px;
+                margin-bottom: 100px;
+                page-break-inside: auto;
+            }
+
+            @page {
+                margin-top: 140px;
+                margin-bottom: 100px;
+                margin-left: 20px;
+                margin-right: 20px;
+            }
+        }
+
+        
+        /* Utility classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .mb-10 { margin-bottom: 10px; }
+        .mb-20 { margin-bottom: 20px; }
     </style>
 </head>
 <body>
     <div class="page">
         <!-- Header Section -->
-    {% include 'partials/header.html' %}
+        <div class="header">
+            <div class="header-top-line"></div>
+            <div class="header-content">
+                <div class="header-colored-section"></div>
+                <div class="logo-container">
+                    <div class="company-text">
+                        <div class="company-name-ar">شركة مجموعة توثيق العدل</div>
+                        <div class="company-name-en">للتطوير والاستثمار العقاري</div>
+                    </div>
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZcAAAH1CAYAAAA6WrNcAAAgAElEQVR4Xux9B5gc1ZX1re7qOHk0oxyNckARJSQBRoDIXmN2DbZ3vc42DuAEeL3+vc7Z63XARBvjtN618QK2yULBSkgoIqEsRjlMzp2r6z/nvW5JyAozo8l6pW++GXVXeHVf9Tt97z33XkvMZixgLGAsYCxgLNDBFrA6+HzmdMYCxgLGAsYCxgJiwMU8BMYCxgLGAsYCHW4BAy4dblJzwt5ugVmDB19qJY8ee7VSKi1L0r39fsz4jQW6wwIGXLrD6uaaPdoCP7z72qcst8JZtPT1Bw9VybbXK6WiRw/YDM5YoAdawIBLD5wUM6TutcCPPzZ+5ezJhZcnU4k3Vr9y4OXNW2r/FB4gK3+1TGLdOzJzdWOB3mMBAy69Z67MSLvIAg99fOTymWPdK61YjYRzBklNk2ffinUH/rR0c/TxRftllwmVddFEmMv0agsYcOnV02cG39EWcF2xHv3k0MVzxqSuDru14iQ84rhBSQdL5WiT78Di9Qd//uqG5t8sPyqHOvra5nzGAn3JAgZc+tJsmnvpEAs8fNfIv80Y1fSWnHSNeFK2WJZPEl6RlCcoUTdX9lU6a9ZsPPK/q/bK05v2yYEOuag5ibFAH7OAAZc+NqHmdi7MAq6I9dCnxqycOaJ5fk66UmzHVidM4F8KnxaP7Qd9LE+aG/Mqj0aDe19Yf+D+9VujS03S/8Lsbo7uexYw4NL35tTc0QVYQIHLXeNemTUielnYrZF0Ki1e4Itrp8QjrnjTXvEScNIeiVlBaQkWyitbjz65ak3kd/sr5JV1VXL8Ai5vDjUW6DMWMODSZ6bS3EhHWIDg8ugnx70yY0Qc4FIltuWVlOuI402Ix02L3xHxEnBSCJMhVBYN+CQd7i+NscLkmo0VTyxfW/1oU4NsWFYlzR0xHnMOY4HeagEDLr115sy4O80CP79r3NqZw1vm5LoV4vUi35JKScKC5+LxiN+1xYbX4kNppQvgaUrHxA1iHwcvBPMkksxrWfHqwd8t3eg8XDhdtj/xBOJpZjMWuAgtYMDlIpx0c8vntsDDd41fO6esYU5eukJch76MF56LF5EwhMRcj0gS7oubFAtvef0BSbpxCeZ4JJpKSmMEGJM/VI7V5W1atOLAnzcdiPzvkp2yx9CXzVN3sVnAgMvFNuPmfs9rgfvvHr92LsClIH1cfAAQeigJF94JvRXkXDxwW3z+qPg8Ft7Pk5bmOLIxABu/R5LpFBL/XnG9uRJL58vBCnftmo1Hn9q2P/0/L5fLwfNe3OxgLNBHLGDApY9MpLmNjrPA/XePA7g0zslzj4OKDO8E4bC0BIQp/bTHJ5YnIWkrIk5SkIOxkJcJAYAAPB4XwOMiR5OUVJrJGT+8mjyJucXO7n3JFcs3Hvn9a7uTz2yolmMdN1pzJmOBnmkBAy49c17MqLrRAgSX+QQXhMXURuQQGwCDgkpExUAVEy88F...[148123 bytes truncated]" alt="Company Logo" class="logo-img">
+                </div>
+            </div>
+        </div>
 <!-- WaterMark Section -->
     {% include 'partials/watermark.html' %}
 

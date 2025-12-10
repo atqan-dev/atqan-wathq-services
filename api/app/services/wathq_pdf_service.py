@@ -2,6 +2,7 @@
 Enhanced WATHQ PDF Generation Service
 """
 
+import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -27,7 +28,7 @@ class WathqPDFService:
         self.env = Environment(
             loader=FileSystemLoader(self.templates_dir), autoescape=True
         )
-        self.default_template = "wathq-modern-template.html"
+        self.default_template = "wathq_modern_template.html"
 
     def load_template(self, template_name: Optional[str] = None) -> Template:
         """Load Jinja2 template from file"""
@@ -99,17 +100,17 @@ class WathqPDFService:
         # Build main content
         content_parts = []
 
-        if cr_data.get("cr_number"):
+        if cr_data.get("crNumber"):
             content_parts.append(
                 PDFHelper.create_styled_paragraph(
-                    f"رقم السجل التجاري: {cr_data['cr_number']}", "highlight"
+                    f"رقم السجل التجاري: {cr_data['crNumber']}", "highlight"
                 )
             )
 
-        if cr_data.get("company_name"):
+        if cr_data.get("name"):
             content_parts.append(
                 PDFHelper.create_styled_paragraph(
-                    f"اسم الشركة: {cr_data['company_name']}", "title"
+                    f"اسم المنشأة: {cr_data['name']}", "title"
                 )
             )
 
@@ -118,36 +119,34 @@ class WathqPDFService:
 
         # Company details box
         company_items = []
-        if cr_data.get("legal_form"):
+        if cr_data.get("entityType", {}).get("name"):
             company_items.append(
-                InfoBoxItem(label="الشكل القانوني", value=cr_data["legal_form"])
+                InfoBoxItem(label="نوع الكيان", value=cr_data["entityType"]["name"])
             )
-        if cr_data.get("capital"):
+        if cr_data.get("crCapital"):
             company_items.append(
-                InfoBoxItem(label="رأس المال", value=cr_data["capital"])
-            )
-        if cr_data.get("main_activity"):
-            company_items.append(
-                InfoBoxItem(label="النشاط الرئيسي", value=cr_data["main_activity"])
+                InfoBoxItem(
+                    label="رأس المال", value=f"{cr_data['crCapital']} ريال سعودي"
+                )
             )
 
         if company_items:
-            info_boxes.append(InfoBox(title="تفاصيل الشركة", items=company_items))
+            info_boxes.append(InfoBox(title="تفاصيل المنشأة", items=company_items))
 
         # Dates box
         date_items = []
-        if cr_data.get("establishment_date"):
+        if cr_data.get("issueDateGregorian"):
             date_items.append(
                 InfoBoxItem(
-                    label="تاريخ التأسيس",
-                    value=PDFHelper.format_arabic_date(cr_data["establishment_date"]),
+                    label="تاريخ الإصدار (ميلادي)",
+                    value=cr_data["issueDateGregorian"],
                 )
             )
-        if cr_data.get("expiry_date"):
+        if cr_data.get("issueDateHijri"):
             date_items.append(
                 InfoBoxItem(
-                    label="تاريخ الانتهاء",
-                    value=PDFHelper.format_arabic_date(cr_data["expiry_date"]),
+                    label="تاريخ الإصدار (هجري)",
+                    value=cr_data["issueDateHijri"],
                 )
             )
 
@@ -174,6 +173,8 @@ class WathqPDFService:
                     return str(value["amount"])
                 elif "text" in value:
                     return str(value["text"])
+                elif "name" in value:
+                    return str(value["name"])
                 else:
                     # Return a formatted representation of the dict
                     return ", ".join(
@@ -192,21 +193,55 @@ class WathqPDFService:
             except Exception:
                 pass  # Continue without logo if conversion fails
 
-        return WathqCommercialRegistrationPDF(
-            main_content=main_content,
-            info_boxes=info_boxes if info_boxes else None,
-            show_signature=True,
-            logo_base64=logo_base64,
-            wathq_data=cr_data,  # Include raw WATHQ data for modern template
-            cr_number=safe_str(cr_data.get("cr_number")),
-            company_name=safe_str(cr_data.get("company_name")),
-            establishment_date=safe_str(cr_data.get("establishment_date")),
-            expiry_date=safe_str(cr_data.get("expiry_date")),
-            capital=safe_str(cr_data.get("capital")),
-            legal_form=safe_str(cr_data.get("legal_form")),
-            main_activity=safe_str(cr_data.get("main_activity")),
-            address=safe_str(cr_data.get("address")),
-        )
+        # Map the JSON data structure to template variables
+        template_vars = {
+            "main_content": main_content,
+            "info_boxes": info_boxes if info_boxes else None,
+            "show_signature": True,
+            "logo_base64": logo_base64,
+            "wathq_data": cr_data,  # Include raw WATHQ data for modern template
+            # Basic Information
+            "cr_number": safe_str(cr_data.get("crNumber")),
+            "cr_national_number": safe_str(cr_data.get("crNationalNumber")),
+            "name": safe_str(cr_data.get("name")),
+            "name_lang_desc": safe_str(cr_data.get("nameLangDesc")),
+            "cr_capital": safe_str(cr_data.get("crCapital")),
+            "company_duration": safe_str(cr_data.get("companyDuration")),
+            "version_no": safe_str(cr_data.get("versionNo")),
+            # Dates
+            "issue_date_gregorian": safe_str(cr_data.get("issueDateGregorian")),
+            "issue_date_hijri": safe_str(cr_data.get("issueDateHijri")),
+            # Status
+            "status": cr_data.get("status"),
+            # Location
+            "headquarter_city_name": safe_str(cr_data.get("headquarterCityName")),
+            "headquarter_city_id": safe_str(cr_data.get("headquarterCityId")),
+            # Entity Type
+            "entity_type": cr_data.get("entityType"),
+            # Contact Information
+            "contact_info": cr_data.get("contactInfo"),
+            # Capital Details
+            "capital": cr_data.get("capital"),
+            # Partners/Parties
+            "parties": cr_data.get("parties"),
+            # Management
+            "management": cr_data.get("management"),
+            # Activities
+            "activities": cr_data.get("activities"),
+            # Additional Information
+            "is_main": cr_data.get("isMain"),
+            "main_cr_number": safe_str(cr_data.get("mainCrNumber")),
+            "main_cr_national_number": safe_str(cr_data.get("mainCrNationalNumber")),
+            "in_liquidation_process": cr_data.get("inLiquidationProcess"),
+            "has_ecommerce": cr_data.get("hasEcommerce"),
+            "is_license_based": cr_data.get("isLicenseBased"),
+            "license_issuer_name": safe_str(cr_data.get("licenseIssuerName")),
+            "partners_nationality_name": safe_str(
+                cr_data.get("PartnersNationalityName")
+            ),
+        }
+
+        return WathqCommercialRegistrationPDF(**template_vars)
 
     def create_table_from_wathq_data(
         self,
@@ -319,7 +354,7 @@ class WathqPDFService:
         self,
         wathq_data: Dict[str, Any],
         document_title: str = "وثيقة وثق",
-        template_name: str = "wathq-modern-template.html",
+        template_name: str = "wathq_modern_template.html",
         **kwargs,
     ) -> WathqPDFData:
         """Create PDF data model for WATHQ live/offline data using modern template"""
@@ -384,7 +419,7 @@ class WathqPDFService:
         self,
         wathq_data: Dict[str, Any],
         document_title: str = "وثيقة وثق",
-        template_name: str = "wathq-modern-template.html",
+        template_name: str = "wathq_modern_template.html",
         **kwargs,
     ) -> bytes:
         """Generate PDF bytes directly from WATHQ data"""
@@ -398,7 +433,7 @@ class WathqPDFService:
         wathq_data: Dict[str, Any],
         document_title: str = "وثيقة وثق",
         filename: Optional[str] = None,
-        template_name: str = "wathq-modern-template.html",
+        template_name: str = "wathq_modern_template.html",
         **kwargs,
     ) -> Response:
         """Generate PDF response directly from WATHQ data"""
@@ -421,7 +456,7 @@ class WathqPDFService:
         self,
         wathq_data: Dict[str, Any],
         document_title: str = "وثيقة وثق",
-        template_name: str = "wathq-modern-template.html",
+        template_name: str = "wathq_modern_template.html",
         **kwargs,
     ) -> str:
         """Generate HTML preview for WATHQ data"""
@@ -431,5 +466,8 @@ class WathqPDFService:
         return self.preview_html(pdf_data, template_name)
 
 
-# Global service instance
-pdf_service = WathqPDFService()
+# Global service instance with absolute path to templates
+templates_path = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "templates"
+)
+pdf_service = WathqPDFService(templates_path)

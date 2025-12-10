@@ -151,10 +151,95 @@ class WathqPDFData(BaseModel):
 class WathqCommercialRegistrationPDF(WathqPDFData):
     """Specialized model for Commercial Registration documents"""
 
-    # CR specific fields
+    # Basic Information
     cr_number: Optional[str] = Field(
         default=None, description="Commercial Registration number"
     )
+    cr_national_number: Optional[str] = Field(
+        default=None, description="CR National number"
+    )
+    name: Optional[str] = Field(default=None, description="Company name")
+    name_lang_desc: Optional[str] = Field(
+        default=None, description="Company name language description"
+    )
+    cr_capital: Optional[str] = Field(default=None, description="CR Capital")
+    company_duration: Optional[str] = Field(
+        default=None, description="Company duration"
+    )
+    version_no: Optional[str] = Field(default=None, description="Version number")
+
+    # Dates
+    issue_date_gregorian: Optional[str] = Field(
+        default=None, description="Issue date (Gregorian)"
+    )
+    issue_date_hijri: Optional[str] = Field(
+        default=None, description="Issue date (Hijri)"
+    )
+
+    # Status (as dictionary)
+    status: Optional[Dict[str, Any]] = Field(
+        default=None, description="Status information"
+    )
+
+    # Location
+    headquarter_city_name: Optional[str] = Field(
+        default=None, description="Headquarter city name"
+    )
+    headquarter_city_id: Optional[str] = Field(
+        default=None, description="Headquarter city ID"
+    )
+
+    # Entity Type (as dictionary)
+    entity_type: Optional[Dict[str, Any]] = Field(
+        default=None, description="Entity type information"
+    )
+
+    # Contact Information (as dictionary)
+    contact_info: Optional[Dict[str, Any]] = Field(
+        default=None, description="Contact information"
+    )
+
+    # Capital Details (as dictionary)
+    capital: Optional[Dict[str, Any]] = Field(
+        default=None, description="Capital details"
+    )
+
+    # Partners/Parties (as list of dictionaries)
+    parties: Optional[List[Dict[str, Any]]] = Field(
+        default=None, description="Partners and parties"
+    )
+
+    # Management (as dictionary)
+    management: Optional[Dict[str, Any]] = Field(
+        default=None, description="Management information"
+    )
+
+    # Activities (as list of dictionaries)
+    activities: Optional[List[Dict[str, Any]]] = Field(
+        default=None, description="Business activities"
+    )
+
+    # Additional Information
+    is_main: Optional[bool] = Field(default=None, description="Is main CR")
+    main_cr_number: Optional[str] = Field(default=None, description="Main CR number")
+    main_cr_national_number: Optional[str] = Field(
+        default=None, description="Main CR national number"
+    )
+    in_liquidation_process: Optional[bool] = Field(
+        default=None, description="In liquidation process"
+    )
+    has_ecommerce: Optional[bool] = Field(default=None, description="Has e-commerce")
+    is_license_based: Optional[bool] = Field(
+        default=None, description="Is license based"
+    )
+    license_issuer_name: Optional[str] = Field(
+        default=None, description="License issuer name"
+    )
+    partners_nationality_name: Optional[str] = Field(
+        default=None, description="Partners nationality name"
+    )
+
+    # Legacy fields for backward compatibility
     company_name: Optional[str] = Field(
         default=None, description="Company name from CR"
     )
@@ -162,7 +247,6 @@ class WathqCommercialRegistrationPDF(WathqPDFData):
         default=None, description="Establishment date"
     )
     expiry_date: Optional[str] = Field(default=None, description="Expiry date")
-    capital: Optional[str] = Field(default=None, description="Company capital")
     legal_form: Optional[str] = Field(default=None, description="Legal form")
     main_activity: Optional[str] = Field(
         default=None, description="Main business activity"
