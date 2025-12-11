@@ -200,4 +200,4 @@ uploads/*
 uploads/
 logs/*
 docs/*
-scripts/*
+# scripts/*
