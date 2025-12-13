@@ -332,6 +332,64 @@
                       <th>رقم الإصدار</th>
                       <td>{{ version_no | default('غير محدد') }}</td>
                     </tr>
+                    <tr>
+                      <th>السجل الرئيسي</th>
+                      <td>
+                        {% if is_main is not none %}
+                        {{ 'نعم' if is_main else 'لا' }}
+                        {% else %}
+                        غير محدد
+                        {% endif %}
+                      </td>
+
+                      <th>رقم السجل الرئيسي</th>
+                      <td>{{ main_cr_number | default('غير محدد', true) }}</td>
+
+                      <th>الرقم الوطني للسجل الرئيسي</th>
+                      <td>
+                        {{ main_cr_national_number | default('غير محدد', true) }}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>تحت التصفية</th>
+                      <td>
+                        {% if in_liquidation_process is not none %}
+                        {{ 'نعم' if in_liquidation_process else 'لا' }}
+                        {% else %}
+                        غير محدد
+                        {% endif %}
+                      </td>
+
+                      <th>التجارة الإلكترونية</th>
+                      <td>
+                        {% if has_ecommerce is not none %}
+                        {{ 'نعم' if has_ecommerce else 'لا' }}
+                        {% else %}
+                        غير محدد
+                        {% endif %}
+                      </td>
+
+                      <th>مبني على ترخيص</th>
+                      <td>
+                        {% if is_license_based is not none %}
+                        {{ 'نعم' if is_license_based else 'لا' }}
+                        {% else %}
+                        غير محدد
+                        {% endif %}
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>جهة إصدار الترخيص</th>
+                      <td>{{ license_issuer_name | default('غير محدد', true) }}</td>
+
+                      <th>جنسية الشركاء</th>
+                      <td>
+                        {{ partners_nationality_name | default('غير محدد', true) }}
+                      </td>
+
+                      <th></th>
+                      <td></td>
+                    </tr>
                   </table>
                 </td>
               </tr>

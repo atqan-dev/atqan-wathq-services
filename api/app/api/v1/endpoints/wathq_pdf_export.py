@@ -203,6 +203,7 @@ async def preview_commercial_registration_html(
     cr_id: str,
     language: str = Query("ar", regex="^(ar|en)$"),
     template: Optional[str] = Query(None, description="Custom template name"),
+    include_full_info: bool = Query(True, description="Include full CR info"),
     db: Session = Depends(deps.get_db),
     current_user: models.User | models.ManagementUser = Depends(
         deps.get_current_active_user_or_management
@@ -215,7 +216,10 @@ async def preview_commercial_registration_html(
         client = get_wathq_client_for_user("commercial-registration", db, current_user)
 
         # Fetch CR data
-        cr_data = await client.get_basic_info(cr_id, language)
+        if include_full_info:
+            cr_data = await client.get_full_info(cr_id, language)
+        else:
+            cr_data = await client.get_basic_info(cr_id, language)
 
         # Create PDF data model
         pdf_data = pdf_service.create_commercial_registration_pdf(cr_data)
