@@ -76,6 +76,68 @@
       /* .section {
   margin-top: 24px;
 } */
+ .data-table {
+  opacity: 75%;
+            width: 100%;
+            border-collapse: collapse;
+            /* background: white; */
+            /* box-shadow: 0 2px 8px rgba(0,0,0,0.1); */
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            color: #004173;
+            font-weight: bold;
+            padding: 3px;
+            text-align: right;
+            border-bottom: 2px solid #e9ecef;
+            font-size: 14px;
+            width: 30%;
+        }
+
+        .data-table td {
+            padding: 3px;
+            border-bottom: 1px solid #e9ecef;
+            color: #333;
+            font-size: 13px;
+            word-wrap: break-word;
+        }
+
+        .data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .data-table tr:hover {
+            background: #e3f2fd;
+        }
+
+        /* Nested table styling */
+        .nested-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 5px 0;
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .nested-table th {
+            background: #e9ecef;
+            color: #495057;
+            padding: 8px 10px;
+            font-size: 12px;
+            text-align: center;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .nested-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #f1f3f4;
+            font-size: 12px;
+            text-align: center;
+        }
 
       .section-title {
         background: #e0ecff;
@@ -443,16 +505,17 @@
             <!-- Header -->
             <header class="header">
               <h1>السجل التجاري <span>(التشريعات الجديدة)</span></h1>
+              <h1>{{ name | default('غير محدد') }}</h1>
 
               <div class="meta">
-                <div>البيئة: <strong>التشريعات الجديدة </strong></div>
-                <div>كل البيانات</div>
+                
                 <div>
                   رقم السجل التجاري:
                   <strong>{{ cr_number | default('غير محدد') }}</strong>
                 </div>
                 <div>تاريخ البحث: <strong>{{ search_date }}</strong></div>
                 <div>تاريخ الطباعة: <strong>{{ print_date }}</strong></div>
+                <div>صفحة رقــم : <strong> 1</strong></div>
               </div>
             </header>
 
@@ -577,6 +640,16 @@
                   <td>{{ issue_date_hijri | default('غير محدد') }}</td>
                   <td class="label en">Issue Date (Hijri)</td>
                 </tr>
+                <tr>
+                        <td class="label">مدينة المقر الرئيسي</td>
+                        <td>{{ headquarter_city_name | default('غير محدد') }}</td>
+                        <td class="label en">Headquarter City Name</td>
+                    </tr>
+                    <!-- <tr>
+                        <td class="label">معرف المدينة</td>
+                        <td>{{ headquarter_city_id | default('غير محدد') }}</td>
+                        <td class="label en">Headquarter City ID</td>
+                    </tr> -->
               </table>
             </section>
 
@@ -613,6 +686,45 @@
                 </tr>
               </table>
             </section>
+ {% if capital and (capital.currency_name or capital.capital or capital.contribution_capital or capital.stock_capital) %}
+            <!-- Capital Details Section-->
+            <section class="section">
+              <div class="section-title">
+                  تفاصيل رأس المال | CAPITAL INFORMATION 
+              </div>
+
+              <table class="info-table">
+                {% if capital.currency_name %}
+                    <tr>
+                        <td class="label">العملة</td>
+                        <td>{{ capital.currency_name }}</td>
+                        <td class="label en">Currency</td>
+                    </tr>
+                    {% endif %}
+                    {% if capital.capital %}
+                    <tr>
+                        <td class="label">رأس المال</td>
+                        <td>{{ capital.capital }}</td>
+                        <td class="label en">Capital</td>
+                    </tr>
+                    {% endif %}
+                    {% if capital.contribution_capital %}
+                    <tr>
+                        <td class="label">رأس المال المساهم</td>
+                        <td>{{ capital.contribution_capital }}</td>
+                        <td class="label en">Contribution Capital</td>
+                    </tr>
+                    {% endif %}
+                    {% if capital.stock_capital %}
+                    <tr>
+                        <td class="label">رأس المال السهمي</td>
+                        <td>{{ capital.stock_capital }}</td>
+                        <td class="label en">Stock Capital</td>
+                    </tr>
+                    {% endif %}
+              </table>
+            </section>
+            {% endif %}
           </div>
           <!-- End DataTables Content -->
           <div
@@ -1100,7 +1212,204 @@
               Investment Company
             </div>
           </div>
+  <!-- Start DataTables Content -->
+          <div class="table-data">
+            <!-- Header -->
+            <header class="header">
+              <h1>تابــع السجل التجاري <span>(التشريعات الجديدة)</span></h1>
+<h1>{{ name | default('غير محدد') }}</h1>
+              <div class="meta">
+                
+                <div>
+                  رقم السجل التجاري:
+                  <strong>{{ cr_number | default('غير محدد') }}</strong>
+                </div>
+                <div>تاريخ البحث: <strong>{{ search_date }}</strong></div>
+                <div>تاريخ الطباعة: <strong>{{ print_date }}</strong></div>
+                <div>صفحة رقــم : <strong>2</strong></div>
+              </div>
+            </header>
 
+            <!-- General Information -->
+            <section class="section">
+              <div class="section-title">
+                📄 الشــركاء والمــالكون |  Owners and Partnership
+              </div>
+
+             <table class="data-table">
+                    <tr>
+                        <th style="width: 20%;">الاسم</th>
+                        <th style="width: 15%;">النوع</th>
+                        <th style="width: 15%;">الهوية</th>
+                        <th style="width: 15%;">الجنسية</th>
+                        <th style="width: 20%;">نوع الشراكة</th>
+                        <th style="width: 15%;">رقم الترخيص</th>
+                    </tr>
+                    {% for party in parties %}
+                    <tr>
+                        <td>{{ party.name | default('غير محدد') }}</td>
+                        <td>{{ party.identity.typeName | default('غير محدد') }}</td>
+                        <td>
+                            {% if party.identity %}
+                                {{ party.identity.id | default('غير محدد') }}<br>
+                            {% else %}
+                                <span class="empty-value">غير محدد</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ party.nationality.name | default('غير محدد') }}</td>
+                        <td>
+                            {% if party.partnership and party.partnership|length > 0 %}
+                                {% for partnership in party.partnership %}
+                                    {{ partnership.name }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="empty-value">غير محدد</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ party.license_no | default('غير محدد', true) }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </section>
+            <section class="section">
+              <div class="section-title">
+                📄  الهيــكل الإداري | MANAGEMENT STRUCTURE
+              </div>
+               <table class="data-table">
+                    <tr>
+                        <th>هيكل الإدارة</th>
+                        <td>{{ management.structureName | default('غير محدد') }}</td>
+                    </tr>
+                    <tr>
+                        <th>معرف الهيكل</th>
+                        <td>{{ management.structureId | default('غير محدد') }}</td>
+                    </tr>
+                    {% if management.managers and management.managers|length > 0 %}
+                    <tr>
+                        <th>المديرون</th>
+                        <td>
+                            <table class="nested-table">
+                                <tr>
+                                    <th>الاسم</th>
+                                    <th>المنصب</th>
+                                    <th>الهوية</th>
+                                </tr>
+                                {% for manager in management.managers %}
+                                <tr>
+                                    <td>{{ manager.name | default('غير محدد') }}</td>
+                                    <td>{{ manager.position | default('غير محدد') }}</td>
+                                    <td>{{ manager.identity | default('غير محدد') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <th>المديرون</th>
+                        <td><span class="empty-value">لا يوجد مديرون مسجلون</span></td>
+                    </tr>
+                    {% endif %}
+                </table>
+              </section>
+               <section class="section">
+              <div class="section-title">
+                📄   الأنشــطة التجــارية | ACTIVITIES
+              </div>
+<!-- Activities Section -->
+            {% if activities and activities|length > 0 %}
+                <table class="data-table">
+                    <tr>
+                        <th style="width: 15%;">رمز النشاط</th>
+                        <th style="width: 40%;">اسم النشاط</th>
+                        <th style="width: 15%;">النوع</th>
+                        <th style="width: 30%;">الوصف</th>
+                    </tr>
+                    {% for activity in activities %}
+                    <tr>
+                        <td>{{ activity.code | default('غير محدد') }}</td>
+                        <td>{{ activity.name | default('غير محدد') }}</td>
+                        <td>{{ activity.type | default('غير محدد') }}</td>
+                        <td>{{ activity.description | default('غير محدد') }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <table class="data-table">
+                    <tr>
+                        <td class="text-center empty-value">لا توجد أنشطة تجارية مسجلة</td>
+                    </tr>
+                </table>
+            {% endif %}
+               </section>
+
+                <section class="section">
+              <div class="section-title">
+                📄    معلومــات إضافية | ADDITIONAL INFORMATION
+              </div>
+              <table class="data-table">
+                    <tr>
+                        <th>سجل رئيسي</th>
+                        <td>
+                            {% if is_main %}
+                                <span class="status-badge status-active">نعم</span>
+                            {% else %}
+                                <span class="status-badge status-inactive">لا</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>رقم السجل الرئيسي</th>
+                        <td>{{ main_cr_number | default('غير محدد', true) }}</td>
+                    </tr>
+                    <tr>
+                        <th>الرقم الوطني للسجل الرئيسي</th>
+                        <td>{{ main_cr_national_number | default('غير محدد', true) }}</td>
+                    </tr>
+                    <tr>
+                        <th>في عملية تصفية</th>
+                        <td>
+                            {% if in_liquidation_process %}
+                                <span class="status-badge status-deleted">نعم</span>
+                            {% else %}
+                                <span class="status-badge status-active">لا</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>يحتوي على تجارة إلكترونية</th>
+                        <td>
+                            {% if has_ecommerce %}
+                                <span class="status-badge status-active">نعم</span>
+                            {% else %}
+                                <span class="status-badge status-inactive">لا</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>مبني على ترخيص</th>
+                        <td>
+                            {% if is_license_based %}
+                                <span class="status-badge status-active">نعم</span>
+                            {% else %}
+                                <span class="status-badge status-inactive">لا</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% if license_issuer_name %}
+                    <tr>
+                        <th>جهة إصدار الترخيص</th>
+                        <td>{{ license_issuer_name }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th>جنسية الشركاء</th>
+                        <td>{{ partners_nationality_name | default('غير محدد', true) }}</td>
+                    </tr>
+                </table>
+              </section>
+          </div>
+          <!-- End DataTables Content -->
           <div
             class="element"
             style="
