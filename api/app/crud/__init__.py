@@ -17,6 +17,21 @@ from .crud_pdf_template import (
     pdf_template,
     pdf_template_version,
 )
+from .crud_wathq_commercial_registration import (
+    commercial_registration,
+    capital_info,
+    cr_entity_character,
+    cr_activity,
+    cr_stock,
+    cr_estore,
+    cr_estore_activity,
+    cr_party,
+    cr_party_partnership,
+    cr_manager,
+    cr_manager_position,
+    cr_liquidator,
+    cr_liquidator_position,
+)
 
 __all__ = [
     "user",
@@ -33,4 +48,17 @@ __all__ = [
     "pdf_template",
     "pdf_template_version",
     "generated_pdf",
+    "commercial_registration",
+    "capital_info",
+    "cr_entity_character",
+    "cr_activity",
+    "cr_stock",
+    "cr_estore",
+    "cr_estore_activity",
+    "cr_party",
+    "cr_party_partnership",
+    "cr_manager",
+    "cr_manager_position",
+    "cr_liquidator",
+    "cr_liquidator_position",
 ]

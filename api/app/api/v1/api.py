@@ -21,6 +21,7 @@ from app.api.v1.endpoints import (
     tenants,
     totp,
     users,
+    wathq_commercial_registrations,
     wathq_export,
     wathq_external,
     wathq_live,
@@ -68,6 +69,11 @@ api_router.include_router(
     wathq_cr.router,
     prefix="/wathq/commercial-registration",
     tags=["wathq-commercial-registration"],
+)
+api_router.include_router(
+    wathq_commercial_registrations.router,
+    prefix="/wathq/cr-data",
+    tags=["wathq-cr-data"],
 )
 api_router.include_router(
     wathq_cc.router, prefix="/wathq/company-contract", tags=["wathq-company-contract"]
