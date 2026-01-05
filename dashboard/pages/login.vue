@@ -134,17 +134,12 @@
 
             <!-- TOTP Code Input -->
             <div>
-              <UInput
+              <OtpInput
+                ref="otpInputRef"
                 v-model="totpCode"
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                maxlength="8"
-                :placeholder="t('login.twoFactor.placeholder')"
+                :length="6"
                 :disabled="isLoading"
-                class="bg-white/10 dark:bg-gray-800/10 text-center text-2xl tracking-widest font-mono"
-                size="lg"
-                @keyup.enter="handleTOTPVerify"
+                @complete="handleTOTPVerify"
               />
               <p class="mt-2 text-xs text-gray-400 text-center">
                 {{ t("login.twoFactor.hint") }}
@@ -222,6 +217,7 @@ const isLoading = ref(false);
 const error = ref("");
 const showTOTP = ref(false);
 const totpCode = ref("");
+const otpInputRef = ref(null);
 
 // Handle login
 const handleLogin = async () => {
@@ -237,6 +233,10 @@ const handleLogin = async () => {
     // Check if TOTP is required
     if (result.requiresTOTP) {
       showTOTP.value = true;
+      // Focus the OTP input after showing the form
+      nextTick(() => {
+        otpInputRef.value?.focus();
+      });
       return;
     }
 
@@ -293,4 +293,13 @@ const cancelTOTP = () => {
   error.value = "";
   authStore.cancelTOTP();
 };
+
+// Clear OTP input on error
+watch(error, (newError) => {
+  if (newError && showTOTP.value) {
+    nextTick(() => {
+      otpInputRef.value?.clear();
+    });
+  }
+});
 </script>
