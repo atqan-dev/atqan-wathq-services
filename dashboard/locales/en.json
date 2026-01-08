@@ -373,6 +373,7 @@
     "powerOfAttorney": "Power of Attorney",
     "realEstateDeeds": "Real Estate Deeds",
     "nationalAddresses": "National Addresses",
+    "employees": "Employee Information",
     "collapse": "Collapse Sidebar",
     "expand": "Expand Sidebar",
     "open": "Open Menu",
@@ -1380,6 +1381,59 @@
     },
     "error": {
       "loadFailed": "Failed to load national addresses"
+    }
+  },
+  "employees": {
+    "title": "Employee Information",
+    "subtitle": "View and manage employee data from Wathq",
+    "search": "Search by name or nationality...",
+    "addNew": "Add New Employee",
+    "noData": "No employees found",
+    "stats": {
+      "total": "Total Employees",
+      "active": "Active",
+      "nationalities": "Nationalities",
+      "thisMonth": "This Month"
+    },
+    "table": {
+      "employeeId": "Employee ID",
+      "name": "Name",
+      "nationality": "Nationality",
+      "workingMonths": "Working Months",
+      "employmentCount": "Employment Count",
+      "status": "Status"
+    },
+    "view": {
+      "back": "Back",
+      "edit": "Edit",
+      "export": "Export",
+      "errorLoading": "Error loading data",
+      "sections": {
+        "mainInfo": "Main Information",
+        "employmentDetails": "Employment Details",
+        "auditInfo": "Audit Information"
+      },
+      "fields": {
+        "employeeId": "Employee ID",
+        "name": "Name",
+        "nationality": "Nationality",
+        "workingMonths": "Working Months",
+        "employer": "Employer",
+        "status": "Status",
+        "basicWage": "Basic Wage",
+        "housingAllowance": "Housing Allowance",
+        "otherAllowance": "Other Allowance",
+        "fullWage": "Full Wage",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "createdBy": "Created By",
+        "updatedBy": "Updated By",
+        "sar": "SAR",
+        "months": "months"
+      }
+    },
+    "error": {
+      "loadFailed": "Failed to load employee information"
     }
   },
   "notificationPermissionPrompt": {

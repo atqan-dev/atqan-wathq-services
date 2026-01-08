@@ -26,6 +26,7 @@ from app.api.v1.endpoints import (
     wathq_power_of_attorney,
     wathq_real_estate_deeds,
     wathq_national_addresses,
+    wathq_employees,
     wathq_export,
     wathq_external,
     wathq_live,
@@ -98,6 +99,11 @@ api_router.include_router(
     wathq_national_addresses.router,
     prefix="/wathq/national-addresses",
     tags=["wathq-national-addresses"],
+)
+api_router.include_router(
+    wathq_employees.router,
+    prefix="/wathq/employees",
+    tags=["wathq-employees"],
 )
 api_router.include_router(
     wathq_cc.router, prefix="/wathq/company-contract", tags=["wathq-company-contract"]

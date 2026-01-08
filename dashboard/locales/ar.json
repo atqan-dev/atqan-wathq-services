@@ -362,6 +362,7 @@
     "powerOfAttorney": "الوكالات",
     "realEstateDeeds": "الصكوك العقارية",
     "nationalAddresses": "العناوين الوطنية",
+    "employees": "معلومات الموظفين",
     "collapse": "طي الشريط الجانبي",
     "expand": "توسيع الشريط الجانبي",
     "open": "فتح القائمة",
@@ -1460,6 +1461,59 @@
     },
     "error": {
       "loadFailed": "فشل في تحميل العناوين الوطنية"
+    }
+  },
+  "employees": {
+    "title": "معلومات الموظفين",
+    "subtitle": "عرض وإدارة بيانات الموظفين من واثق",
+    "search": "البحث بالاسم أو الجنسية...",
+    "addNew": "إضافة موظف جديد",
+    "noData": "لم يتم العثور على موظفين",
+    "stats": {
+      "total": "إجمالي الموظفين",
+      "active": "نشط",
+      "nationalities": "الجنسيات",
+      "thisMonth": "هذا الشهر"
+    },
+    "table": {
+      "employeeId": "معرف الموظف",
+      "name": "الاسم",
+      "nationality": "الجنسية",
+      "workingMonths": "أشهر العمل",
+      "employmentCount": "عدد الوظائف",
+      "status": "الحالة"
+    },
+    "view": {
+      "back": "رجوع",
+      "edit": "تعديل",
+      "export": "تصدير",
+      "errorLoading": "خطأ في تحميل البيانات",
+      "sections": {
+        "mainInfo": "المعلومات الأساسية",
+        "employmentDetails": "تفاصيل التوظيف",
+        "auditInfo": "معلومات المراجعة"
+      },
+      "fields": {
+        "employeeId": "معرف الموظف",
+        "name": "الاسم",
+        "nationality": "الجنسية",
+        "workingMonths": "أشهر العمل",
+        "employer": "صاحب العمل",
+        "status": "الحالة",
+        "basicWage": "الراتب الأساسي",
+        "housingAllowance": "بدل السكن",
+        "otherAllowance": "بدلات أخرى",
+        "fullWage": "الراتب الكامل",
+        "createdAt": "تاريخ الإنشاء",
+        "updatedAt": "تاريخ التحديث",
+        "createdBy": "أنشئ بواسطة",
+        "updatedBy": "حدث بواسطة",
+        "sar": "ريال",
+        "months": "شهر"
+      }
+    },
+    "error": {
+      "loadFailed": "فشل في تحميل معلومات الموظفين"
     }
   },
   "passwordReset": {

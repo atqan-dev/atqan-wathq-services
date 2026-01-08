@@ -380,6 +380,12 @@ const wathqDataItems = computed(() => [
     icon: 'i-heroicons-map-pin',
     label: t('sidebar.nationalAddresses'),
     requiresAuth: true
+  },
+  {
+    to: '/wathq-data/employees',
+    icon: 'i-heroicons-user-group',
+    label: t('sidebar.employees'),
+    requiresAuth: true
   }
 ])
 

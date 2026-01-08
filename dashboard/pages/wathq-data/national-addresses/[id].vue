@@ -293,6 +293,71 @@ function getMockAddressData(id: string) {
   }
 }
 
+function loadLeafletCSS() {
+  if (process.client && !document.getElementById('leaflet-css')) {
+    const link = document.createElement('link')
+    link.id = 'leaflet-css'
+    link.rel = 'stylesheet'
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+    link.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY='
+    link.crossOrigin = ''
+    document.head.appendChild(link)
+  }
+}
+
+async function initializeMap() {
+  if (!process.client || !addressData.value?.latitude || !addressData.value?.longitude) {
+    return
+  }
+
+  await nextTick()
+
+  const mapElement = document.getElementById('map')
+  if (!mapElement) return
+
+  try {
+    // Dynamically import Leaflet
+    const L = await import('leaflet')
+    
+    // Clear existing map if any
+    if (map) {
+      map.remove()
+    }
+
+    const lat = typeof addressData.value.latitude === 'string' 
+      ? parseFloat(addressData.value.latitude) 
+      : addressData.value.latitude
+    const lng = typeof addressData.value.longitude === 'string' 
+      ? parseFloat(addressData.value.longitude) 
+      : addressData.value.longitude
+
+    // Initialize map
+    map = L.map('map').setView([lat, lng], 15)
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19
+    }).addTo(map)
+
+    // Add marker
+    const marker = L.marker([lat, lng]).addTo(map)
+    
+    // Add popup with address info
+    const popupContent = `
+      <div class="p-2">
+        <h3 class="font-semibold text-sm mb-1">${addressData.value.title || 'Address'}</h3>
+        <p class="text-xs text-gray-600">${addressData.value.address || ''}</p>
+        <p class="text-xs text-gray-500 mt-1">${addressData.value.city || ''}, ${addressData.value.post_code || ''}</p>
+      </div>
+    `
+    marker.bindPopup(popupContent).openPopup()
+
+  } catch (error) {
+    console.error('Failed to initialize map:', error)
+  }
+}
+
 async function fetchAddressData() {
   loading.value = true
   error.value = null
@@ -315,6 +380,9 @@ async function fetchAddressData() {
     console.log('Using mock address data:', addressData.value)
   } finally {
     loading.value = false
+    // Initialize map after data is loaded
+    await nextTick()
+    initializeMap()
   }
 }
 
