@@ -362,6 +362,24 @@ const wathqDataItems = computed(() => [
     icon: 'i-heroicons-document-text',
     label: t('sidebar.corporateContracts'),
     requiresAuth: true
+  },
+  {
+    to: '/wathq-data/power-of-attorney',
+    icon: 'i-heroicons-document-check',
+    label: t('sidebar.powerOfAttorney'),
+    requiresAuth: true
+  },
+  {
+    to: '/wathq-data/real-estate-deeds',
+    icon: 'i-heroicons-home-modern',
+    label: t('sidebar.realEstateDeeds'),
+    requiresAuth: true
+  },
+  {
+    to: '/wathq-data/national-addresses',
+    icon: 'i-heroicons-map-pin',
+    label: t('sidebar.nationalAddresses'),
+    requiresAuth: true
   }
 ])
 
