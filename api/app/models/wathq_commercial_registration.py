@@ -2,7 +2,7 @@
 Commercial Registration model for Wathq schema.
 """
 
-from sqlalchemy import Boolean, Column, Date, Integer, Numeric, String
+from sqlalchemy import Boolean, Column, Date, DateTime, Integer, Numeric, String, JSON, func
 from sqlalchemy.orm import relationship
 
 from app.db.base_class import Base
@@ -16,7 +16,8 @@ class CommercialRegistration(Base):
     __tablename__ = "commercial_registrations"
     __table_args__ = {'schema': 'wathq'}
 
-    cr_number = Column(String(20), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    cr_number = Column(String(20), unique=True, nullable=False, index=True)
     cr_national_number = Column(String(20), nullable=True)
     version_no = Column(Integer, nullable=True)
     name = Column(String(255), nullable=True)
@@ -70,6 +71,13 @@ class CommercialRegistration(Base):
 
     mgmt_structure_id = Column(Integer, nullable=True)
     mgmt_structure_name = Column(String(100), nullable=True)
+
+    # Audit fields
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    created_by = Column(Integer, nullable=True)
+    updated_by = Column(Integer, nullable=True)
+    request_body = Column(JSON, nullable=True)
 
     capital_info = relationship("CapitalInfo", back_populates="commercial_registration", uselist=False)
     entity_characters = relationship("CREntityCharacter", back_populates="commercial_registration")

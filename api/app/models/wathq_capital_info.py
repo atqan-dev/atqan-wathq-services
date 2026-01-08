@@ -16,7 +16,8 @@ class CapitalInfo(Base):
     __tablename__ = "capital_info"
     __table_args__ = {'schema': 'wathq'}
 
-    cr_number = Column(String(20), ForeignKey('wathq.commercial_registrations.cr_number'), primary_key=True)
+    cr_number = Column(String(20), primary_key=True)
+    cr_id = Column(Integer, ForeignKey('wathq.commercial_registrations.id'), nullable=False, index=True)
     currency_id = Column(Integer, nullable=True)
     currency_name = Column(String(50), nullable=True)
     

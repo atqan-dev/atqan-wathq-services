@@ -29,6 +29,26 @@ from app.schemas.wathq_commercial_registration import (
 class CRUDCommercialRegistration(
     CRUDBase[CommercialRegistration, CommercialRegistrationCreate, CommercialRegistrationUpdate]
 ):
+    def get_with_relations(
+        self, db: Session, *, id: int
+    ) -> Optional[CommercialRegistration]:
+        """Get commercial registration by ID with all related data."""
+        return (
+            db.query(CommercialRegistration)
+            .options(
+                joinedload(CommercialRegistration.capital_info),
+                joinedload(CommercialRegistration.entity_characters),
+                joinedload(CommercialRegistration.activities),
+                joinedload(CommercialRegistration.stocks),
+                joinedload(CommercialRegistration.estores).joinedload(CREstore.activities),
+                joinedload(CommercialRegistration.parties).joinedload(CRParty.partnerships),
+                joinedload(CommercialRegistration.managers).joinedload(CRManager.positions),
+                joinedload(CommercialRegistration.liquidators).joinedload(CRLiquidator.positions),
+            )
+            .filter(CommercialRegistration.id == id)
+            .first()
+        )
+    
     def get_by_cr_number(
         self, db: Session, *, cr_number: str
     ) -> Optional[CommercialRegistration]:

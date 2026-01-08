@@ -2,9 +2,9 @@
 Pydantic schemas for Commercial Registration.
 """
 
-from datetime import date
+from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional
+from typing import Optional, Any
 
 from pydantic import BaseModel
 
@@ -361,6 +361,7 @@ class CommercialRegistrationUpdate(CommercialRegistrationBase):
 
 
 class CommercialRegistration(CommercialRegistrationBase):
+    id: int
     cr_number: str
     capital_info: Optional[CapitalInfo] = None
     entity_characters: list[CREntityCharacter] = []
@@ -370,6 +371,13 @@ class CommercialRegistration(CommercialRegistrationBase):
     parties: list[CRParty] = []
     managers: list[CRManager] = []
     liquidators: list[CRLiquidator] = []
+    
+    # Audit fields
+    created_at: datetime
+    updated_at: datetime
+    created_by: Optional[int] = None
+    updated_by: Optional[int] = None
+    request_body: Optional[Any] = None
 
     class Config:
         from_attributes = True

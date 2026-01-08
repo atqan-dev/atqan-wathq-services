@@ -77,15 +77,15 @@ def get_commercial_registrations_by_city(
     return crs
 
 
-@router.get("/{cr_number}", response_model=CommercialRegistration)
+@router.get("/{id}", response_model=CommercialRegistration)
 def get_commercial_registration(
-    cr_number: str,
+    id: int,
     db: Session = Depends(deps.get_db),
 ) -> Any:
     """
-    Get commercial registration by CR number with all related data.
+    Get commercial registration by ID with all related data.
     """
-    cr = commercial_registration.get_by_cr_number(db, cr_number=cr_number)
+    cr = commercial_registration.get_with_relations(db, id=id)
     if not cr:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -114,17 +114,17 @@ def create_commercial_registration(
     return cr
 
 
-@router.put("/{cr_number}", response_model=CommercialRegistration)
+@router.put("/{id}", response_model=CommercialRegistration)
 def update_commercial_registration(
     *,
     db: Session = Depends(deps.get_db),
-    cr_number: str,
+    id: int,
     cr_in: CommercialRegistrationUpdate,
 ) -> Any:
     """
     Update commercial registration.
     """
-    cr = commercial_registration.get_by_cr_number(db, cr_number=cr_number)
+    cr = commercial_registration.get(db, id=id)
     if not cr:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -135,15 +135,15 @@ def update_commercial_registration(
     return cr
 
 
-@router.delete("/{cr_number}")
+@router.delete("/{id}")
 def delete_commercial_registration(
-    cr_number: str,
+    id: int,
     db: Session = Depends(deps.get_db),
 ) -> Any:
     """
     Delete commercial registration.
     """
-    cr = commercial_registration.get_by_cr_number(db, cr_number=cr_number)
+    cr = commercial_registration.get(db, id=id)
     if not cr:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

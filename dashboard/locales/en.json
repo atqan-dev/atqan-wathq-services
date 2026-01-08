@@ -367,6 +367,9 @@
     "metrics": "Metrics",
     "users": "Users",
     "notifications": "Notifications",
+    "wathqData": "Wathq Data",
+    "commercialRegistrations": "Commercial Registrations",
+    "corporateContracts": "Corporate Contracts",
     "collapse": "Collapse Sidebar",
     "expand": "Expand Sidebar",
     "open": "Open Menu",
@@ -465,8 +468,8 @@
     "updateTenantError": "Failed to update  App",
     "deleteTenantSuccess": "App deleted successfully",
     "deleteTenantError": "Failed to delete  App",
-    "services":{
-      "table":{
+    "services": {
+      "table": {
         "service": "Service",
         "approval": "Approval",
         "usage": "Usage",
@@ -474,7 +477,7 @@
         "actions": "Actions",
         "groupBy": "Group By"
       },
-      "stats":{
+      "stats": {
         "total": "Total Services",
         "active": "Active",
         "inactive": "Inactive",
@@ -978,18 +981,160 @@
       "responseData": "Response Data"
     }
   },
-  "notificationPermissionPrompt":{
-    "title":"Notification Permission",
-    "description":"Please grant notification permission to receive important updates and alerts",
-    "allow":"Allow",
-    "block":"Block",
-    "content":"Notification permission is required to receive important updates and alerts. Please grant permission to continue.",
-    "deploymentStatusUpdates":"Deployment Status Updates",
-    "systemAlertsAndWarnings":"System Alerts and Warnings",
-    "importantAppNotifications":"Important App Notifications",
-    "maybeLater":"May be later",
-    "allowNotifications":"Allow Notifications",
-    "neverShow":"Never Show",
-    "requesting":"Requesting"
+  "wathqData": {
+    "commercialRegistrations": {
+      "subtitle": "View and manage commercial registration data from Wathq"
+    },
+    "stats": {
+      "total": "Total Registrations",
+      "active": "Active",
+      "suspended": "Suspended",
+      "cancelled": "Cancelled"
+    },
+    "search": "Search by CR number or name...",
+    "addNew": "Add New CR",
+    "noData": "No commercial registrations found",
+    "filters": {
+      "status": "Filter by Status",
+      "city": "Filter by City",
+      "allCities": "All Cities"
+    },
+    "status": {
+      "all": "All Statuses",
+      "active": "Active",
+      "suspended": "Suspended",
+      "cancelled": "Cancelled"
+    },
+    "table": {
+      "crNumber": "CR Number",
+      "name": "Name",
+      "status": "Status",
+      "city": "City",
+      "issueDate": "Issue Date"
+    },
+    "error": {
+      "loadFailed": "Failed to load commercial registrations"
+    }
+  },
+  "corporateContracts": {
+    "title": "Corporate Contracts",
+    "subtitle": "View and manage corporate contract data from Wathq",
+    "search": "Search by contract ID or CR number...",
+    "addNew": "Add New Corporate Contract",
+    "noData": "No corporate contracts found",
+    "stats": {
+      "totalCapital": "Total Capital",
+      "thisMonth": "This Month",
+      "avgCapital": "Avg Capital"
+    },
+    "table": {
+      "contractId": "Contract ID",
+      "crNumber": "CR Number",
+      "entityName": "Entity Name",
+      "contractDate": "Contract Date",
+      "totalCapital": "Total Capital",
+      "city": "City"
+    },
+    "view": {
+      "back": "Back",
+      "edit": "Edit",
+      "export": "Export",
+      "errorLoading": "Error loading data",
+      "sections": {
+        "mainInfo": "Main Information",
+        "entityDetails": "Entity Details",
+        "fiscalInfo": "Fiscal Information",
+        "capitalInfo": "Capital Information",
+        "profitAllocation": "Profit Allocation",
+        "auditInfo": "Audit Information",
+        "stocks": "Stocks",
+        "parties": "Parties",
+        "managers": "Managers",
+        "managementConfig": "Management Configuration",
+        "activities": "Activities",
+        "articles": "Articles",
+        "decisions": "Decisions",
+        "notificationChannels": "Notification Channels"
+      },
+      "fields": {
+        "id": "ID",
+        "contractId": "Contract ID",
+        "contractCopyNumber": "Contract Copy Number",
+        "contractDate": "Contract Date",
+        "crNumber": "CR Number",
+        "crNationalNumber": "CR National Number",
+        "entityName": "Entity Name",
+        "entityNameLang": "Entity Name (Language)",
+        "companyDuration": "Company Duration",
+        "headquarterCity": "Headquarter City",
+        "isLicenseBased": "License Based",
+        "entityType": "Entity Type",
+        "entityForm": "Entity Form",
+        "fiscalCalendarType": "Fiscal Calendar Type",
+        "fiscalYearEndMonth": "Fiscal Year End Month",
+        "fiscalYearEndDay": "Fiscal Year End Day",
+        "fiscalYearEndYear": "Fiscal Year End Year",
+        "currency": "Currency",
+        "totalCapital": "Total Capital",
+        "paidCapital": "Paid Capital",
+        "cashCapital": "Cash Capital",
+        "inKindCapital": "In-Kind Capital",
+        "isSetAsideEnabled": "Set Aside Enabled",
+        "profitAllocationPercentage": "Profit Allocation Percentage",
+        "profitAllocationPurpose": "Profit Allocation Purpose",
+        "additionalDecisionText": "Additional Decision Text",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At",
+        "createdBy": "Created By",
+        "updatedBy": "Updated By",
+        "stockType": "Stock Type",
+        "stockCount": "Stock Count",
+        "stockValue": "Stock Value",
+        "partyName": "Party Name",
+        "partyType": "Party Type",
+        "identityNumber": "Identity Number",
+        "identityType": "Identity Type",
+        "nationality": "Nationality",
+        "guardianName": "Guardian Name",
+        "guardianIdentityNumber": "Guardian Identity Number",
+        "isFatherGuardian": "Father is Guardian",
+        "managerName": "Manager Name",
+        "managerType": "Manager Type",
+        "isLicensed": "Licensed",
+        "positionName": "Position Name",
+        "structureName": "Structure Name",
+        "meetingQuorumName": "Meeting Quorum",
+        "canDelegateAttendance": "Can Delegate Attendance",
+        "termYears": "Term (Years)",
+        "activityId": "Activity ID",
+        "activityName": "Activity Name",
+        "originalId": "Original ID",
+        "articleText": "Article Text",
+        "partName": "Part Name",
+        "decisionName": "Decision Name",
+        "approvePercentage": "Approval Percentage",
+        "channelName": "Channel Name",
+        "yes": "Yes",
+        "no": "No",
+        "years": "Years"
+      }
+    },
+    "error": {
+      "loadFailed": "Failed to load corporate contracts"
+    }
+  },
+  "notificationPermissionPrompt": {
+    "title": "Notification Permission",
+    "description": "Please grant notification permission to receive important updates and alerts",
+    "allow": "Allow",
+    "block": "Block",
+    "content": "Notification permission is required to receive important updates and alerts. Please grant permission to continue.",
+    "deploymentStatusUpdates": "Deployment Status Updates",
+    "systemAlertsAndWarnings": "System Alerts and Warnings",
+    "importantAppNotifications": "Important App Notifications",
+    "maybeLater": "May be later",
+    "allowNotifications": "Allow Notifications",
+    "neverShow": "Never Show",
+    "requesting": "Requesting"
   }
 }

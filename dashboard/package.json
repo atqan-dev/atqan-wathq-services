@@ -19,7 +19,7 @@
     "test:e2e": "cypress run"
   },
   "dependencies": {
-        "@nuxt/image": "^1.8.1",
+    "@nuxt/image": "^1.8.1",
     "@nuxt/kit": "^3.17.7",
     "@nuxt/ui": "^2.22.0",
     "@nuxtjs/color-mode": "^3.5.2",
@@ -42,13 +42,14 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "lucide-vue-next": "^0.468.0",
     "@nuxt/devtools": "^2.6.2",
     "@nuxt/test-utils": "^3.17.7",
     "@vue/test-utils": "^2.4.3",
+    "baseline-browser-mapping": "^2.9.12",
     "cross-env": "^10.0.0",
     "cypress": "^13.6.0",
     "jsdom": "^23.0.1",
+    "lucide-vue-next": "^0.468.0",
     "nuxt": "^3.17.7",
     "pm2": "^5.3.0",
     "tailwindcss": "^3.4.17",
