@@ -275,7 +275,7 @@
           <div class="flex justify-between items-center">
             <div class="text-xs text-gray-500 dark:text-gray-400">
               <span v-if="liveRequest.response">
-                {{ t('liveRequest.responseSize') }} {{ new Blob([formattedJsonResponse]).size }} {{ t('liveRequest.bytes') }}
+                {{ t('liveRequest.responseSize') }} {{ responseSize }} {{ t('liveRequest.bytes') }}
               </span>
             </div>
             <div class="flex gap-3">
@@ -306,11 +306,13 @@
 import { ref, computed } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useRouter } from 'vue-router'
+import { useConfirm } from '@/composables/useConfirm'
 import type { DataTableConfig } from '~/types/datatable'
 import AdvancedDataTable from '~/components/ui/AdvancedDataTable.vue'
 
 const { t, locale } = useI18n()
 const router = useRouter()
+const { confirm, confirmWarning } = useConfirm()
 
 // Define page metadata
 definePageMeta({
@@ -354,6 +356,13 @@ const formattedJsonResponse = computed(() => {
   }
 })
 
+const responseSize = computed(() => {
+  if (!formattedJsonResponse.value) {
+    return 0
+  }
+  return new globalThis.Blob([formattedJsonResponse.value]).size
+})
+
 function openLiveRequestDialog() {
   isLiveRequestDialogOpen.value = true
   // Reset form
@@ -392,7 +401,7 @@ async function handleMakeRequest() {
     .replace('{crNumber}', liveRequest.value.crNumber)
     .replace('{language}', liveRequest.value.language)
   
-  const confirmed = confirm(message)
+  const confirmed = await confirmWarning(message, t('liveRequest.title'))
 
   if (!confirmed) return
 
@@ -401,45 +410,42 @@ async function handleMakeRequest() {
   liveRequest.value.response = null
 
   try {
-    // Build URL with query parameters
-    const url = new URL(liveRequest.value.url)
-    url.searchParams.append('id', liveRequest.value.crNumber)
-    url.searchParams.append('lang', liveRequest.value.language)
-
-    const response = await fetch(url.toString(), {
+    // Use backend proxy to avoid CORS issues
+    const response = await $fetch('/api/v1/wathq/commercial-registration/fullinfo', {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept-Language': liveRequest.value.language
+      params: {
+        cr_number: liveRequest.value.crNumber,
+        lang: liveRequest.value.language
       }
     })
 
-    const data = await response.json()
-
     liveRequest.value.response = {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-      data: data
+      status: 200,
+      statusText: 'OK',
+      data: response
     }
 
-    if (response.ok) {
-      liveRequest.value.status = 'Success'
-    } else {
-      liveRequest.value.status = 'Error'
-    }
+    liveRequest.value.status = 'Success'
 
     // Save the request to database
-    await saveCrRequest(response.status, response.statusText)
+    await saveCrRequest(200, 'Success')
   } catch (error: any) {
+    console.error('Request failed:', error)
+    
     liveRequest.value.status = 'Failed'
+    
+    const errorMessage = error?.data?.detail || error?.message || 'Request failed'
+    const statusCode = error?.statusCode || error?.status || 0
+    
     liveRequest.value.response = {
-      error: error.message || 'Request failed',
-      details: error.toString()
+      status: statusCode,
+      statusText: 'Error',
+      error: errorMessage,
+      details: error?.data || error
     }
 
     // Save the failed request to database
-    await saveCrRequest(0, error.message || 'Request failed')
+    await saveCrRequest(statusCode, errorMessage)
   } finally {
     liveRequest.value.loading = false
   }
@@ -473,7 +479,7 @@ async function handleSaveData() {
   try {
     // Create a JSON blob from the response data
     const jsonString = JSON.stringify(liveRequest.value.response, null, 2)
-    const blob = new Blob([jsonString], { type: 'application/json' })
+    const blob = new globalThis.Blob([jsonString], { type: 'application/json' })
     
     // Create download link
     const url = window.URL.createObjectURL(blob)
@@ -514,8 +520,9 @@ async function copyToClipboard() {
 async function handleCloseWithConfirm() {
   if (liveRequest.value.response) {
     // Show confirmation if there's response data
-    const confirmed = confirm(
-      t('liveRequest.confirm.close')
+    const confirmed = await confirmWarning(
+      t('liveRequest.confirm.close'),
+      t('liveRequest.close')
     )
 
     if (confirmed) {
@@ -822,7 +829,7 @@ const tableConfig: DataTableConfig<any> = {
       key: 'delete',
       label: '',
       icon: 'i-heroicons-trash',
-      color: 'error' as const,
+      color: 'red' as const,
       variant: 'ghost',
       size: 'sm',
       confirm: {
@@ -860,7 +867,7 @@ const tableConfig: DataTableConfig<any> = {
       key: 'delete',
       label: 'Delete Selected',
       icon: 'i-heroicons-trash',
-      color: 'error' as const,
+      color: 'red' as const,
       variant: 'outline',
       confirm: {
         title: 'Delete Multiple Records',

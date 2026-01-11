@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   experimental: {
     asyncContext: true,
   },
-  
+
   // Server configuration
   devServer: {
     host: "localhost",
@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     apiBaseUrl: process.env.NUXT_PRIVATE_API_BASE_URL || 'http://localhost:5551',
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:5551/api/v1',
+      wathqApiKey: process.env.NUXT_PUBLIC_WATHQ_API_KEY || '',
     },
   },
   // App configuration
