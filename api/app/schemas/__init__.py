@@ -140,6 +140,11 @@ from .wathq_commercial_registration import (
     CRLiquidatorPositionCreate,
     CRLiquidatorPositionUpdate,
 )
+from .cr_request import (
+    CrRequest,
+    CrRequestCreate,
+    CrRequestUpdate,
+)
 
 __all__ = [
     "User",
@@ -268,4 +273,7 @@ __all__ = [
     "CRLiquidatorPosition",
     "CRLiquidatorPositionCreate",
     "CRLiquidatorPositionUpdate",
+    "CrRequest",
+    "CrRequestCreate",
+    "CrRequestUpdate",
 ]

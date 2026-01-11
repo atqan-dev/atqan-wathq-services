@@ -1383,6 +1383,53 @@
       "loadFailed": "Failed to load national addresses"
     }
   },
+  "liveRequest": {
+    "title": "Make a Live Request",
+    "subtitle": "Test API endpoints in real-time",
+    "requestConfiguration": "Request Configuration",
+    "responseData": "Response Data",
+    "apiUrl": "API URL",
+    "crNumber": "CR Number",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "arabic": "Arabic",
+    "english": "English",
+    "makeRequest": "Make Request",
+    "sendingRequest": "Sending Request...",
+    "status": "Status",
+    "responseReceived": "Response Received",
+    "statusLabel": "Status:",
+    "copy": "Copy",
+    "close": "Close",
+    "saveData": "Save Data",
+    "responseSize": "Response size:",
+    "bytes": "bytes",
+    "parameter": "Parameter:",
+    "required": "*",
+    "generateUrl": "Auto-generate Wathq URL",
+    "placeholder": {
+      "url": "https://api.example.com/endpoint",
+      "crNumber": "e.g., 1010711252",
+      "response": "Response will appear here after making a request..."
+    },
+    "warning": {
+      "title": "Important Notice",
+      "message": "Please note that this operation is costly through your Wathq inquiry service account",
+      "requestCount": "Number of requests for this operation:"
+    },
+    "confirm": {
+      "makeRequest": "Are you sure you want to make a request to:\n\n{url}\n\nWith CR Number: {crNumber}\nLanguage: {language}",
+      "close": "You have response data. Are you sure you want to close this dialog? The data will be lost."
+    },
+    "success": {
+      "dataSaved": "Data saved successfully!",
+      "copied": "Response copied to clipboard!"
+    },
+    "error": {
+      "saveFailed": "Failed to save data:",
+      "copyFailed": "Failed to copy to clipboard:"
+    }
+  },
   "employees": {
     "title": "Employee Information",
     "subtitle": "View and manage employee data from Wathq",

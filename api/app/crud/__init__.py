@@ -12,6 +12,7 @@ from .crud_tenant import tenant
 from .crud_user import user
 from .crud_wathq_call_log import wathq_call_log
 from .crud_wathq_offline_data import wathq_offline_data
+from .crud_cr_request import cr_request
 from .crud_pdf_template import (
     generated_pdf,
     pdf_template,
@@ -45,6 +46,7 @@ __all__ = [
     "management_user_profile",
     "wathq_call_log",
     "wathq_offline_data",
+    "cr_request",
     "pdf_template",
     "pdf_template_version",
     "generated_pdf",

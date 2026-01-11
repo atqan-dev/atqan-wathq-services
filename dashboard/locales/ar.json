@@ -1463,6 +1463,53 @@
       "loadFailed": "فشل في تحميل العناوين الوطنية"
     }
   },
+  "liveRequest": {
+    "title": "إجراء طلب مباشر",
+    "subtitle": "اختبار نقاط النهاية API في الوقت الفعلي",
+    "requestConfiguration": "إعدادات الطلب",
+    "responseData": "بيانات الاستجابة",
+    "apiUrl": "رابط API",
+    "crNumber": "رقم السجل التجاري",
+    "language": "اللغة",
+    "selectLanguage": "اختر اللغة",
+    "arabic": "العربية",
+    "english": "الإنجليزية",
+    "makeRequest": "إجراء الطلب",
+    "sendingRequest": "جاري إرسال الطلب...",
+    "status": "الحالة",
+    "responseReceived": "تم استلام الاستجابة",
+    "statusLabel": "الحالة:",
+    "copy": "نسخ",
+    "close": "إغلاق",
+    "saveData": "حفظ البيانات",
+    "responseSize": "حجم الاستجابة:",
+    "bytes": "بايت",
+    "parameter": "المعامل:",
+    "required": "*",
+    "generateUrl": "إنشاء رابط واثق تلقائياً",
+    "placeholder": {
+      "url": "https://api.example.com/endpoint",
+      "crNumber": "مثال: 1010711252",
+      "response": "ستظهر الاستجابة هنا بعد إجراء الطلب..."
+    },
+    "warning": {
+      "title": "تنبيه هام",
+      "message": "يرجى الانتباه تلك العملية مكلفة من خلال حسابك الخاص بخدمة واثق الاستعلامية",
+      "requestCount": "عدد الطلبات الخاصة بهذا الطلب:"
+    },
+    "confirm": {
+      "makeRequest": "هل أنت متأكد من إجراء طلب إلى:\n\n{url}\n\nبرقم السجل التجاري: {crNumber}\nاللغة: {language}",
+      "close": "لديك بيانات استجابة. هل أنت متأكد من إغلاق هذا الحوار؟ سيتم فقدان البيانات."
+    },
+    "success": {
+      "dataSaved": "تم حفظ البيانات بنجاح!",
+      "copied": "تم نسخ الاستجابة إلى الحافظة!"
+    },
+    "error": {
+      "saveFailed": "فشل في حفظ البيانات:",
+      "copyFailed": "فشل في النسخ إلى الحافظة:"
+    }
+  },
   "employees": {
     "title": "معلومات الموظفين",
     "subtitle": "عرض وإدارة بيانات الموظفين من واثق",

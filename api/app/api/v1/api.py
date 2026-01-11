@@ -7,6 +7,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     admin_example,
     auth,
+    cr_requests,
     health,
     management,
     management_auth,
@@ -104,6 +105,11 @@ api_router.include_router(
     wathq_employees.router,
     prefix="/wathq/employees",
     tags=["wathq-employees"],
+)
+api_router.include_router(
+    cr_requests.router,
+    prefix="/cr-requests",
+    tags=["cr-requests"],
 )
 api_router.include_router(
     wathq_cc.router, prefix="/wathq/company-contract", tags=["wathq-company-contract"]
