@@ -307,12 +307,16 @@ import { ref, computed } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useRouter } from 'vue-router'
 import { useConfirm } from '@/composables/useConfirm'
+import { useAuthenticatedFetch } from '@/composables/useAuthenticatedFetch'
+import { useAuthStore } from '@/stores/auth'
 import type { DataTableConfig } from '~/types/datatable'
 import AdvancedDataTable from '~/components/ui/AdvancedDataTable.vue'
 
 const { t, locale } = useI18n()
 const router = useRouter()
 const { confirm, confirmWarning } = useConfirm()
+const { authenticatedFetch } = useAuthenticatedFetch()
+const toast = useToast()
 
 // Define page metadata
 definePageMeta({
@@ -410,13 +414,20 @@ async function handleMakeRequest() {
   liveRequest.value.response = null
 
   try {
-    // Use backend proxy to avoid CORS issues
-    const response = await $fetch('/api/v1/wathq/commercial-registration/fullinfo', {
-      method: 'GET',
-      params: {
-        cr_number: liveRequest.value.crNumber,
-        lang: liveRequest.value.language
-      }
+    // Determine endpoint based on user type
+    // Management users use /management endpoint, tenant users use regular endpoint
+    const authStore = useAuthStore()
+    const isManagementUser = authStore.user?.is_super_admin || false
+    const endpoint = isManagementUser 
+      ? '/api/v1/wathq/live/management/commercial-registration/query'
+      : '/api/v1/wathq/live/commercial-registration/query'
+    
+    // Use authenticated fetch to include auth token
+    const response = await authenticatedFetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify({
+        cr_number: liveRequest.value.crNumber
+      })
     })
 
     liveRequest.value.response = {
@@ -476,30 +487,104 @@ async function handleSaveData() {
     return
   }
 
+  const confirmed = await confirmWarning(
+    t('liveRequest.confirmSave'),
+    t('liveRequest.saveDataTitle')
+  )
+
+  if (!confirmed) return
+
   try {
-    // Create a JSON blob from the response data
-    const jsonString = JSON.stringify(liveRequest.value.response, null, 2)
-    const blob = new globalThis.Blob([jsonString], { type: 'application/json' })
+    // Extract the response data from the API response
+    const responseData = liveRequest.value.response?.data?.response_data || liveRequest.value.response?.data || liveRequest.value.response
     
-    // Create download link
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `cr-${liveRequest.value.crNumber}-${liveRequest.value.language}-${Date.now()}.json`
+    console.log('Full response:', liveRequest.value.response)
+    console.log('Extracted responseData:', responseData)
     
-    // Trigger download
-    document.body.appendChild(link)
-    link.click()
+    // Check if the response is successful
+    if (!responseData) {
+      throw new Error('No response data available to save')
+    }
+
+    // Extract commercial registration data from the Wathq API response
+    // The structure should match what the Wathq API returns
+    const crData = {
+      cr_number: liveRequest.value.crNumber,
+      cr_national_number: responseData.crNationalNumber || responseData.cr_national_number,
+      version_no: responseData.versionNo || responseData.version_no,
+      name: responseData.name,
+      name_lang_id: responseData.nameLangId || responseData.name_lang_id,
+      name_lang_desc: responseData.nameLangDesc || responseData.name_lang_desc,
+      cr_capital: responseData.crCapital || responseData.cr_capital,
+      company_duration: responseData.companyDuration || responseData.company_duration,
+      is_main: responseData.isMain || responseData.is_main,
+      issue_date_gregorian: responseData.issueDateGregorian || responseData.issue_date_gregorian,
+      issue_date_hijri: responseData.issueDateHijri || responseData.issue_date_hijri,
+      main_cr_national_number: responseData.mainCrNationalNumber || responseData.main_cr_national_number,
+      main_cr_number: responseData.mainCrNumber || responseData.main_cr_number,
+      in_liquidation_process: responseData.inLiquidationProcess || responseData.in_liquidation_process,
+      has_ecommerce: responseData.hasEcommerce || responseData.has_ecommerce,
+      headquarter_city_id: responseData.headquarterCityId || responseData.headquarter_city_id,
+      headquarter_city_name: responseData.headquarterCityName || responseData.headquarter_city_name,
+      is_license_based: responseData.isLicenseBased || responseData.is_license_based,
+      license_issuer_national_number: responseData.licenseIssuerNationalNumber || responseData.license_issuer_national_number,
+      license_issuer_name: responseData.licenseIssuerName || responseData.license_issuer_name,
+      partners_nationality_id: responseData.partnersNationalityId || responseData.partners_nationality_id,
+      partners_nationality_name: responseData.partnersNationalityName || responseData.partners_nationality_name,
+      entity_type_id: responseData.entityTypeId || responseData.entity_type_id,
+      entity_type_name: responseData.entityTypeName || responseData.entity_type_name,
+      entity_form_id: responseData.entityFormId || responseData.entity_form_id,
+      entity_form_name: responseData.entityFormName || responseData.entity_form_name,
+      status_id: responseData.statusId || responseData.status_id,
+      status_name: responseData.statusName || responseData.status_name,
+      confirmation_date_gregorian: responseData.confirmationDateGregorian || responseData.confirmation_date_gregorian,
+      confirmation_date_hijri: responseData.confirmationDateHijri || responseData.confirmation_date_hijri,
+      reactivation_date_gregorian: responseData.reactivationDateGregorian || responseData.reactivation_date_gregorian,
+      reactivation_date_hijri: responseData.reactivationDateHijri || responseData.reactivation_date_hijri,
+      suspension_date_gregorian: responseData.suspensionDateGregorian || responseData.suspension_date_gregorian,
+      suspension_date_hijri: responseData.suspensionDateHijri || responseData.suspension_date_hijri,
+      deletion_date_gregorian: responseData.deletionDateGregorian || responseData.deletion_date_gregorian,
+      deletion_date_hijri: responseData.deletionDateHijri || responseData.deletion_date_hijri,
+      contact_phone: responseData.contactPhone || responseData.contact_phone,
+      contact_mobile: responseData.contactMobile || responseData.contact_mobile,
+      contact_email: responseData.contactEmail || responseData.contact_email,
+      contact_website: responseData.contactWebsite || responseData.contact_website,
+      fiscal_is_first: responseData.fiscalIsFirst || responseData.fiscal_is_first,
+      fiscal_calendar_type_id: responseData.fiscalCalendarTypeId || responseData.fiscal_calendar_type_id,
+      fiscal_calendar_type_name: responseData.fiscalCalendarTypeName || responseData.fiscal_calendar_type_name,
+      fiscal_end_month: responseData.fiscalEndMonth || responseData.fiscal_end_month,
+      fiscal_end_day: responseData.fiscalEndDay || responseData.fiscal_end_day,
+      fiscal_end_year: responseData.fiscalEndYear || responseData.fiscal_end_year,
+      mgmt_structure_id: responseData.mgmtStructureId || responseData.mgmt_structure_id,
+      mgmt_structure_name: responseData.mgmtStructureName || responseData.mgmt_structure_name,
+    }
+
+    console.log('Prepared crData to send:', crData)
+
+    // Save to commercial registrations table
+    const result = await authenticatedFetch('/api/v1/wathq/cr-data/', {
+      method: 'POST',
+      body: JSON.stringify(crData)
+    })
     
-    // Cleanup
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
-    
+    console.log('Save result:', result)
+
     // Show success message
-    alert(t('liveRequest.success.dataSaved'))
+    toast.add({
+      title: t('liveRequest.success.dataSaved'),
+      color: 'green'
+    })
+    
+    // Close the dialog
+    isLiveRequestDialogOpen.value = false
   } catch (error: any) {
     console.error('Failed to save data:', error)
-    alert(t('liveRequest.error.saveFailed') + ' ' + error.message)
+    const errorMessage = error?.data?.detail || error?.message || 'Unknown error'
+    toast.add({
+      title: t('liveRequest.error.saveFailed'),
+      description: errorMessage,
+      color: 'red'
+    })
   }
 }
 

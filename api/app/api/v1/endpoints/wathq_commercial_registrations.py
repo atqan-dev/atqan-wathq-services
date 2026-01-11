@@ -102,14 +102,9 @@ def create_commercial_registration(
 ) -> Any:
     """
     Create new commercial registration.
+    Allow duplicate CR numbers since users can request the same CR multiple times.
+    Each request is uniquely identified by its auto-generated ID.
     """
-    existing_cr = commercial_registration.get_by_cr_number(db, cr_number=cr_in.cr_number)
-    if existing_cr:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Commercial registration with this CR number already exists",
-        )
-    
     cr = commercial_registration.create(db, obj_in=cr_in)
     return cr
 
