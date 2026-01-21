@@ -12,7 +12,7 @@
     <template #item="{ item }">
       <div class="flex items-center gap-2 w-full" :class="isRTL ? 'dropdown-item-rtl' : ''">
         <UIcon :name="item.icon" class="w-4 h-4" />
-        <span>{{ t(`theme.${item.value}`) }}</span>
+        <span>{{ item.label }}</span>
         <UIcon 
           v-if="item.value === currentTheme" 
           name="i-heroicons-check" 
@@ -28,12 +28,13 @@ const { t } = useI18n()
 const { isRTL } = useLanguage()
 const { themes, currentTheme, setTheme, currentThemeInfo } = useTheme()
 
-// Dropdown items
-const themeItems = computed(() => [
-  themes.map(theme => ({
-    ...theme,
+// Dropdown items - UDropdown expects array of arrays for grouping
+const themeItems = computed(() => [[
+  ...themes.map(theme => ({
+    value: theme.value,
     label: t(`theme.${theme.value}`),
+    icon: theme.icon,
     click: () => setTheme(theme.value)
   }))
-])
+]])
 </script>

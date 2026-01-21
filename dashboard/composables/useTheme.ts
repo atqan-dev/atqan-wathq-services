@@ -12,8 +12,8 @@ export const useTheme = () => {
     { value: 'system', label: 'System', icon: 'i-heroicons-computer-desktop' }
   ]
 
-  // Current theme
-  const currentTheme = computed(() => colorMode.value)
+  // Current theme (user's preference, not computed value)
+  const currentTheme = computed(() => colorMode.preference)
 
   // Is dark mode active
   const isDark = computed(() => colorMode.value === 'dark')

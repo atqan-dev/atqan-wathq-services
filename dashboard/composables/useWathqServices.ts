@@ -35,7 +35,7 @@ export function useWathqServices() {
   const error = ref<string | null>(null)
 
   // Computed
-  const activeServices = computed(() => 
+  const activeServices = computed(() =>
     services.value.filter(s => s.is_active)
   )
 
@@ -160,7 +160,7 @@ export function useWathqServices() {
 
       const url = `/api/v1/management/analytics/requests?${params.toString()}`
       const apiData = await authenticatedFetch<any[]>(url)
-      
+
       // Transform API response to match frontend interface
       requests.value = apiData.map(item => ({
         id: item.id,
@@ -200,7 +200,7 @@ export function useWathqServices() {
 
       const startTime = Date.now()
       const url = `${getBaseUrl()}/test`
-      
+
       const response = await authenticatedFetch<any>(url, {
         method: 'POST',
         body: JSON.stringify(testRequest)
@@ -223,14 +223,14 @@ export function useWathqServices() {
       const errorMessage = err.message || 'API test failed'
       error.value = errorMessage
       notifyError(errorMessage)
-      
+
       const result: WathqTestResponse = {
         success: false,
         error: errorMessage,
         duration_ms: duration,
         timestamp: new Date().toISOString()
       }
-      
+
       console.error('[WathqServices] Test failed:', err)
       return result
     } finally {
@@ -280,12 +280,33 @@ export function useWathqServices() {
       isLoading.value = true
       error.value = null
 
-      const url = serviceType 
+      const url = serviceType
         ? `${getBaseUrl()}/offline/${serviceType}`
         : `${getBaseUrl()}/offline`
-      
-      const data = await authenticatedFetch<WathqApiRequest[]>(url)
-      requests.value = data
+
+      const data = await authenticatedFetch<any[]>(url)
+
+      // Transform offline data to match WathqApiRequest interface
+      requests.value = data.map(item => {
+        // Extract endpoint from full_external_url
+        const urlObj = new URL(item.full_external_url)
+        const endpoint = urlObj.pathname
+
+        return {
+          id: item.id,
+          service_type: serviceType || 'commercial-registration',
+          endpoint: endpoint,
+          method: 'GET' as const,
+          request_data: {},
+          response_data: item.response_body || {},
+          status_code: 200,
+          duration_ms: 0,
+          is_success: true,
+          created_at: item.fetched_at,
+          tenant_id: item.tenant_id,
+          user_id: item.fetched_by
+        }
+      })
 
       console.log('[WathqServices] Fetched offline requests:', requests.value.length)
     } catch (err: any) {
@@ -314,7 +335,7 @@ export function useWathqServices() {
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
     const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000)
 
-    const requestsToday = requests.value.filter(r => 
+    const requestsToday = requests.value.filter(r =>
       new Date(r.created_at) >= today
     ).length
 

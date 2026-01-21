@@ -33,10 +33,15 @@
     <div v-else-if="filteredData.length === 0" class="text-center py-12">
       <UIcon name="i-heroicons-document-text" class="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
       <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
-        No requests found
+        {{ type === 'offline' ? 'No offline data available' : 'No requests found' }}
       </h3>
       <p class="text-sm text-gray-600 dark:text-gray-400">
-        Try making some API calls or adjusting your search
+        {{ type === 'offline' 
+          ? 'Offline data is automatically saved from successful API calls. Make some API requests using the Test API or Live Requests tabs to see cached data here.' 
+          : 'Try making some API calls or adjusting your search' }}
+      </p>
+      <p v-if="type === 'offline'" class="text-xs text-gray-500 dark:text-gray-500 mt-2">
+        Note: Offline data is only saved for tenant users, not management users.
       </p>
     </div>
 

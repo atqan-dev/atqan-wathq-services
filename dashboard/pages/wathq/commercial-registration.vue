@@ -23,20 +23,24 @@
     <!-- Live Requests -->
     <template #live-requests>
       <div class="space-y-4">
-        <form @submit.prevent="handleLiveRequest" class="space-y-4 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+        <UForm @submit.prevent="handleLiveRequest" class="space-y-4 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <UFormGroup :label="t('wathq.services.commercialRegistration.fields.crNumber')" name="crNumber">
             <UInput
               v-model="liveForm.cr_number"
               :label="t('wathq.services.commercialRegistration.fields.crNumber')"
               placeholder="1010711252"
               required
             />
+            </UFormGroup>
+            <UFormGroup :label="t('wathq.services.commercialRegistration.fields.dateGregorian')" name="dateGregorian">
             <UInput
               v-model="liveForm.date_gregorian"
               :label="t('wathq.services.commercialRegistration.fields.dateGregorian')"
               type="date"
               :placeholder="t('common.optional')"
             />
+            </UFormGroup>
           </div>
 
           <UButton
@@ -47,7 +51,7 @@
           >
             {{ t('wathq.actions.makeLiveRequest') }}
           </UButton>
-        </form>
+        </UForm>
 
         <SimpleRequestLogsTable 
           ref="liveRequestsTable"
