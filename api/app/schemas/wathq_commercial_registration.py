@@ -5,6 +5,7 @@ Pydantic schemas for Commercial Registration.
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional, Any
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -37,7 +38,7 @@ class CapitalInfoUpdate(CapitalInfoBase):
 
 
 class CapitalInfo(CapitalInfoBase):
-    cr_number: str
+    cr_number: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -58,7 +59,7 @@ class CREntityCharacterUpdate(CREntityCharacterBase):
 
 class CREntityCharacter(CREntityCharacterBase):
     id: int
-    cr_number: str
+    cr_number: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -79,7 +80,7 @@ class CRActivityUpdate(CRActivityBase):
 
 class CRActivity(CRActivityBase):
     id: int
-    cr_number: str
+    cr_number: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -104,7 +105,7 @@ class CRStockUpdate(CRStockBase):
 
 class CRStock(CRStockBase):
     id: int
-    cr_number: str
+    cr_number: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -146,7 +147,7 @@ class CREstoreUpdate(CREstoreBase):
 
 class CREstore(CREstoreBase):
     id: int
-    cr_number: str
+    cr_number: Optional[str] = None
     activities: list[CREstoreActivity] = []
 
     class Config:
@@ -196,7 +197,7 @@ class CRPartyUpdate(CRPartyBase):
 
 class CRParty(CRPartyBase):
     id: int
-    cr_number: str
+    cr_number: Optional[str] = None
     partnerships: list[CRPartyPartnership] = []
 
     class Config:
@@ -246,7 +247,7 @@ class CRManagerUpdate(CRManagerBase):
 
 class CRManager(CRManagerBase):
     id: int
-    cr_number: str
+    cr_number: Optional[str] = None
     positions: list[CRManagerPosition] = []
 
     class Config:
@@ -295,7 +296,7 @@ class CRLiquidatorUpdate(CRLiquidatorBase):
 
 class CRLiquidator(CRLiquidatorBase):
     id: int
-    cr_number: str
+    cr_number: Optional[str] = None
     positions: list[CRLiquidatorPosition] = []
 
     class Config:
@@ -363,6 +364,8 @@ class CommercialRegistrationUpdate(CommercialRegistrationBase):
 class CommercialRegistration(CommercialRegistrationBase):
     id: int
     cr_number: str
+    log_id: Optional[UUID] = None
+    fetched_at: Optional[datetime] = None
     capital_info: Optional[CapitalInfo] = None
     entity_characters: list[CREntityCharacter] = []
     activities: list[CRActivity] = []

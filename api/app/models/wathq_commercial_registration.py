@@ -2,8 +2,9 @@
 Commercial Registration model for Wathq schema.
 """
 
-from sqlalchemy import Boolean, Column, Date, DateTime, Integer, Numeric, String, JSON, func
+from sqlalchemy import Boolean, Column, Date, DateTime, Integer, Numeric, String, JSON, func, ForeignKey
 from sqlalchemy.orm import relationship
+from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.base_class import Base
 
@@ -17,9 +18,11 @@ class CommercialRegistration(Base):
     __table_args__ = {'schema': 'wathq'}
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    cr_number = Column(String(20), unique=True, nullable=False, index=True)
+    log_id = Column(UUID(as_uuid=True), ForeignKey('wathq_call_logs.id'), nullable=True, index=True)  # Link to the call log
+    cr_number = Column(String(20), nullable=False, index=True)  # Removed unique constraint to allow historical records
     cr_national_number = Column(String(20), nullable=True)
     version_no = Column(Integer, nullable=True)
+    fetched_at = Column(DateTime(timezone=True), nullable=True)  # Track when this data was fetched from Wathq
     name = Column(String(255), nullable=True)
     name_lang_id = Column(Integer, nullable=True)
     name_lang_desc = Column(String(50), nullable=True)

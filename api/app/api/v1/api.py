@@ -34,6 +34,7 @@ from app.api.v1.endpoints import (
     wathq_logs,
     wathq_offline,
     wathq_pdf_export,
+    wathq_sync,
     ws_notifications,
 )
 from app.wathq.attorney import endpoints as wathq_attorney
@@ -138,6 +139,9 @@ api_router.include_router(
 )
 api_router.include_router(
     wathq_pdf_export.router, prefix="/wathq/pdf", tags=["wathq-pdf-export"]
+)
+api_router.include_router(
+    wathq_sync.router, prefix="/wathq/sync", tags=["wathq-sync"]
 )
 
 # WATHQ External API endpoints - separate for tenant and management users

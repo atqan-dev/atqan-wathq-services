@@ -46,14 +46,25 @@
     <!-- Action Bar -->
     <div class="flex justify-between items-center mb-4">
       <div></div>
-      <UButton
-        icon="i-heroicons-bolt"
-        color="primary"
-        size="lg"
-        @click="openLiveRequestDialog"
-      >
-        {{ t('liveRequest.title') }}
-      </UButton>
+      <div class="flex gap-3">
+        <UButton
+          icon="i-heroicons-arrow-path"
+          color="green"
+          size="lg"
+          :loading="isSyncing"
+          @click="handleSync"
+        >
+          {{ t('wathqData.syncFromLogs') }}
+        </UButton>
+        <UButton
+          icon="i-heroicons-bolt"
+          color="primary"
+          size="lg"
+          @click="openLiveRequestDialog"
+        >
+          {{ t('liveRequest.title') }}
+        </UButton>
+      </div>
     </div>
 
     <!-- Advanced DataTable -->
@@ -716,27 +727,42 @@ const tableConfig: DataTableConfig<any> = {
         }
       })
 
-      // Check if response has data, otherwise use mock data
-      let data = response?.data || response || []
+      // Response now has structure: { data, total, page, pageSize, totalPages }
+      const data = response?.data || []
+      const total = response?.total || 0
       
       // If API returns empty or no data, use mock data for development
       if (!Array.isArray(data) || data.length === 0) {
         console.warn('No data from API, using mock data')
-        data = getMockData()
+        const mockData = getMockData()
+        
+        // Update stats with mock data
+        stats.value.total = mockData.length
+        stats.value.active = mockData.filter((item: any) => item.status_name?.toLowerCase() === 'active').length
+        stats.value.suspended = mockData.filter((item: any) => item.status_name?.toLowerCase() === 'suspended').length
+        stats.value.cancelled = mockData.filter((item: any) => item.status_name?.toLowerCase() === 'cancelled').length
+        
+        return {
+          data: mockData,
+          total: mockData.length,
+          page: params.page,
+          pageSize: params.pageSize,
+          totalPages: Math.ceil(mockData.length / params.pageSize)
+        }
       }
 
-      // Update stats
-      stats.value.total = data.length
+      // Update stats with actual data total
+      stats.value.total = total
       stats.value.active = data.filter((item: any) => item.status_name?.toLowerCase() === 'active').length
       stats.value.suspended = data.filter((item: any) => item.status_name?.toLowerCase() === 'suspended').length
       stats.value.cancelled = data.filter((item: any) => item.status_name?.toLowerCase() === 'cancelled').length
 
       return {
         data: data,
-        total: data.length,
-        page: params.page,
-        pageSize: params.pageSize,
-        totalPages: Math.ceil(data.length / params.pageSize)
+        total: total,
+        page: response.page || params.page,
+        pageSize: response.pageSize || params.pageSize,
+        totalPages: response.totalPages || Math.ceil(total / params.pageSize)
       }
     } catch (error) {
       console.error('Failed to fetch commercial registrations:', error)
@@ -987,6 +1013,8 @@ const tableConfig: DataTableConfig<any> = {
   initialPage: 1,
   initialPageSize: 10,
   pageSizeOptions: [10, 20, 50, 100],
+  showSizeChanger: true,
+  showTotal: true,
   
   // Search settings
   globalSearch: true,
@@ -1011,6 +1039,9 @@ const tableConfig: DataTableConfig<any> = {
   stateKey: 'commercial-registrations-table-v2'
 }
 
+// Sync state
+const isSyncing = ref(false)
+
 // Event handlers
 function handleRowClick(row: any, index: number, event: Event) {
   console.log('Row clicked:', row)
@@ -1018,5 +1049,70 @@ function handleRowClick(row: any, index: number, event: Event) {
 
 function handleActionClick(action: any, row: any, index: number) {
   console.log('Action clicked:', action.key, row)
+}
+
+// Sync handler
+async function handleSync() {
+  try {
+    isSyncing.value = true
+    
+    console.log('Starting sync from call logs...')
+    
+    const response = await authenticatedFetch<{
+      success: boolean
+      message: string
+      synced_count: number
+      total_logs: number
+      errors: any[]
+    }>('/api/v1/wathq/sync/commercial-registration/sync', {
+      method: 'POST'
+    })
+    
+    console.log('Sync response:', response)
+    
+    if (response.success) {
+      const message = response.synced_count > 0
+        ? `Synced ${response.synced_count} of ${response.total_logs} records from call logs`
+        : `No new records to sync. Found ${response.total_logs} call logs but all records already exist.`
+      
+      toast.add({
+        title: t('common.success'),
+        description: message,
+        color: 'green'
+      })
+      
+      // Show errors if any
+      if (response.errors && response.errors.length > 0) {
+        console.warn('Sync errors:', response.errors)
+        toast.add({
+          title: 'Some records had errors',
+          description: `${response.errors.length} records failed to sync. Check console for details.`,
+          color: 'orange'
+        })
+      }
+      
+      // Only reload if records were synced
+      if (response.synced_count > 0) {
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      }
+    } else {
+      toast.add({
+        title: t('common.error'),
+        description: response.message || 'Failed to sync data from call logs',
+        color: 'red'
+      })
+    }
+  } catch (error: any) {
+    console.error('Sync failed:', error)
+    toast.add({
+      title: t('common.error'),
+      description: error.message || 'Failed to sync data from call logs',
+      color: 'red'
+    })
+  } finally {
+    isSyncing.value = false
+  }
 }
 </script>

@@ -2,7 +2,7 @@
 Commercial Registration endpoints for Wathq schema.
 """
 
-from typing import Any
+from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
@@ -18,17 +18,77 @@ from app.schemas.wathq_commercial_registration import (
 router = APIRouter()
 
 
-@router.get("/", response_model=list[CommercialRegistration])
+@router.get("/")
 def get_commercial_registrations(
     db: Session = Depends(deps.get_db),
-    skip: int = 0,
-    limit: int = Query(default=100, le=1000),
-) -> Any:
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=10, le=1000),
+    search: str = Query(default=""),
+    sort_by: str = Query(default="cr_number"),
+    sort_order: str = Query(default="asc"),
+    status_name: str = Query(default=""),
+    headquarter_city_name: str = Query(default=""),
+    cr_number: str = Query(default=""),
+) -> Dict[str, Any]:
     """
     Retrieve commercial registrations with all related data.
+    Supports pagination, search, and filtering.
+    Returns paginated response with total count.
     """
-    crs = commercial_registration.get_multi_with_relations(db, skip=skip, limit=limit)
-    return crs
+    from app.models.wathq_commercial_registration import CommercialRegistration as CRModel
+    from sqlalchemy import or_, and_, desc, asc
+    
+    # Build query with filters
+    query = db.query(CRModel)
+    
+    # Apply filters
+    filters = []
+    
+    if status_name and status_name.lower() != "all statuses":
+        filters.append(CRModel.status_name == status_name)
+    
+    if headquarter_city_name and headquarter_city_name.lower() != "all cities":
+        filters.append(CRModel.headquarter_city_name == headquarter_city_name)
+    
+    if cr_number:
+        filters.append(CRModel.cr_number.like(f"%{cr_number}%"))
+    
+    if search:
+        search_filter = or_(
+            CRModel.cr_number.like(f"%{search}%"),
+            CRModel.name.like(f"%{search}%"),
+            CRModel.headquarter_city_name.like(f"%{search}%")
+        )
+        filters.append(search_filter)
+    
+    if filters:
+        query = query.filter(and_(*filters))
+    
+    # Get total count with filters
+    total = query.count()
+    
+    # Apply sorting
+    if sort_by and hasattr(CRModel, sort_by):
+        sort_column = getattr(CRModel, sort_by)
+        if sort_order == "desc":
+            query = query.order_by(desc(sort_column))
+        else:
+            query = query.order_by(asc(sort_column))
+    
+    # Apply pagination
+    skip = (page - 1) * limit
+    crs = query.offset(skip).limit(limit).all()
+    
+    # Convert to Pydantic models for proper serialization
+    data = [CommercialRegistration.model_validate(cr) for cr in crs]
+    
+    return {
+        "data": data,
+        "total": total,
+        "page": page,
+        "pageSize": limit,
+        "totalPages": (total + limit - 1) // limit  # Ceiling division
+    }
 
 
 @router.get("/search", response_model=list[CommercialRegistration])
