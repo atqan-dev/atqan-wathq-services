@@ -883,6 +883,190 @@ function printCR() {
       </div>
       ` : ''}
       
+      ${crData.value.contact_phone || crData.value.contact_mobile || crData.value.contact_email || crData.value.contact_website ? `
+      <div class="section">
+        <h2>معلومات الاتصال</h2>
+        <div class="info-grid">
+          ${crData.value.contact_phone ? `
+          <div class="info-field">
+            <div class="info-label">الهاتف</div>
+            <div class="info-value">${crData.value.contact_phone}</div>
+          </div>
+          ` : ''}
+          ${crData.value.contact_mobile ? `
+          <div class="info-field">
+            <div class="info-label">الجوال</div>
+            <div class="info-value">${crData.value.contact_mobile}</div>
+          </div>
+          ` : ''}
+          ${crData.value.contact_email ? `
+          <div class="info-field">
+            <div class="info-label">البريد الإلكتروني</div>
+            <div class="info-value">${crData.value.contact_email}</div>
+          </div>
+          ` : ''}
+          ${crData.value.contact_website ? `
+          <div class="info-field">
+            <div class="info-label">الموقع الإلكتروني</div>
+            <div class="info-value">${crData.value.contact_website}</div>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+      ` : ''}
+      
+      ${crData.value.capital_info ? `
+      <div class="section">
+        <h2>معلومات رأس المال</h2>
+        <div class="info-grid">
+          <div class="info-field">
+            <div class="info-label">العملة</div>
+            <div class="info-value">${crData.value.capital_info.currency_name || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">نوع المساهمة</div>
+            <div class="info-value">${crData.value.capital_info.contrib_type_name || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">المساهمة النقدية</div>
+            <div class="info-value">${formatCurrency(crData.value.capital_info.contrib_cash)}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">المساهمة العينية</div>
+            <div class="info-value">${formatCurrency(crData.value.capital_info.contrib_in_kind)}</div>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      
+      ${crData.value.fiscal_calendar_type_name ? `
+      <div class="section">
+        <h2>المعلومات المالية</h2>
+        <div class="info-grid">
+          <div class="info-field">
+            <div class="info-label">نوع التقويم المالي</div>
+            <div class="info-value">${crData.value.fiscal_calendar_type_name || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">السنة المالية الأولى</div>
+            <div class="info-value">${crData.value.fiscal_is_first ? 'نعم' : 'لا'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">شهر نهاية السنة المالية</div>
+            <div class="info-value">${crData.value.fiscal_end_month || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">يوم نهاية السنة المالية</div>
+            <div class="info-value">${crData.value.fiscal_end_day || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">سنة نهاية السنة المالية</div>
+            <div class="info-value">${crData.value.fiscal_end_year || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">هيكل الإدارة</div>
+            <div class="info-value">${crData.value.mgmt_structure_name || '-'}</div>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+      
+      ${crData.value.entity_characters && crData.value.entity_characters.length > 0 ? `
+      <div class="section">
+        <h2>خصائص الكيان (${crData.value.entity_characters.length})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>رقم الخاصية</th>
+              <th>اسم الخاصية</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${crData.value.entity_characters.map((character: any) => `
+              <tr>
+                <td>${character.character_id || '-'}</td>
+                <td>${character.character_name || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ` : ''}
+      
+      ${crData.value.stocks && crData.value.stocks.length > 0 ? `
+      <div class="section">
+        <h2>الأسهم (${crData.value.stocks.length})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>نوع السهم</th>
+              <th>عدد الأسهم</th>
+              <th>قيمة السهم</th>
+              <th>الفئة</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${crData.value.stocks.map((stock: any) => `
+              <tr>
+                <td>${stock.type_name || '-'}</td>
+                <td>${stock.stock_count || '-'}</td>
+                <td>${formatCurrency(stock.stock_value)}</td>
+                <td>${stock.class_name || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ` : ''}
+      
+      ${crData.value.estores && crData.value.estores.length > 0 ? `
+      <div class="section">
+        <h2>المتاجر الإلكترونية (${crData.value.estores.length})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>رابط المنصة</th>
+              <th>رابط المتجر</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${crData.value.estores.map((estore: any) => `
+              <tr>
+                <td>${estore.auth_platform_url || '-'}</td>
+                <td>${estore.store_url || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ` : ''}
+      
+      ${crData.value.liquidators && crData.value.liquidators.length > 0 ? `
+      <div class="section">
+        <h2>المصفون (${crData.value.liquidators.length})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>الاسم</th>
+              <th>النوع</th>
+              <th>رقم الهوية</th>
+              <th>الجنسية</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${crData.value.liquidators.map((liquidator: any) => `
+              <tr>
+                <td>${liquidator.name || '-'}</td>
+                <td>${liquidator.type_name || '-'}</td>
+                <td>${liquidator.identity_id || '-'}</td>
+                <td>${liquidator.nationality_name || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ` : ''}
+      
       <div class="section" style="margin-top: 40px; text-align: center; color: #6b7280; font-size: 12px;">
         <p>تم الطباعة في: ${new Date().toLocaleString('ar-SA')}</p>
       </div>

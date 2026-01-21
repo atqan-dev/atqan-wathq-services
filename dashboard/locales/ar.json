@@ -986,6 +986,7 @@
     "commercialRegistrations": {
       "subtitle": "عرض وإدارة بيانات السجلات التجارية من واثق"
     },
+    "syncFromLogs": "تحديث البيانات",
     "stats": {
       "total": "إجمالي السجلات",
       "active": "نشط",
@@ -1017,6 +1018,7 @@
       "back": "رجوع",
       "edit": "تعديل",
       "export": "تصدير",
+      "print": "طباعة",
       "errorLoading": "خطأ في تحميل البيانات",
       "sections": {
         "mainInfo": "المعلومات الأساسية",
