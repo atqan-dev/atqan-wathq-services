@@ -29,13 +29,27 @@
         >
           {{ t('wathqData.view.edit') }}
         </UButton>
+        
+        <!-- Export Dropdown -->
+        <UDropdown :items="exportMenuItems" :popper="{ placement: 'bottom-end' }">
+          <UButton
+            icon="i-heroicons-arrow-down-tray"
+            color="gray"
+            variant="outline"
+            trailing-icon="i-heroicons-chevron-down"
+          >
+            {{ t('wathqData.view.export') }}
+          </UButton>
+        </UDropdown>
+        
+        <!-- Print Button -->
         <UButton
-          icon="i-heroicons-arrow-down-tray"
-          color="gray"
-          variant="outline"
-          @click="handleExport"
+          icon="i-heroicons-printer"
+          color="green"
+          variant="soft"
+          @click="printCR"
         >
-          {{ t('wathqData.view.export') }}
+          {{ t('wathqData.view.print') }}
         </UButton>
       </div>
     </div>
@@ -349,16 +363,45 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
+import { useAuthStore } from '@/stores/auth'
+import { useAlert } from '@/composables/useAlert'
 import InfoField from '~/components/ui/InfoField.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const config = useRuntimeConfig()
+const authStore = useAuthStore()
+const { success: showSuccess, error: showError } = useAlert()
+
 const crData = ref<any>(null)
 const loading = ref(true)
 const error = ref<string | null>(null)
+const isExportingXls = ref(false)
+const isExportingPdf = ref(false)
 
 const id = computed(() => route.params.id)
+
+// Export menu items
+const exportMenuItems = computed(() => [[
+  {
+    label: t('wathq.actions.exportJson'),
+    icon: 'i-heroicons-arrow-down-tray',
+    click: exportToJson
+  },
+  {
+    label: t('wathq.actions.exportXls'),
+    icon: 'i-heroicons-table-cells',
+    click: exportToXls,
+    loading: isExportingXls.value
+  },
+  {
+    label: t('wathq.actions.exportPdf'),
+    icon: 'i-heroicons-document-text',
+    click: exportToPdf,
+    loading: isExportingPdf.value
+  }
+]])
 
 // Mock data for development
 const getMockCRData = (id: number) => {
@@ -522,9 +565,338 @@ function handleEdit() {
   // TODO: Implement edit functionality
 }
 
-function handleExport() {
-  console.log('Export CR:', id.value)
-  // TODO: Implement export functionality
+// Export to JSON
+function exportToJson() {
+  if (!crData.value) return
+  
+  const blob = new Blob([JSON.stringify(crData.value, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `commercial_registration_${crData.value.cr_number}_${Date.now()}.json`
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+  
+  showSuccess(t('wathq.exportSuccess'))
+}
+
+// Export to XLS
+async function exportToXls() {
+  if (!crData.value) return
+  
+  try {
+    isExportingXls.value = true
+    
+    // Import XLSX library dynamically
+    const XLSX = await import('xlsx')
+    
+    // Prepare main data
+    const mainData = {
+      'CR Number': crData.value.cr_number,
+      'Name': crData.value.name,
+      'Arabic Name': crData.value.name_lang_desc,
+      'Status': crData.value.status_name,
+      'Entity Type': crData.value.entity_type_name,
+      'Capital': crData.value.cr_capital,
+      'City': crData.value.headquarter_city_name,
+      'Issue Date': crData.value.issue_date_gregorian,
+      'Phone': crData.value.contact_phone,
+      'Email': crData.value.contact_email
+    }
+    
+    // Create workbook
+    const wb = XLSX.utils.book_new()
+    
+    // Add main info sheet
+    const mainWs = XLSX.utils.json_to_sheet([mainData])
+    XLSX.utils.book_append_sheet(wb, mainWs, 'Main Info')
+    
+    // Add activities sheet if exists
+    if (crData.value.activities && crData.value.activities.length > 0) {
+      const activitiesWs = XLSX.utils.json_to_sheet(crData.value.activities)
+      XLSX.utils.book_append_sheet(wb, activitiesWs, 'Activities')
+    }
+    
+    // Add parties sheet if exists
+    if (crData.value.parties && crData.value.parties.length > 0) {
+      const partiesWs = XLSX.utils.json_to_sheet(crData.value.parties)
+      XLSX.utils.book_append_sheet(wb, partiesWs, 'Parties')
+    }
+    
+    // Add managers sheet if exists
+    if (crData.value.managers && crData.value.managers.length > 0) {
+      const managersWs = XLSX.utils.json_to_sheet(crData.value.managers)
+      XLSX.utils.book_append_sheet(wb, managersWs, 'Managers')
+    }
+    
+    // Save file
+    const filename = `commercial_registration_${crData.value.cr_number}_${Date.now()}.xlsx`
+    XLSX.writeFile(wb, filename)
+    
+    showSuccess(t('wathq.exportXlsSuccess'))
+  } catch (err: any) {
+    console.error('XLS export error:', err)
+    showError(err.message || t('wathq.exportXlsFailed'))
+  } finally {
+    isExportingXls.value = false
+  }
+}
+
+// Export to PDF
+async function exportToPdf() {
+  if (!crData.value) return
+  
+  try {
+    isExportingPdf.value = true
+    
+    // Use the dedicated CR PDF export endpoint
+    const pdfUrl = `${config.public.apiBase}/wathq/pdf/commercial-registration/${id.value}/pdf`
+    const queryParams = new URLSearchParams({
+      language: 'ar',
+      include_activities: 'true',
+      include_parties: 'true',
+      include_managers: 'true'
+    })
+    
+    const fullUrl = `${pdfUrl}?${queryParams.toString()}`
+    
+    // Use fetch to download with authentication
+    const token = authStore.token
+    if (token) {
+      const response = await fetch(fullUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `commercial_registration_${crData.value.cr_number}.pdf`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url)
+        
+        showSuccess(t('wathq.actions.exportPdfSuccess'))
+      } else {
+        throw new Error('Failed to generate PDF')
+      }
+    }
+  } catch (error) {
+    console.error('PDF export failed:', error)
+    showError(t('wathq.actions.exportPdfError'))
+  } finally {
+    isExportingPdf.value = false
+  }
+}
+
+// Print CR
+function printCR() {
+  if (!crData.value) return
+  
+  const printContent = `
+    <!DOCTYPE html>
+    <html dir="rtl" lang="ar">
+    <head>
+      <meta charset="UTF-8">
+      <title>Commercial Registration - ${crData.value.cr_number}</title>
+      <style>
+        body {
+          font-family: 'Arial', sans-serif;
+          margin: 20px;
+          direction: rtl;
+        }
+        h1 {
+          color: #1e40af;
+          border-bottom: 2px solid #1e40af;
+          padding-bottom: 10px;
+        }
+        h2 {
+          color: #3b82f6;
+          margin-top: 20px;
+          border-bottom: 1px solid #e5e7eb;
+          padding-bottom: 5px;
+        }
+        .info-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 15px;
+          margin: 15px 0;
+        }
+        .info-field {
+          padding: 10px;
+          background: #f9fafb;
+          border-radius: 4px;
+        }
+        .info-label {
+          font-weight: bold;
+          color: #6b7280;
+          font-size: 12px;
+        }
+        .info-value {
+          color: #111827;
+          margin-top: 5px;
+        }
+        .section {
+          margin: 20px 0;
+          page-break-inside: avoid;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 10px 0;
+        }
+        th, td {
+          border: 1px solid #e5e7eb;
+          padding: 8px;
+          text-align: right;
+        }
+        th {
+          background: #f3f4f6;
+          font-weight: bold;
+        }
+        @media print {
+          body { margin: 0; }
+          .no-print { display: none; }
+        }
+      </style>
+    </head>
+    <body>
+      <h1>السجل التجاري - ${crData.value.cr_number}</h1>
+      
+      <div class="section">
+        <h2>المعلومات الأساسية</h2>
+        <div class="info-grid">
+          <div class="info-field">
+            <div class="info-label">رقم السجل التجاري</div>
+            <div class="info-value">${crData.value.cr_number || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">الاسم</div>
+            <div class="info-value">${crData.value.name || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">الاسم بالعربية</div>
+            <div class="info-value">${crData.value.name_lang_desc || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">الحالة</div>
+            <div class="info-value">${crData.value.status_name || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">نوع الكيان</div>
+            <div class="info-value">${crData.value.entity_type_name || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">رأس المال</div>
+            <div class="info-value">${formatCurrency(crData.value.cr_capital)}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">المدينة</div>
+            <div class="info-value">${crData.value.headquarter_city_name || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">تاريخ الإصدار</div>
+            <div class="info-value">${formatDate(crData.value.issue_date_gregorian)}</div>
+          </div>
+        </div>
+      </div>
+      
+      ${crData.value.activities && crData.value.activities.length > 0 ? `
+      <div class="section">
+        <h2>الأنشطة (${crData.value.activities.length})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>اسم النشاط</th>
+              <th>رمز ISIC</th>
+              <th>الوصف</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${crData.value.activities.map((activity: any) => `
+              <tr>
+                <td>${activity.activity_name || '-'}</td>
+                <td>${activity.isic_code || '-'}</td>
+                <td>${activity.isic_desc || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ` : ''}
+      
+      ${crData.value.parties && crData.value.parties.length > 0 ? `
+      <div class="section">
+        <h2>الشركاء (${crData.value.parties.length})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>الاسم</th>
+              <th>النوع</th>
+              <th>رقم الهوية</th>
+              <th>الجنسية</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${crData.value.parties.map((party: any) => `
+              <tr>
+                <td>${party.name || '-'}</td>
+                <td>${party.type_name || '-'}</td>
+                <td>${party.identity_id || '-'}</td>
+                <td>${party.identity_type_name || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ` : ''}
+      
+      ${crData.value.managers && crData.value.managers.length > 0 ? `
+      <div class="section">
+        <h2>المديرون (${crData.value.managers.length})</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>الاسم</th>
+              <th>النوع</th>
+              <th>رقم الهوية</th>
+              <th>الجنسية</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${crData.value.managers.map((manager: any) => `
+              <tr>
+                <td>${manager.name || '-'}</td>
+                <td>${manager.type_name || '-'}</td>
+                <td>${manager.identity_id || '-'}</td>
+                <td>${manager.nationality_name || '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+      ` : ''}
+      
+      <div class="section" style="margin-top: 40px; text-align: center; color: #6b7280; font-size: 12px;">
+        <p>تم الطباعة في: ${new Date().toLocaleString('ar-SA')}</p>
+      </div>
+    </body>
+    </html>
+  `
+  
+  const printWindow = window.open('', '_blank')
+  if (printWindow) {
+    printWindow.document.write(printContent)
+    printWindow.document.close()
+    printWindow.focus()
+    printWindow.print()
+  }
 }
 </script>
 

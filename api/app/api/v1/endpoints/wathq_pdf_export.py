@@ -66,22 +66,44 @@ async def export_commercial_registration_pdf(
 ) -> Response:
     """
     Export Commercial Registration data as PDF
+    cr_id can be either the database ID or the CR number
     """
     try:
+        from app.models.wathq_commercial_registration import CommercialRegistration
+        
+        # Try to get CR record from database first
+        # Check if cr_id is a numeric database ID
+        cr_number = cr_id
+        try:
+            db_id = int(cr_id)
+            # It's a database ID, look up the CR record
+            cr_record = db.query(CommercialRegistration).filter(
+                CommercialRegistration.id == db_id
+            ).first()
+            
+            if cr_record and cr_record.cr_number:
+                cr_number = cr_record.cr_number
+                print(f"Found CR record with database ID {db_id}, using cr_number: {cr_number}")
+            else:
+                print(f"No CR record found for database ID {db_id}, using as cr_number")
+        except ValueError:
+            # It's not a number, assume it's already a cr_number
+            print(f"Using provided cr_id as cr_number: {cr_id}")
+        
         client = get_wathq_client_for_user("commercial-registration", db, current_user)
 
-        # Fetch CR data
+        # Fetch CR data using the actual cr_number
         if include_full_info:
-            cr_data = await client.get_full_info(cr_id, language)
+            cr_data = await client.get_full_info(cr_number, language)
         else:
-            cr_data = await client.get_basic_info(cr_id, language)
+            cr_data = await client.get_basic_info(cr_number, language)
 
         # Fetch additional data if requested
         additional_sections = []
 
         if include_owners:
             try:
-                owners_data = await client.get_owners(cr_id, language)
+                owners_data = await client.get_owners(cr_number, language)
                 if owners_data.get("owners"):
                     owners_content = pdf_service.create_table_from_wathq_data(
                         {"owners": owners_data["owners"]},
@@ -99,7 +121,7 @@ async def export_commercial_registration_pdf(
 
         if include_managers:
             try:
-                managers_data = await client.get_managers(cr_id, language)
+                managers_data = await client.get_managers(cr_number, language)
                 if managers_data.get("managers"):
                     managers_content = pdf_service.create_table_from_wathq_data(
                         {"managers": managers_data["managers"]},
@@ -117,7 +139,7 @@ async def export_commercial_registration_pdf(
 
         if include_branches:
             try:
-                branches_data = await client.get_branches(cr_id, language)
+                branches_data = await client.get_branches(cr_number, language)
                 if branches_data.get("branches"):
                     branches_content = pdf_service.create_table_from_wathq_data(
                         {"branches": branches_data["branches"]},
