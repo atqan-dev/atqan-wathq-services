@@ -1,12 +1,16 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-05-15",
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NODE_ENV !== 'production' },
   ssr: false,
   experimental: {
     asyncContext: true,
   },
-  
+  debug: process.env.NODE_ENV !== 'production',
+
+  // Logging configuration
+  logLevel: process.env.NODE_ENV === 'production' ? 'info' : 'verbose',
+
   // Server configuration
   devServer: {
     host: "localhost",
@@ -16,6 +20,7 @@ export default defineNuxtConfig({
     apiBaseUrl: process.env.NUXT_PRIVATE_API_BASE_URL || 'http://localhost:5551',
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:5551/api/v1',
+      wathqApiKey: process.env.NUXT_PUBLIC_WATHQ_API_KEY || '',
     },
   },
   // App configuration
@@ -39,10 +44,8 @@ export default defineNuxtConfig({
   },
   // Color mode configuration
   colorMode: {
-    preference: "light",
+    preference: "system",
     fallback: "light",
-    classSuffix: '',
-    classPrefix: '',
   },
   // CSS
   css: ["~/assets/css/main.css"],
@@ -56,13 +59,12 @@ export default defineNuxtConfig({
     format: ['webp', 'png', 'jpg'],
   },
 
-
   // Vite configuration
   vite: {
     server: {
       proxy: {
         '/api': {
-          target: 'http://localhost:5551',
+          target: process.env.NUXT_PRIVATE_API_BASE_URL || 'http://localhost:5551',
           changeOrigin: true,
           secure: false,
           ws: true,
@@ -101,7 +103,7 @@ export default defineNuxtConfig({
   nitro: {
     routeRules: {
       '/api/**': {
-        proxy: 'http://localhost:5551/api/**',
+        proxy: process.env.NUXT_PRIVATE_API_BASE_URL ? `${process.env.NUXT_PRIVATE_API_BASE_URL}/api/**` : 'http://localhost:5551/api/**',
       },
     }
   },

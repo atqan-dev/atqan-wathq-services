@@ -126,6 +126,50 @@
         <!-- Divider -->
         <div class="border-t border-gray-200 dark:border-gray-700 my-3" />
 
+        <!-- Wathq Data Group -->
+        <div v-if="!isCollapsed" class="px-3 py-2">
+          <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            {{ t('sidebar.wathqData') }}
+          </h3>
+        </div>
+        <div
+          v-for="item in wathqDataItems"
+          :key="item.to"
+        >
+          <NuxtLink
+            :to="item.to"
+            :class="[
+              'flex items-center px-3 py-2.5 rounded-lg',
+              'text-sm font-medium transition-all duration-200',
+              'hover:bg-gray-100 dark:hover:bg-gray-700',
+              'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2',
+              'active:scale-95',
+              isActiveRoute(item.to)
+                ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 shadow-sm'
+                : 'text-gray-700 dark:text-gray-300',
+              isCollapsed ? 'justify-center' : (isRTL ? 'gap-3' : 'gap-3')
+            ]"
+            @click="closeMobileMenu"
+            :aria-label="item.label"
+            :title="isCollapsed ? item.label : undefined"
+          >
+            <UIcon
+              :name="item.icon"
+              class="w-5 h-5 flex-shrink-0"
+              :class="isRTL && !isCollapsed ? 'ml-3' : (isCollapsed ? '' : 'mr-0')"
+            />
+            <span
+              v-if="!isCollapsed"
+              class="flex-1 truncate"
+            >
+              {{ item.label }}
+            </span>
+          </NuxtLink>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-200 dark:border-gray-700 my-3" />
+
         <!-- Secondary Navigation Items -->
         <div
           v-for="item in secondaryNavItems"
@@ -306,6 +350,45 @@ const mainNavItems = computed((): NavItem[] => [
   }
 ])
 
+const wathqDataItems = computed(() => [
+  {
+    to: '/wathq-data/commercial-registrations',
+    icon: 'i-heroicons-building-office',
+    label: t('sidebar.commercialRegistrations'),
+    requiresAuth: true
+  },
+  {
+    to: '/wathq-data/corporate-contracts',
+    icon: 'i-heroicons-document-text',
+    label: t('sidebar.corporateContracts'),
+    requiresAuth: true
+  },
+  {
+    to: '/wathq-data/power-of-attorney',
+    icon: 'i-heroicons-document-check',
+    label: t('sidebar.powerOfAttorney'),
+    requiresAuth: true
+  },
+  {
+    to: '/wathq-data/real-estate-deeds',
+    icon: 'i-heroicons-home-modern',
+    label: t('sidebar.realEstateDeeds'),
+    requiresAuth: true
+  },
+  {
+    to: '/wathq-data/national-addresses',
+    icon: 'i-heroicons-map-pin',
+    label: t('sidebar.nationalAddresses'),
+    requiresAuth: true
+  },
+  {
+    to: '/wathq-data/employees',
+    icon: 'i-heroicons-user-group',
+    label: t('sidebar.employees'),
+    requiresAuth: true
+  }
+])
+
 const secondaryNavItems = computed(() => [
   {
     to: '/settings',
@@ -336,7 +419,8 @@ function isActiveRoute(path: string): boolean {
   if (path === '/') {
     return route.path === '/'
   }
-  return route.path.startsWith(path)
+  // Exact match or starts with the path
+  return route.path === path || route.path.startsWith(path + '/')
 }
 
 // Touch gesture handlers for swipe to close

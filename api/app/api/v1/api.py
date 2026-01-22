@@ -7,6 +7,7 @@ from fastapi import APIRouter
 from app.api.v1.endpoints import (
     admin_example,
     auth,
+    cr_requests,
     health,
     management,
     management_auth,
@@ -21,12 +22,19 @@ from app.api.v1.endpoints import (
     tenants,
     totp,
     users,
+    wathq_commercial_registrations,
+    wathq_corporate_contracts,
+    wathq_power_of_attorney,
+    wathq_real_estate_deeds,
+    wathq_national_addresses,
+    wathq_employees,
     wathq_export,
     wathq_external,
     wathq_live,
     wathq_logs,
     wathq_offline,
     wathq_pdf_export,
+    wathq_sync,
     ws_notifications,
 )
 from app.wathq.attorney import endpoints as wathq_attorney
@@ -70,6 +78,41 @@ api_router.include_router(
     tags=["wathq-commercial-registration"],
 )
 api_router.include_router(
+    wathq_commercial_registrations.router,
+    prefix="/wathq/cr-data",
+    tags=["wathq-cr-data"],
+)
+api_router.include_router(
+    wathq_corporate_contracts.router,
+    prefix="/wathq/corporate-contracts",
+    tags=["wathq-corporate-contracts"],
+)
+api_router.include_router(
+    wathq_power_of_attorney.router,
+    prefix="/wathq/power-of-attorney",
+    tags=["wathq-power-of-attorney"],
+)
+api_router.include_router(
+    wathq_real_estate_deeds.router,
+    prefix="/wathq/real-estate-deeds",
+    tags=["wathq-real-estate-deeds"],
+)
+api_router.include_router(
+    wathq_national_addresses.router,
+    prefix="/wathq/national-addresses",
+    tags=["wathq-national-addresses"],
+)
+api_router.include_router(
+    wathq_employees.router,
+    prefix="/wathq/employees",
+    tags=["wathq-employees"],
+)
+api_router.include_router(
+    cr_requests.router,
+    prefix="/cr-requests",
+    tags=["cr-requests"],
+)
+api_router.include_router(
     wathq_cc.router, prefix="/wathq/company-contract", tags=["wathq-company-contract"]
 )
 api_router.include_router(
@@ -96,6 +139,9 @@ api_router.include_router(
 )
 api_router.include_router(
     wathq_pdf_export.router, prefix="/wathq/pdf", tags=["wathq-pdf-export"]
+)
+api_router.include_router(
+    wathq_sync.router, prefix="/wathq/sync", tags=["wathq-sync"]
 )
 
 # WATHQ External API endpoints - separate for tenant and management users

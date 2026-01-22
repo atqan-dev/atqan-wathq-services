@@ -483,30 +483,24 @@ const paginationEnd = computed(() =>
 )
 
 // Column toggle items
-const columnToggleItems = computed(() => [{
-  label: 'Toggle Columns',
-  slot: 'toggle-columns',
-  disabled: true
-}, ...props.config.columns.map(column => ({
-  label: column.label,
-  icon: dataTable.state.visibleColumns.includes(column.key) 
-    ? 'i-heroicons-check' 
-    : undefined,
-  click: () => dataTable.toggleColumnVisibility(column.key)
-}))])
+const columnToggleItems = computed(() => 
+  props.config.columns.map(column => ([{
+    label: column.label,
+    icon: dataTable.state.visibleColumns.includes(column.key) 
+      ? 'i-heroicons-check' 
+      : undefined,
+    click: () => dataTable.toggleColumnVisibility(column.key)
+  }]))
+)
 
 // Export items
 const exportItems = computed(() => {
   const formats = props.config.exportFormats || ['csv', 'json']
-  return [{
-    label: 'Export Data',
-    slot: 'export-header',
-    disabled: true
-  }, ...formats.map(format => ({
+  return formats.map(format => ([{
     label: format.toUpperCase(),
     icon: 'i-heroicons-arrow-down-tray',
     click: () => dataTable.exportData(format)
-  }))]
+  }]))
 })
 
 // Helper functions

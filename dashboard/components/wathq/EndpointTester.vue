@@ -37,50 +37,39 @@
       </div>
 
       <!-- Parameters Form -->
-      <UForm  v-if="selectedEndpointData.params.length > 0" @submit.prevent="handleSubmit" class="space-y-4">
+      <UForm v-if="selectedEndpointData.params.length > 0" :state="formData" @submit="handleSubmit" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div v-for="param in selectedEndpointData.params" :key="param.key">
+          <UFormGroup
+            v-for="param in selectedEndpointData.params"
+            :key="param.key"
+            :label="t(param.label)"
+            :name="param.key"
+            :required="param.required"
+            :help="param.description ? t(param.description) : undefined"
+          >
             <!-- Select Input -->
             <USelect
               v-if="param.type === 'select'"
               v-model="formData[param.key]"
-              :label="param.label"
-              :placeholder="param.placeholder"
+              :placeholder="param.placeholder ? t(param.placeholder) : undefined"
               :options="param.options"
-              :required="param.required"
-            >
-              <template v-if="param.description" #help>
-                <span class="text-xs text-gray-500">{{ param.description }}</span>
-              </template>
-            </USelect>
+            />
             
             <!-- Number Input -->
             <UInput
               v-else-if="param.type === 'number'"
               v-model.number="formData[param.key]"
-              :label="param.label"
-              :placeholder="param.placeholder"
-              :required="param.required"
+              :placeholder="param.placeholder ? t(param.placeholder) : undefined"
               type="number"
-            >
-              <template v-if="param.description" #help>
-                <span class="text-xs text-gray-500">{{ param.description }}</span>
-              </template>
-            </UInput>
+            />
             
             <!-- Default Text Input -->
             <UInput
               v-else
               v-model="formData[param.key]"
-              :label="param.label"
-              :placeholder="param.placeholder"
-              :required="param.required"
-            >
-              <template v-if="param.description" #help>
-                <span class="text-xs text-gray-500">{{ param.description }}</span>
-              </template>
-            </UInput>
-          </div>
+              :placeholder="param.placeholder ? t(param.placeholder) : undefined"
+            />
+          </UFormGroup>
         </div>
 
         <div class="flex gap-3">

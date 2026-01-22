@@ -97,7 +97,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   }
 
   // Computed properties
-  const visibleColumnsComputed = computed(() => 
+  const visibleColumnsComputed = computed(() =>
     config.columns.filter(col => state.visibleColumns.includes(col.key))
   )
 
@@ -107,12 +107,12 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   const hasFilters = computed(() => config.filters && config.filters.length > 0)
 
   const selectedCount = computed(() => state.selection.selectedRows.length)
-  const isAllSelected = computed(() => 
-    state.paginatedData.length > 0 && 
+  const isAllSelected = computed(() =>
+    state.paginatedData.length > 0 &&
     state.selection.selectedRows.length === state.paginatedData.length
   )
-  const isIndeterminate = computed(() => 
-    state.selection.selectedRows.length > 0 && 
+  const isIndeterminate = computed(() =>
+    state.selection.selectedRows.length > 0 &&
     state.selection.selectedRows.length < state.paginatedData.length
   )
 
@@ -124,8 +124,8 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
     if (state.globalSearch && config.globalSearch !== false) {
       const searchTerm = state.globalSearch.toLowerCase()
       const searchableColumns = config.columns.filter(col => col.searchable !== false)
-      
-      filtered = filtered.filter(row => 
+
+      filtered = filtered.filter(row =>
         searchableColumns.some(col => {
           const value = getNestedValue(row, col.key)
           return String(value || '').toLowerCase().includes(searchTerm)
@@ -142,37 +142,37 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
 
       filtered = filtered.filter(row => {
         const rowValue = getNestedValue(row, key)
-        
+
         switch (filter.type) {
           case 'text':
             return String(rowValue || '').toLowerCase().includes(String(value).toLowerCase())
-          
+
           case 'select':
-            return filter.multiple 
+            return filter.multiple
               ? Array.isArray(value) && value.includes(rowValue)
               : rowValue === value
-          
+
           case 'multiselect':
             return Array.isArray(value) && value.includes(rowValue)
-          
+
           case 'boolean':
             return Boolean(rowValue) === Boolean(value)
-          
+
           case 'number':
             return Number(rowValue) === Number(value)
-          
+
           case 'numberrange':
             if (Array.isArray(value) && value.length === 2) {
               const num = Number(rowValue)
               return num >= value[0] && num <= value[1]
             }
             return true
-          
+
           case 'date':
             const rowDate = new Date(rowValue)
             const filterDate = new Date(value)
             return rowDate.toDateString() === filterDate.toDateString()
-          
+
           case 'daterange':
             if (Array.isArray(value) && value.length === 2) {
               const rowDate = new Date(rowValue)
@@ -181,7 +181,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
               return rowDate >= startDate && rowDate <= endDate
             }
             return true
-          
+
           default:
             return true
         }
@@ -227,20 +227,22 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
 
   const processData = () => {
     let processed = [...state.data]
-    
+
     // Apply filters
     processed = applyFilters(processed)
     state.filteredData = processed
 
-    // Update pagination totals
-    state.pagination.total = processed.length
-    state.pagination.totalPages = Math.ceil(processed.length / state.pagination.pageSize)
+    // Update pagination totals only if not using server-side pagination
+    if (!config.fetchFunction) {
+      state.pagination.total = processed.length
+      state.pagination.totalPages = Math.ceil(processed.length / state.pagination.pageSize)
+    }
 
     // Apply sorting
     processed = applySorting(processed)
 
-    // Apply pagination
-    state.paginatedData = applyPagination(processed)
+    // Apply pagination (only for client-side pagination)
+    state.paginatedData = config.fetchFunction ? processed : applyPagination(processed)
 
     // Update selection state
     updateSelectionState()
@@ -323,11 +325,11 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
       }
 
       const result = await config.fetchFunction(fetchParams)
-      
+
       state.data = result.data
       state.pagination.total = result.total
       state.pagination.totalPages = result.totalPages || Math.ceil(result.total / state.pagination.pageSize)
-      
+
       if (result.page) state.pagination.page = result.page
       if (result.pageSize) state.pagination.pageSize = result.pageSize
 
@@ -350,7 +352,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   const goToPage = (page: number) => {
     if (page < 1 || page > state.pagination.totalPages) return
     state.pagination.page = page
-    
+
     if (config.fetchFunction) {
       fetchData()
     } else {
@@ -361,7 +363,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   const changePageSize = (pageSize: number) => {
     state.pagination.pageSize = pageSize
     state.pagination.page = 1
-    
+
     if (config.fetchFunction) {
       fetchData()
     } else {
@@ -404,7 +406,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   const clearSort = () => {
     state.sort.column = null
     state.sort.direction = null
-    
+
     if (config.fetchFunction) {
       fetchData()
     } else {
@@ -416,7 +418,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   const setFilter = (key: string, value: any) => {
     state.filters[key] = value
     state.pagination.page = 1 // Reset to first page when filtering
-    
+
     if (config.fetchFunction) {
       fetchData()
     } else {
@@ -427,7 +429,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   const clearFilter = (key: string) => {
     delete state.filters[key]
     state.pagination.page = 1
-    
+
     if (config.fetchFunction) {
       fetchData()
     } else {
@@ -439,7 +441,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
     state.filters = {}
     state.globalSearch = ''
     state.pagination.page = 1
-    
+
     if (config.fetchFunction) {
       fetchData()
     } else {
@@ -450,7 +452,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   // Search function with debouncing
   const debouncedSearch = debounce(() => {
     state.pagination.page = 1
-    
+
     if (config.fetchFunction) {
       fetchData()
     } else {
@@ -497,7 +499,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
 
     // This would typically integrate with a library like xlsx, jsPDF, etc.
     // For now, we'll provide the basic structure
-    
+
     switch (format) {
       case 'csv':
         exportToCsv(dataToExport, exportFilename)
@@ -518,13 +520,13 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
 
   const exportToCsv = (data: T[], filename: string) => {
     const headers = visibleColumnsComputed.value.map(col => col.label).join(',')
-    const rows = data.map(row => 
+    const rows = data.map(row =>
       visibleColumnsComputed.value.map(col => {
         const value = getNestedValue(row, col.key)
         return `"${String(value || '').replace(/"/g, '""')}"`
       }).join(',')
     ).join('\n')
-    
+
     const csv = `${headers}\n${rows}`
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
@@ -593,7 +595,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   // Initialize
   onMounted(() => {
     loadState()
-    
+
     if (config.data) {
       state.data = [...config.data]
       processData()
@@ -613,7 +615,7 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
   return {
     // State
     state: readonly(state),
-    
+
     // Computed
     visibleColumns: visibleColumnsComputed,
     hasSelection,
@@ -623,12 +625,12 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
     selectedCount,
     isAllSelected,
     isIndeterminate,
-    
+
     // Data operations
     refresh,
     fetchData,
     processData,
-    
+
     // Pagination
     goToPage,
     nextPage,
@@ -636,31 +638,31 @@ export function useAdvancedDataTable<T extends DataTableItem = DataTableItem>(
     firstPage,
     lastPage,
     changePageSize,
-    
+
     // Sorting
     sortBy,
     clearSort,
-    
+
     // Filtering
     setFilter,
     clearFilter,
     clearAllFilters,
     setGlobalSearch,
-    
+
     // Selection
     toggleRowSelection,
     toggleAllSelection,
     clearSelection,
-    
+
     // Column management
     toggleColumnVisibility,
     showColumn,
     hideColumn,
     resetColumnVisibility,
-    
+
     // Export
     exportData,
-    
+
     // Utilities
     getNestedValue,
     setNestedValue
