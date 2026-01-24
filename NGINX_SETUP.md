@@ -44,7 +44,7 @@ sudo nano /etc/nginx/sites-available/atqan
 ```
 
 **Update these values:**
-- Domain is set to: `verify.tawthiq.com.sa`
+- Domain is set to: `verify.notarizationjustice.sa`
 - Update SSL certificate paths (or remove SSL section for now)
 - Verify paths match your setup
 
@@ -195,7 +195,7 @@ curl http://162.241.87.35/docs
 sudo apt install certbot python3-certbot-nginx -y
 
 # Get certificate for your domain
-sudo certbot --nginx -d verify.tawthiq.com.sa -d www.verify.tawthiq.com.sa
+sudo certbot --nginx -d verify.notarizationjustice.sa -d www.verify.notarizationjustice.sa
 
 # Certbot will automatically update your Nginx config
 # Test auto-renewal
@@ -332,15 +332,15 @@ sudo apt upgrade nginx
 
 ## URLs After Setup
 
-- **Frontend**: `https://verify.tawthiq.com.sa`
-- **API**: `https://verify.tawthiq.com.sa/api/`
-- **API Docs**: `https://verify.tawthiq.com.sa/docs`
-- **ReDoc**: `https://verify.tawthiq.com.sa/redoc`
+- **Frontend**: `https://verify.notarizationjustice.sa`
+- **API**: `https://verify.notarizationjustice.sa/api/`
+- **API Docs**: `https://verify.notarizationjustice.sa/docs`
+- **ReDoc**: `https://verify.notarizationjustice.sa/redoc`
 
 **Without SSL (HTTP only):**
-- **Frontend**: `http://verify.tawthiq.com.sa` or `http://162.241.87.35`
-- **API**: `http://verify.tawthiq.com.sa/api/` or `http://162.241.87.35/api/`
-- **API Docs**: `http://verify.tawthiq.com.sa/docs` or `http://162.241.87.35/docs`
+- **Frontend**: `http://verify.notarizationjustice.sa` or `http://162.241.87.35`
+- **API**: `http://verify.notarizationjustice.sa/api/` or `http://162.241.87.35/api/`
+- **API Docs**: `http://verify.notarizationjustice.sa/docs` or `http://162.241.87.35/docs`
 
 ## Benefits of This Setup
 
