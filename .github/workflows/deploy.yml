@@ -22,12 +22,12 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /path/to/your/app
+            cd /home/mahmoud/atqan-wathq-services
             git pull origin main
             
             # Backend deployment
             cd api
-            source venv/bin/activate
+            source .venv/bin/activate
             pip install -r requirements.txt
             alembic upgrade head
             sudo systemctl restart atqan-api

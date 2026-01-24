@@ -21,7 +21,7 @@ After=network.target postgresql.service
 
 [Service]
 Type=simple
-User=your-user
+User=mahmoud
 WorkingDirectory=/home/mahmoud/atqan-wathq-services/api
 Environment="PATH=/home/mahmoud/atqan-wathq-services/api/.venv/bin"
 ExecStart=/home/mahmoud/atqan-wathq-services/api/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 5551
@@ -41,7 +41,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=your-user
+User=mahmoud
 WorkingDirectory=/home/mahmoud/atqan-wathq-services/dashboard
 ExecStart=/usr/bin/pnpm start
 Environment="NODE_ENV=production"
@@ -170,7 +170,7 @@ chmod +x post-receive
 
 On your local machine:
 ```bash
-git remote add production your-user@your-server:~/atqan-repo.git
+git remote add production mahmoud@your-server:~/atqan-repo.git
 git push production main
 ```
 
@@ -209,7 +209,7 @@ module.exports = {
   
   deploy: {
     production: {
-      user: 'your-user',
+      user: 'mahmoud',
       host: 'your-server',
       ref: 'origin/main',
       repo: 'git@github.com:your-org/atqan-wathq-services-fixing.git',
@@ -268,7 +268,7 @@ pm2 deploy production revert 1
 1. **Use SSH keys** instead of passwords
 2. **Restrict sudo access** - create specific sudoers rules:
    ```bash
-   your-user ALL=(ALL) NOPASSWD: /bin/systemctl restart atqan-api, /bin/systemctl restart atqan-dashboard
+   mahmoud ALL=(ALL) NOPASSWD: /bin/systemctl restart atqan-api, /bin/systemctl restart atqan-dashboard
    ```
 3. **Use environment variables** for secrets
 4. **Enable firewall** and only allow necessary ports
