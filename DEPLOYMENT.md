@@ -76,7 +76,7 @@ WorkingDirectory=/home/mahmoud/atqan-wathq-services/dashboard
 # Update this path based on 'which pnpm' output
 ExecStart=/home/mahmoud/.nvm/versions/node/v22.17.1/bin/pnpm start
 Environment="NODE_ENV=production"
-Environment="PORT=3000"
+Environment="PORT=4551"
 Environment="PATH=/home/mahmoud/.nvm/versions/node/v22.17.1/bin:/usr/local/bin:/usr/bin:/bin"
 Restart=always
 RestartSec=10
@@ -97,7 +97,7 @@ User=mahmoud
 WorkingDirectory=/home/mahmoud/atqan-wathq-services/dashboard
 ExecStart=/usr/bin/node .output/server/index.mjs
 Environment="NODE_ENV=production"
-Environment="PORT=3000"
+Environment="PORT=4551"
 Restart=always
 RestartSec=10
 
