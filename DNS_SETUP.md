@@ -1,8 +1,8 @@
-# DNS Configuration for verify.tawthiq.com.sa
+# DNS Configuration for verify.notarizationjustice.sa
 
 ## Required DNS Records
 
-You need to configure these DNS records with your domain registrar (tawthiq.com.sa):
+You need to configure these DNS records with your domain registrar (notarizationjustice.sa):
 
 ### A Records (Point domain to your server)
 
@@ -20,7 +20,7 @@ TTL: 3600 (or Auto)
 
 ### Optional: API Subdomain
 
-If you want to use `api.verify.tawthiq.com.sa`:
+If you want to use `api.verify.notarizationjustice.sa`:
 
 ```
 Type: A
@@ -35,8 +35,8 @@ After adding DNS records, wait 5-30 minutes for propagation, then test:
 
 ```bash
 # Check if domain resolves to your server
-dig verify.tawthiq.com.sa
-nslookup verify.tawthiq.com.sa
+dig verify.notarizationjustice.sa
+nslookup verify.notarizationjustice.sa
 
 # Should show: 162.241.87.35
 ```
@@ -72,7 +72,7 @@ sudo nano /etc/nginx/sites-available/atqan
 server {
     listen 80;
     listen [::]:80;
-    server_name verify.tawthiq.com.sa www.verify.tawthiq.com.sa;
+    server_name verify.notarizationjustice.sa www.verify.notarizationjustice.sa;
     
     # Remove the redirect to HTTPS
     # Comment out: return 301 https://$host$request_uri;
@@ -91,8 +91,8 @@ sudo systemctl reload nginx
 
 ### 5. Test HTTP Access
 ```bash
-curl http://verify.tawthiq.com.sa
-curl http://verify.tawthiq.com.sa/docs
+curl http://verify.notarizationjustice.sa
+curl http://verify.notarizationjustice.sa/docs
 ```
 
 ### 6. Add SSL Certificate (After HTTP works)
@@ -101,7 +101,7 @@ curl http://verify.tawthiq.com.sa/docs
 sudo apt install certbot python3-certbot-nginx -y
 
 # Get free SSL certificate from Let's Encrypt
-sudo certbot --nginx -d verify.tawthiq.com.sa -d www.verify.tawthiq.com.sa
+sudo certbot --nginx -d verify.notarizationjustice.sa -d www.verify.notarizationjustice.sa
 
 # Certbot will automatically:
 # - Get the certificate
@@ -111,18 +111,18 @@ sudo certbot --nginx -d verify.tawthiq.com.sa -d www.verify.tawthiq.com.sa
 
 ### 7. Test HTTPS Access
 ```bash
-curl https://verify.tawthiq.com.sa
-curl https://verify.tawthiq.com.sa/docs
+curl https://verify.notarizationjustice.sa
+curl https://verify.notarizationjustice.sa/docs
 ```
 
 ## Final URLs
 
 After complete setup:
 
-- **Frontend**: https://verify.tawthiq.com.sa
-- **API**: https://verify.tawthiq.com.sa/api/
-- **API Docs**: https://verify.tawthiq.com.sa/docs
-- **ReDoc**: https://verify.tawthiq.com.sa/redoc
+- **Frontend**: https://verify.notarizationjustice.sa
+- **API**: https://verify.notarizationjustice.sa/api/
+- **API Docs**: https://verify.notarizationjustice.sa/docs
+- **ReDoc**: https://verify.notarizationjustice.sa/redoc
 
 ## Troubleshooting
 
@@ -134,7 +134,7 @@ After complete setup:
 ### SSL certificate fails
 - Make sure HTTP works first
 - Ensure port 80 is open: `sudo ufw allow 80`
-- Check domain resolves: `dig verify.tawthiq.com.sa`
+- Check domain resolves: `dig verify.notarizationjustice.sa`
 - Let's Encrypt needs to verify domain ownership via HTTP
 
 ### 502 Bad Gateway
@@ -149,9 +149,9 @@ After complete setup:
 If you don't have access to DNS settings, contact your domain administrator with this information:
 
 **Request:**
-"Please add the following DNS A records for verify.tawthiq.com.sa:
+"Please add the following DNS A records for verify.notarizationjustice.sa:
 
-- Host: verify.tawthiq.com.sa → IP: 162.241.87.35
-- Host: www.verify.tawthiq.com.sa → IP: 162.241.87.35
+- Host: verify.notarizationjustice.sa → IP: 162.241.87.35
+- Host: www.verify.notarizationjustice.sa → IP: 162.241.87.35
 
 These records will point the subdomain to our application server."
