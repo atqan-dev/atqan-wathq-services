@@ -22,9 +22,9 @@ After=network.target postgresql.service
 [Service]
 Type=simple
 User=your-user
-WorkingDirectory=/path/to/atqan-wathq-services-fixing/api
-Environment="PATH=/path/to/atqan-wathq-services-fixing/api/venv/bin"
-ExecStart=/path/to/atqan-wathq-services-fixing/api/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 5551
+WorkingDirectory=/home/mahmoud/atqan-wathq-services/api
+Environment="PATH=/home/mahmoud/atqan-wathq-services/api/.venv/bin"
+ExecStart=/home/mahmoud/atqan-wathq-services/api/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 5551
 Restart=always
 RestartSec=10
 
@@ -42,7 +42,7 @@ After=network.target
 [Service]
 Type=simple
 User=your-user
-WorkingDirectory=/path/to/atqan-wathq-services-fixing/dashboard
+WorkingDirectory=/home/mahmoud/atqan-wathq-services/dashboard
 ExecStart=/usr/bin/pnpm start
 Environment="NODE_ENV=production"
 Environment="PORT=3000"
@@ -108,10 +108,10 @@ deploy_production:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - ssh $SERVER_USER@$SERVER_HOST "
-        cd /path/to/atqan-wathq-services-fixing &&
+        cd /home/mahmoud/atqan-wathq-services &&
         git pull origin main &&
         cd api &&
-        source venv/bin/activate &&
+        source .venv/bin/activate &&
         pip install -r requirements.txt &&
         alembic upgrade head &&
         sudo systemctl restart atqan-api &&
@@ -128,7 +128,7 @@ On your server, create a post-receive hook:
 
 ```bash
 # On server
-cd /path/to/atqan-wathq-services-fixing
+cd /home/mahmoud/atqan-wathq-services
 git init --bare ~/atqan-repo.git
 cd ~/atqan-repo.git/hooks
 nano post-receive
@@ -139,7 +139,7 @@ Add this script:
 ```bash
 #!/bin/bash
 
-WORK_TREE=/path/to/atqan-wathq-services-fixing
+WORK_TREE=/home/mahmoud/atqan-wathq-services
 GIT_DIR=$HOME/atqan-repo.git
 
 echo "Deploying to production..."
@@ -149,7 +149,7 @@ git --work-tree=$WORK_TREE --git-dir=$GIT_DIR checkout -f main
 
 # Deploy API
 cd $WORK_TREE/api
-source venv/bin/activate
+source .venv/bin/activate
 pip install -r requirements.txt
 alembic upgrade head
 sudo systemctl restart atqan-api
@@ -188,16 +188,16 @@ module.exports = {
   apps: [
     {
       name: 'atqan-api',
-      cwd: '/path/to/atqan-wathq-services-fixing/api',
-      script: 'venv/bin/uvicorn',
+      cwd: '/home/mahmoud/atqan-wathq-services/api',
+      script: '.venv/bin/uvicorn',
       args: 'app.main:app --host 0.0.0.0 --port 5551',
       env: {
-        PYTHONPATH: '/path/to/atqan-wathq-services-fixing/api'
+        PYTHONPATH: '/home/mahmoud/atqan-wathq-services/api'
       }
     },
     {
       name: 'atqan-dashboard',
-      cwd: '/path/to/atqan-wathq-services-fixing/dashboard',
+      cwd: '/home/mahmoud/atqan-wathq-services/dashboard',
       script: 'pnpm',
       args: 'start',
       env: {
@@ -213,8 +213,8 @@ module.exports = {
       host: 'your-server',
       ref: 'origin/main',
       repo: 'git@github.com:your-org/atqan-wathq-services-fixing.git',
-      path: '/path/to/atqan-wathq-services-fixing',
-      'post-deploy': 'cd api && source venv/bin/activate && pip install -r requirements.txt && alembic upgrade head && cd ../dashboard && pnpm install && pnpm build && pm2 reload ecosystem.config.js'
+      path: '/home/mahmoud/atqan-wathq-services',
+      'post-deploy': 'cd api && source .venv/bin/activate && pip install -r requirements.txt && alembic upgrade head && cd ../dashboard && pnpm install && pnpm build && pm2 reload ecosystem.config.js'
     }
   }
 }
@@ -251,7 +251,7 @@ pm2 logs atqan-dashboard
 
 ### Using systemd:
 ```bash
-cd /path/to/atqan-wathq-services-fixing
+cd /home/mahmoud/atqan-wathq-services
 git log --oneline -10  # Find commit to rollback to
 git reset --hard <commit-hash>
 sudo systemctl restart atqan-api
