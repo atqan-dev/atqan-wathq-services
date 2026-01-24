@@ -25,14 +25,14 @@ jobs:
             cd /home/mahmoud/atqan-wathq-services
             git pull origin main
             
-            # Backend deployment
+            # Backend deployment (Port 5551)
             cd api
             source .venv/bin/activate
             pip install -r requirements.txt
             alembic upgrade head
             sudo systemctl restart atqan-api
             
-            # Frontend deployment
+            # Frontend deployment (Port 4551)
             cd ../dashboard
             pnpm install
             pnpm build
