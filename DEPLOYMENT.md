@@ -10,7 +10,29 @@ This guide explains how to set up automatic deployment when merging to the main 
 
 ## Option 1: GitHub Actions (Recommended)
 
-### Step 1: Create Systemd Services
+### Step 1: Install System Dependencies
+
+WeasyPrint (for PDF generation) requires system libraries. Install them first:
+
+```bash
+# Ubuntu/Debian
+sudo apt-get update
+sudo apt-get install -y \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libgdk-pixbuf2.0-0 \
+    libffi-dev \
+    shared-mime-info
+
+# CentOS/RHEL
+sudo yum install -y \
+    pango \
+    pango-devel \
+    gdk-pixbuf2 \
+    libffi-devel
+```
+
+### Step 2: Create Systemd Services
 
 #### API Service (`/etc/systemd/system/atqan-api.service`)
 
@@ -34,6 +56,14 @@ WantedBy=multi-user.target
 
 #### Dashboard Service (`/etc/systemd/system/atqan-dashboard.service`)
 
+**Important:** First find where `pnpm` is installed:
+```bash
+which pnpm
+# Example output: /home/mahmoud/.nvm/versions/node/v22.17.1/bin/pnpm
+```
+
+Then use that path in the service file:
+
 ```ini
 [Unit]
 Description=Atqan WATHQ Dashboard Service
@@ -43,7 +73,29 @@ After=network.target
 Type=simple
 User=mahmoud
 WorkingDirectory=/home/mahmoud/atqan-wathq-services/dashboard
-ExecStart=/usr/bin/pnpm start
+# Update this path based on 'which pnpm' output
+ExecStart=/home/mahmoud/.nvm/versions/node/v22.17.1/bin/pnpm start
+Environment="NODE_ENV=production"
+Environment="PORT=3000"
+Environment="PATH=/home/mahmoud/.nvm/versions/node/v22.17.1/bin:/usr/local/bin:/usr/bin:/bin"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Alternative:** Use Node.js directly with the built output:
+```ini
+[Unit]
+Description=Atqan WATHQ Dashboard Service
+After=network.target
+
+[Service]
+Type=simple
+User=mahmoud
+WorkingDirectory=/home/mahmoud/atqan-wathq-services/dashboard
+ExecStart=/usr/bin/node .output/server/index.mjs
 Environment="NODE_ENV=production"
 Environment="PORT=3000"
 Restart=always
