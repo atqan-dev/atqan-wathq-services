@@ -183,7 +183,7 @@ class WathqPDFService:
             return str(value)
 
         # Add logo as base64
-        logo_path = self.templates_dir / "assets" / "header_logo_after_colored.png"
+        logo_path = self.templates_dir / "assets" / "header_logo_after_colored.avif"
         logo_base64 = None
         if logo_path.exists():
             try:
@@ -387,7 +387,7 @@ class WathqPDFService:
         )
 
         # Add logo as base64
-        logo_path = self.templates_dir / "assets" / "header_logo_after_colored.png"
+        logo_path = self.templates_dir / "assets" / "header_logo_after_colored.avif"
         logo_base64 = None
         if logo_path.exists():
             try:

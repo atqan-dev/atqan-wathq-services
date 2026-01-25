@@ -772,6 +772,6 @@ onUnmounted(() => {
 
 // Set page meta
 useHead({
-  title: "أتقن - لوحة التحكم",
+  title: "توثيق العدل  - لوحة التحكم",
 });
 </script>

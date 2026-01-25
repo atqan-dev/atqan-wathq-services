@@ -4,7 +4,7 @@
 A modern PDF template designed for WATHQ (وثق) live and offline data visualization. The template follows the company branding with blue and orange color scheme and supports Arabic content.
 
 ## Template Design
-Based on the design from `dashboard/assets/images/simple_pdf_template.png`, the template includes:
+Based on the design from `dashboard/assets/images/simple_pdf_template.avif`, the template includes:
 - **Header**: Company logo, Arabic/English company name, blue top line, orange accent section
 - **Content Area**: Main document content with watermark background
 - **Footer**: Contact information with colored bottom line
@@ -15,11 +15,11 @@ Based on the design from `dashboard/assets/images/simple_pdf_template.png`, the 
 - `api/templates/wathq-modern-template.html` - Main PDF template
 
 ### Assets
-- `api/templates/assets/header_fixed_line.png` - Blue header line
-- `api/templates/assets/header_right_colored.png` - Orange header section
-- `api/templates/assets/header_logo_after_colored.png` - Company logo
-- `api/templates/assets/header_logo_text_after_logo.png` - Company text logo
-- `api/templates/assets/footer_fixed_line.png` - Footer colored line
+- `api/templates/assets/header_fixed_line.avif` - Blue header line
+- `api/templates/assets/header_right_colored.avif` - Orange header section
+- `api/templates/assets/header_logo_after_colored.avif` - Company logo
+- `api/templates/assets/header_logo_text_after_logo.avif` - Company text logo
+- `api/templates/assets/footer_fixed_line.avif` - Footer colored line
 
 ### Service Methods
 New methods added to `WathqPDFService`:

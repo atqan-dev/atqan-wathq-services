@@ -1,7 +1,7 @@
 <template>
   <div h-85 w-85>
     <div class="flex justify-center">
-      <img :src="atqanLogo" alt="Atqan" class="w-96 h-96" />
+      <img :src="tawthiqLogo" alt="tawthiq" class="w-6 h-6" style="width: 4rem; height: 4rem !important;"/>
     </div>
     <UForm :schema="schema" :state="formState" class="mt-6" @submit="handleLogin">
       <div class="space-y-6">
@@ -108,7 +108,7 @@
 
 <script setup>
 import { z } from "zod";
-import atqanLogo from "~/assets/images/atqan-logo.svg";
+import tawthiqLogo from "~/assets/images/tawthiq-logo.svg";
 
 const emit = defineEmits(["login-success"]);
 

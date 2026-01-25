@@ -287,7 +287,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "ATQAN Dashboard management wathq api's ",
+    "subtitle": "TAWTHIQ Dashboard management wathq api's ",
     "refresh": "Refresh",
     "systemTenants": "System Apps",
     "viewAllTenants": "View All Apps",
@@ -348,7 +348,7 @@
     "getStarted": "Get started by adding your first application"
   },
   "nav": {
-    "dashboard": "ATQAN API'S MS",
+    "dashboard": "TAWTHIQ API'S MS",
     "tenants": "Apps",
     "wathqServices": "Wathq Services",
     "settings": "Settings",

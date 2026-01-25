@@ -18,7 +18,7 @@
         >
           <!-- Logo -->
           <div class="flex justify-center mb-6">
-            <img :src="atqanLogo" alt="Atqan" class="w-46 h-46" />
+            <img :src="tawthiqLogo" alt="tawthiq" class="w-46 h-46" />
           </div>
 
           <!-- Login Form -->
@@ -184,8 +184,8 @@
 
 <script setup>
 import { z } from "zod";
-import loginBg from "~/assets/images/sign-in-background.png";
-import atqanLogo from "~/assets/images/atqan-logo.svg";
+import loginBg from "~/assets/images/sign-in-background.avif";
+import tawthiqLogo from "~/assets/images/tawthiq-logo.png";
 
 // Page meta
 definePageMeta({

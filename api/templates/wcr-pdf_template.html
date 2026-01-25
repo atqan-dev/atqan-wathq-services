@@ -206,7 +206,7 @@
             {% if logo_base64 %}
             <img src="data:image/png;base64,{{ logo_base64 }}" alt="Logo" class="logo-img">
             {% else %}
-            <img src="{{ logo_url | default('logo.png') }}" alt="Logo" class="logo-img">
+            <img src="{{ logo_url | default('logo.avif') }}" alt="Logo" class="logo-img">
             {% endif %}
             <div class="company-name">{{ company_name_ar | default('شركة مجموعة توثيق العدل') }}</div>
             <div class="company-name-en">{{ company_name_en | default('Notarization Justice Group for Real Estate Development and Investment Company') }}</div>

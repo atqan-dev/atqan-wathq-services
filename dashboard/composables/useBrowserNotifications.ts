@@ -91,16 +91,16 @@ function showBrowserNotification(options: {
 
   // Default icons based on notification type - all use favicon for consistency
   const defaultIcons = {
-    info: '/favicon-96x96.png',
-    success: '/favicon-96x96.png',
-    warning: '/favicon-96x96.png',
-    error: '/favicon-96x96.png'
+    info: '/favicon.ico',
+    success: '/favicon.ico',
+    warning: '/favicon.ico',
+    error: '/favicon.ico'
   }
 
   try {
     const notification = new Notification(validTitle, {
       body: validMessage,
-      icon: icon || defaultIcons[validType] || '/favicon-96x96.png',
+      icon: icon || defaultIcons[validType] || '/favicon.ico',
       tag: tag || `notification-${Date.now()}`,
       requireInteraction,
       badge: '/favicon.ico'
@@ -211,7 +211,7 @@ function testNotification() {
     title: '🧪 Test Notification',
     message: 'Browser notifications are working correctly!',
     type: 'success',
-    icon: '/favicon-96x96.png',
+    icon: '/favicon.ico',
     requireInteraction: false
   })
 }

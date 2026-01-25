@@ -7,7 +7,7 @@ Successfully implemented export to PDF and preview features for the commercial r
 
 ### 1. **New PDF Template Created**
 - **File**: `api/templates/wathq-modern-template.html`
-- **Design**: Based on `dashboard/assets/images/simple_pdf_template.png`
+- **Design**: Based on `dashboard/assets/images/simple_pdf_template.avif`
 - **Features**:
   - Blue header line with orange accent section
   - Company logo and Arabic/English text
@@ -19,11 +19,11 @@ Successfully implemented export to PDF and preview features for the commercial r
 ### 2. **Assets Integration**
 - **Location**: `api/templates/assets/`
 - **Files**:
-  - `header_fixed_line.png` - Blue header line
-  - `header_right_colored.png` - Orange header section
-  - `header_logo_after_colored.png` - Company logo
-  - `header_logo_text_after_logo.png` - Company text
-  - `footer_fixed_line.png` - Footer colored line
+  - `header_fixed_line.avif` - Blue header line
+  - `header_right_colored.avif` - Orange header section
+  - `header_logo_after_colored.avif` - Company logo
+  - `header_logo_text_after_logo.avif` - Company text
+  - `footer_fixed_line.avif` - Footer colored line
 
 ### 3. **Backend Service Enhancement**
 - **File**: `api/app/services/wathq_pdf_service.py`
