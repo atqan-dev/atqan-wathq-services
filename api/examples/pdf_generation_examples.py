@@ -150,7 +150,7 @@ def example_custom_info_boxes():
             title="معلومات الشركة",
             items=[
                 InfoBoxItem(label="اسم الشركة", value="شركة التقنية المتقدمة"),
-                InfoBoxItem(label="رقم السجل التجاري", value="1010123456"),
+                InfoBoxItem(label="رقم السجل التجاري ( التشريعات الجديدة )", value="1010123456"),
                 InfoBoxItem(label="تاريخ التأسيس", value="15 يناير 2020"),
             ],
         ),

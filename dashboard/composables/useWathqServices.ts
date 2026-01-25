@@ -54,10 +54,10 @@ export function useWathqServices() {
     {
       id: 'wathq-cr',
       name: 'Commercial Registration',
-      name_ar: 'السجل التجاري',
+      name_ar: 'السجل التجاري ( التشريعات الجديدة )',
       slug: 'commercial-registration',
       description: 'Query commercial registration information',
-      description_ar: 'الاستعلام عن معلومات السجل التجاري',
+      description_ar: 'الاستعلام عن معلومات السجل التجاري ( التشريعات الجديدة )',
       icon: 'i-heroicons-building-office-2',
       is_active: true,
       requires_authentication: true
@@ -65,10 +65,10 @@ export function useWathqServices() {
     {
       id: 'wathq-contract',
       name: 'Company Contract',
-      name_ar: 'عقد الشركة',
+      name_ar: 'عقود الشركات ( التشريعات الجديدة )',
       slug: 'company-contract',
       description: 'Retrieve company contract details',
-      description_ar: 'استرجاع تفاصيل عقد الشركة',
+      description_ar: 'استرجاع تفاصيل عقود الشركات ( التشريعات الجديدة )',
       icon: 'i-heroicons-document-text',
       is_active: true,
       requires_authentication: true
@@ -76,10 +76,10 @@ export function useWathqServices() {
     {
       id: 'wathq-attorney',
       name: 'Attorney Authorization',
-      name_ar: 'التوكيل',
+      name_ar: 'الوكالات العدلية',
       slug: 'attorney',
       description: 'Verify attorney authorization',
-      description_ar: 'التحقق من التوكيل',
+      description_ar: 'التحقق من الوكالات العدلية',
       icon: 'i-heroicons-scale',
       is_active: true,
       requires_authentication: true
@@ -87,10 +87,10 @@ export function useWathqServices() {
     {
       id: 'wathq-real-estate',
       name: 'Real Estate',
-      name_ar: 'العقارات',
+      name_ar: 'الصكوك العقارية',
       slug: 'real-estate',
       description: 'Query real estate information',
-      description_ar: 'الاستعلام عن معلومات العقارات',
+      description_ar: 'الاستعلام عن معلومات الصكوك العقارية',
       icon: 'i-heroicons-home',
       is_active: true,
       requires_authentication: true
@@ -109,7 +109,7 @@ export function useWathqServices() {
     {
       id: 'wathq-employee',
       name: 'Employee Verification',
-      name_ar: 'التحقق من الموظف',
+      name_ar: 'بيانات الموظف',
       slug: 'employee',
       description: 'Verify employee information',
       description_ar: 'التحقق من معلومات الموظف',

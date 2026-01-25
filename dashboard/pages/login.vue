@@ -185,7 +185,7 @@
 <script setup>
 import { z } from "zod";
 import loginBg from "~/assets/images/sign-in-background.avif";
-import tawthiqLogo from "~/assets/images/tawthiq-logo.png";
+import tawthiqLogo from "~/assets/images/logo.avif";
 
 // Page meta
 definePageMeta({

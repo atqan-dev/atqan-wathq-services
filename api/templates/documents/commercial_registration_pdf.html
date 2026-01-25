@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ document_title | default('السجل التجاري') }}</title>
+    <title>{{ document_title | default('السجل التجاري ( التشريعات الجديدة )') }}</title>
     <style>
         * {
             margin: 0;
@@ -177,7 +178,7 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             border-radius: 0 0 8px 8px;
             overflow: hidden;
         }
@@ -314,7 +315,7 @@
             flex-shrink: 0;
         }
 
-        
+
 
         /* Print optimizations */
         @media print {
@@ -324,7 +325,7 @@
                 margin: 0;
                 padding: 0;
             }
-            
+
             .no-print {
                 display: none;
             }
@@ -369,15 +370,30 @@
             }
         }
 
-        
+
         /* Utility classes */
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .font-bold { font-weight: bold; }
-        .mb-10 { margin-bottom: 10px; }
-        .mb-20 { margin-bottom: 20px; }
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .font-bold {
+            font-weight: bold;
+        }
+
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
+
 <body>
     <div class="page">
         <!-- Header Section -->
@@ -390,390 +406,396 @@
                         <div class="company-name-ar">شركة مجموعة توثيق العدل</div>
                         <div class="company-name-en">للتطوير والاستثمار العقاري</div>
                     </div>
-                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZcAAAH1CAYAAAA6WrNcAAAgAElEQVR4Xux9B5gc1ZX1re7qOHk0oxyNckARJSQBRoDIXmN2DbZ3vc42DuAEeL3+vc7Z63XARBvjtN618QK2yULBSkgoIqEsRjlMzp2r6z/nvW5JyAozo8l6pW++GXVXeHVf9Tt97z33XkvMZixgLGAsYCxgLNDBFrA6+HzmdMYCxgLGAsYCxgJiwMU8BMYCxgLGAsYCHW4BAy4dblJzwt5ugVmDB19qJY8ee7VSKi1L0r39fsz4jQW6wwIGXLrD6uaaPdoCP7z72qcst8JZtPT1Bw9VybbXK6WiRw/YDM5YoAdawIBLD5wUM6TutcCPPzZ+5ezJhZcnU4k3Vr9y4OXNW2r/FB4gK3+1TGLdOzJzdWOB3mMBAy69Z67MSLvIAg99fOTymWPdK61YjYRzBklNk2ffinUH/rR0c/TxRftllwmVddFEmMv0agsYcOnV02cG39EWcF2xHv3k0MVzxqSuDru14iQ84rhBSQdL5WiT78Di9Qd//uqG5t8sPyqHOvra5nzGAn3JAgZc+tJsmnvpEAs8fNfIv80Y1fSWnHSNeFK2WJZPEl6RlCcoUTdX9lU6a9ZsPPK/q/bK05v2yYEOuag5ibFAH7OAAZc+NqHmdi7MAq6I9dCnxqycOaJ5fk66UmzHVidM4F8KnxaP7Qd9LE+aG/Mqj0aDe19Yf+D+9VujS03S/8Lsbo7uexYw4NL35tTc0QVYQIHLXeNemTUielnYrZF0Ki1e4Itrp8QjrnjTXvEScNIeiVlBaQkWyitbjz65ak3kd/sr5JV1VXL8Ai5vDjUW6DMWMODSZ6bS3EhHWIDg8ugnx70yY0Qc4FIltuWVlOuI402Ix02L3xHxEnBSCJMhVBYN+CQd7i+NscLkmo0VTyxfW/1oU4NsWFYlzR0xHnMOY4HeagEDLr115sy4O80CP79r3NqZw1vm5LoV4vUi35JKScKC5+LxiN+1xYbX4kNppQvgaUrHxA1iHwcvBPMkksxrWfHqwd8t3eg8XDhdtj/xBOJpZjMWuAgtYMDlIpx0c8vntsDDd41fO6esYU5eukJch76MF56LF5EwhMRcj0gS7oubFAtvef0BSbpxCeZ4JJpKSmMEGJM/VI7V5W1atOLAnzcdiPzvkp2yx9CXzVN3sVnAgMvFNuPmfs9rgfvvHr92LsClIH1cfAAQeigJF94JvRXkXDxwW3z+qPg8Ft7Pk5bmOLIxABu/R5LpFBL/XnG9uRJL58vBCnftmo1Hn9q2P/0/L5fLwfNe3OxgLNBHLGDApY9MpLmNjrPA/XePA7g0zslzj4OKDO8E4bC0BIQp/bTHJ5YnIWkrIk5SkIOxkJcJAYAAPB4XwOMiR5OUVJrJGT+8mjyJucXO7n3JFcs3Hvn9a7uTz2yolmMdN1pzJmOBnmkBAy49c17MqLrRAgSX+QQXhMXURuQQGwCDgkpExUAVEy88F...[148123 bytes truncated]" alt="Company Logo" class="logo-img">
+                    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZcAAAH1CAYAAAA6WrNcAAAgAElEQVR4Xux9B5gc1ZX1re7qOHk0oxyNckARJSQBRoDIXmN2DbZ3vc42DuAEeL3+vc7Z63XARBvjtN618QK2yULBSkgoIqEsRjlMzp2r6z/nvW5JyAozo8l6pW++GXVXeHVf9Tt97z33XkvMZixgLGAsYCxgLNDBFrA6+HzmdMYCxgLGAsYCxgJiwMU8BMYCxgLGAsYCHW4BAy4dblJzwt5ugVmDB19qJY8ee7VSKi1L0r39fsz4jQW6wwIGXLrD6uaaPdoCP7z72qcst8JZtPT1Bw9VybbXK6WiRw/YDM5YoAdawIBLD5wUM6TutcCPPzZ+5ezJhZcnU4k3Vr9y4OXNW2r/FB4gK3+1TGLdOzJzdWOB3mMBAy69Z67MSLvIAg99fOTymWPdK61YjYRzBklNk2ffinUH/rR0c/TxRftllwmVddFEmMv0agsYcOnV02cG39EWcF2xHv3k0MVzxqSuDru14iQ84rhBSQdL5WiT78Di9Qd//uqG5t8sPyqHOvra5nzGAn3JAgZc+tJsmnvpEAs8fNfIv80Y1fSWnHSNeFK2WJZPEl6RlCcoUTdX9lU6a9ZsPPK/q/bK05v2yYEOuag5ibFAH7OAAZc+NqHmdi7MAq6I9dCnxqycOaJ5fk66UmzHVidM4F8KnxaP7Qd9LE+aG/Mqj0aDe19Yf+D+9VujS03S/8Lsbo7uexYw4NL35tTc0QVYQIHLXeNemTUielnYrZF0Ki1e4Itrp8QjrnjTXvEScNIeiVlBaQkWyitbjz65ak3kd/sr5JV1VXL8Ai5vDjUW6DMWMODSZ6bS3EhHWIDg8ugnx70yY0Qc4FIltuWVlOuI402Ix02L3xHxEnBSCJMhVBYN+CQd7i+NscLkmo0VTyxfW/1oU4NsWFYlzR0xHnMOY4HeagEDLr115sy4O80CP79r3NqZw1vm5LoV4vUi35JKScKC5+LxiN+1xYbX4kNppQvgaUrHxA1iHwcvBPMkksxrWfHqwd8t3eg8XDhdtj/xBOJpZjMWuAgtYMDlIpx0c8vntsDDd41fO6esYU5eukJch76MF56LF5EwhMRcj0gS7oubFAtvef0BSbpxCeZ4JJpKSmMEGJM/VI7V5W1atOLAnzcdiPzvkp2yx9CXzVN3sVnAgMvFNuPmfs9rgfvvHr92LsClIH1cfAAQeigJF94JvRXkXDxwW3z+qPg8Ft7Pk5bmOLIxABu/R5LpFBL/XnG9uRJL58vBCnftmo1Hn9q2P/0/L5fLwfNe3OxgLNBHLGDApY9MpLmNjrPA/XePA7g0zslzj4OKDO8E4bC0BIQp/bTHJ5YnIWkrIk5SkIOxkJcJAYAAPB4XwOMiR5OUVJrJGT+8mjyJucXO7n3JFcs3Hvn9a7uTz2yolmMdN1pzJmOBnmkBAy49c17MqLrRAgSX+QQXhMXURuQQGwCDgkpExUAVEy88F...[148123 bytes truncated]"
+                        alt="Company Logo" class="logo-img">
                 </div>
             </div>
         </div>
-<!-- WaterMark Section -->
-    {% include 'partials/watermark.html' %}
+        <!-- WaterMark Section -->
+        {% include 'partials/watermark.html' %}
 
-    <!-- Main Content -->
-    <div class="content">
-        <div class="content-wrapper">
-            <!-- Document Title -->
-            <div class="document-title">
-                بيانات السجل التجاري
-            </div>
+        <!-- Main Content -->
+        <div class="content">
+            <div class="content-wrapper">
+                <!-- Document Title -->
+                <div class="document-title">
+                    بيانات السجل التجاري ( التشريعات الجديدة )
+                </div>
 
-            <!-- Basic Information Section -->
-            <div class="table-section">
-                <div class="section-header">المعلومات الأساسية</div>
-                <table class="data-table">
-                    <tr>
-                        <th>رقم السجل التجاري</th>
-                        <td>{{ cr_number | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>الرقم الوطني للسجل التجاري</th>
-                        <td>{{ cr_national_number | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>اسم المنشأة</th>
-                        <td>{{ name | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>لغة الاسم</th>
-                        <td>{{ name_lang_desc | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>رأس المال</th>
-                        <td>{{ cr_capital | default('غير محدد') }} ريال سعودي</td>
-                    </tr>
-                    <tr>
-                        <th>مدة الشركة</th>
-                        <td>{{ company_duration | default('غير محدد', true) }}</td>
-                    </tr>
-                    <tr>
-                        <th>رقم الإصدار</th>
-                        <td>{{ version_no | default('غير محدد') }}</td>
-                    </tr>
-                </table>
-            </div>
+                <!-- Basic Information Section -->
+                <div class="table-section">
+                    <div class="section-header">المعلومات الأساسية</div>
+                    <table class="data-table">
+                        <tr>
+                            <th>رقم السجل التجاري ( التشريعات الجديدة )</th>
+                            <td>{{ cr_number | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>الرقم الوطني للسجل التجاري</th>
+                            <td>{{ cr_national_number | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>اسم المنشأة</th>
+                            <td>{{ name | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>لغة الاسم</th>
+                            <td>{{ name_lang_desc | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>رأس المال</th>
+                            <td>{{ cr_capital | default('غير محدد') }} ريال سعودي</td>
+                        </tr>
+                        <tr>
+                            <th>مدة الشركة</th>
+                            <td>{{ company_duration | default('غير محدد', true) }}</td>
+                        </tr>
+                        <tr>
+                            <th>رقم الإصدار</th>
+                            <td>{{ version_no | default('غير محدد') }}</td>
+                        </tr>
+                    </table>
+                </div>
 
-            <!-- Dates Section -->
-            <div class="table-section">
-                <div class="section-header">التواريخ المهمة</div>
-                <table class="data-table">
-                    <tr>
-                        <th>تاريخ الإصدار (ميلادي)</th>
-                        <td>{{ issue_date_gregorian | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>تاريخ الإصدار (هجري)</th>
-                        <td>{{ issue_date_hijri | default('غير محدد') }}</td>
-                    </tr>
-                </table>
-            </div>
+                <!-- Dates Section -->
+                <div class="table-section">
+                    <div class="section-header">التواريخ المهمة</div>
+                    <table class="data-table">
+                        <tr>
+                            <th>تاريخ الإصدار (ميلادي)</th>
+                            <td>{{ issue_date_gregorian | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>تاريخ الإصدار (هجري)</th>
+                            <td>{{ issue_date_hijri | default('غير محدد') }}</td>
+                        </tr>
+                    </table>
+                </div>
 
-            <!-- Status Section -->
-            <div class="table-section">
-                <div class="section-header">حالة السجل التجاري</div>
-                <table class="data-table">
-                    <tr>
-                        <th>الحالة</th>
-                        <td>
-                            {% if status and status.name %}
-                                <span class="status-badge {% if status.name == 'نشط' %}status-active{% elif status.name == 'مشطوب' %}status-deleted{% else %}status-inactive{% endif %}">
+                <!-- Status Section -->
+                <div class="table-section">
+                    <div class="section-header">حالة السجل التجاري ( التشريعات الجديدة )</div>
+                    <table class="data-table">
+                        <tr>
+                            <th>الحالة</th>
+                            <td>
+                                {% if status and status.name %}
+                                <span
+                                    class="status-badge {% if status.name == 'نشط' %}status-active{% elif status.name == 'مشطوب' %}status-deleted{% else %}status-inactive{% endif %}">
                                     {{ status.name }}
                                 </span>
-                            {% else %}
+                                {% else %}
                                 <span class="empty-value">غير محدد</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% if status %}
-                    <tr>
-                        <th>تاريخ التأكيد</th>
-                        <td>
-                            {% if status.confirmation_date and status.confirmation_date.gregorian %}
-                                {{ status.confirmation_date.gregorian }} ({{ status.confirmation_date.hijri | default('غير محدد') }})
-                            {% else %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if status %}
+                        <tr>
+                            <th>تاريخ التأكيد</th>
+                            <td>
+                                {% if status.confirmation_date and status.confirmation_date.gregorian %}
+                                {{ status.confirmation_date.gregorian }} ({{ status.confirmation_date.hijri |
+                                default('غير محدد') }})
+                                {% else %}
                                 <span class="empty-value">غير محدد</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>تاريخ الحذف</th>
-                        <td>
-                            {% if status.deletion_date and status.deletion_date.gregorian %}
-                                {{ status.deletion_date.gregorian }} ({{ status.deletion_date.hijri | default('غير محدد') }})
-                            {% else %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>تاريخ الحذف</th>
+                            <td>
+                                {% if status.deletion_date and status.deletion_date.gregorian %}
+                                {{ status.deletion_date.gregorian }} ({{ status.deletion_date.hijri | default('غير
+                                محدد') }})
+                                {% else %}
                                 <span class="empty-value">غير محدد</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endif %}
-                </table>
-            </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
 
-            <!-- Location Information Section -->
-            <div class="table-section">
-                <div class="section-header">معلومات الموقع</div>
-                <table class="data-table">
-                    <tr>
-                        <th>مدينة المقر الرئيسي</th>
-                        <td>{{ headquarter_city_name | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>معرف المدينة</th>
-                        <td>{{ headquarter_city_id | default('غير محدد') }}</td>
-                    </tr>
-                </table>
-            </div>
+                <!-- Location Information Section -->
+                <div class="table-section">
+                    <div class="section-header">معلومات الموقع</div>
+                    <table class="data-table">
+                        <tr>
+                            <th>مدينة المقر الرئيسي</th>
+                            <td>{{ headquarter_city_name | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>معرف المدينة</th>
+                            <td>{{ headquarter_city_id | default('غير محدد') }}</td>
+                        </tr>
+                    </table>
+                </div>
 
-            <!-- Entity Type Section -->
-            <div class="table-section">
-                <div class="section-header">نوع الكيان</div>
-                <table class="data-table">
-                    <tr>
-                        <th>نوع الكيان</th>
-                        <td>{{ entity_type.name | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>معرف النوع</th>
-                        <td>{{ entity_type.id | default('غير محدد') }}</td>
-                    </tr>
-                    {% if entity_type.form_name %}
-                    <tr>
-                        <th>اسم النموذج</th>
-                        <td>{{ entity_type.form_name }}</td>
-                    </tr>
-                    {% endif %}
-                </table>
-            </div>
+                <!-- Entity Type Section -->
+                <div class="table-section">
+                    <div class="section-header">نوع الكيان</div>
+                    <table class="data-table">
+                        <tr>
+                            <th>نوع الكيان</th>
+                            <td>{{ entity_type.name | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>معرف النوع</th>
+                            <td>{{ entity_type.id | default('غير محدد') }}</td>
+                        </tr>
+                        {% if entity_type.form_name %}
+                        <tr>
+                            <th>اسم النموذج</th>
+                            <td>{{ entity_type.form_name }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
 
-            <!-- Contact Information Section -->
-            <div class="table-section">
-                <div class="section-header">معلومات الاتصال</div>
-                <table class="data-table">
-                    <tr>
-                        <th>رقم الهاتف</th>
-                        <td>{{ contact_info.phone_no | default('غير محدد', true) }}</td>
-                    </tr>
-                    <tr>
-                        <th>رقم الجوال</th>
-                        <td>{{ contact_info.mobile_no | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>البريد الإلكتروني</th>
-                        <td>{{ contact_info.email | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>الموقع الإلكتروني</th>
-                        <td>{{ contact_info.website_url | default('غير محدد', true) }}</td>
-                    </tr>
-                </table>
-            </div>
+                <!-- Contact Information Section -->
+                <div class="table-section">
+                    <div class="section-header">معلومات الاتصال</div>
+                    <table class="data-table">
+                        <tr>
+                            <th>رقم الهاتف</th>
+                            <td>{{ contact_info.phone_no | default('غير محدد', true) }}</td>
+                        </tr>
+                        <tr>
+                            <th>رقم الجوال</th>
+                            <td>{{ contact_info.mobile_no | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>البريد الإلكتروني</th>
+                            <td>{{ contact_info.email | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>الموقع الإلكتروني</th>
+                            <td>{{ contact_info.website_url | default('غير محدد', true) }}</td>
+                        </tr>
+                    </table>
+                </div>
 
-            <!-- Capital Details Section -->
-            {% if capital and (capital.currency_name or capital.capital or capital.contribution_capital or capital.stock_capital) %}
-            <div class="table-section">
-                <div class="section-header">تفاصيل رأس المال</div>
-                <table class="data-table">
-                    {% if capital.currency_name %}
-                    <tr>
-                        <th>العملة</th>
-                        <td>{{ capital.currency_name }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if capital.capital %}
-                    <tr>
-                        <th>رأس المال</th>
-                        <td>{{ capital.capital }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if capital.contribution_capital %}
-                    <tr>
-                        <th>رأس المال المساهم</th>
-                        <td>{{ capital.contribution_capital }}</td>
-                    </tr>
-                    {% endif %}
-                    {% if capital.stock_capital %}
-                    <tr>
-                        <th>رأس المال السهمي</th>
-                        <td>{{ capital.stock_capital }}</td>
-                    </tr>
-                    {% endif %}
-                </table>
-            </div>
-            {% endif %}
+                <!-- Capital Details Section -->
+                {% if capital and (capital.currency_name or capital.capital or capital.contribution_capital or
+                capital.stock_capital) %}
+                <div class="table-section">
+                    <div class="section-header">تفاصيل رأس المال</div>
+                    <table class="data-table">
+                        {% if capital.currency_name %}
+                        <tr>
+                            <th>العملة</th>
+                            <td>{{ capital.currency_name }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if capital.capital %}
+                        <tr>
+                            <th>رأس المال</th>
+                            <td>{{ capital.capital }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if capital.contribution_capital %}
+                        <tr>
+                            <th>رأس المال المساهم</th>
+                            <td>{{ capital.contribution_capital }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if capital.stock_capital %}
+                        <tr>
+                            <th>رأس المال السهمي</th>
+                            <td>{{ capital.stock_capital }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+                {% endif %}
 
-            <!-- Partners Section -->
-            {% if parties and parties|length > 0 %}
-            <div class="table-section">
-                <div class="section-header">الشركاء والمالكون</div>
-                <table class="data-table">
-                    <tr>
-                        <th style="width: 20%;">الاسم</th>
-                        <th style="width: 15%;">النوع</th>
-                        <th style="width: 15%;">الهوية</th>
-                        <th style="width: 15%;">الجنسية</th>
-                        <th style="width: 20%;">نوع الشراكة</th>
-                        <th style="width: 15%;">رقم الترخيص</th>
-                    </tr>
-                    {% for party in parties %}
-                    <tr>
-                        <td>{{ party.name | default('غير محدد') }}</td>
-                        <td>{{ party.type_name | default('غير محدد') }}</td>
-                        <td>
-                            {% if party.identity %}
+                <!-- Partners Section -->
+                {% if parties and parties|length > 0 %}
+                <div class="table-section">
+                    <div class="section-header">الشركاء والمالكون</div>
+                    <table class="data-table">
+                        <tr>
+                            <th style="width: 20%;">الاسم</th>
+                            <th style="width: 15%;">النوع</th>
+                            <th style="width: 15%;">الهوية</th>
+                            <th style="width: 15%;">الجنسية</th>
+                            <th style="width: 20%;">نوع الشراكة</th>
+                            <th style="width: 15%;">رقم الترخيص</th>
+                        </tr>
+                        {% for party in parties %}
+                        <tr>
+                            <td>{{ party.name | default('غير محدد') }}</td>
+                            <td>{{ party.type_name | default('غير محدد') }}</td>
+                            <td>
+                                {% if party.identity %}
                                 {{ party.identity.id | default('غير محدد') }}<br>
                                 <small>({{ party.identity.type_name | default('غير محدد') }})</small>
-                            {% else %}
+                                {% else %}
                                 <span class="empty-value">غير محدد</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ party.nationality.name | default('غير محدد') }}</td>
-                        <td>
-                            {% if party.partnership and party.partnership|length > 0 %}
+                                {% endif %}
+                            </td>
+                            <td>{{ party.nationality.name | default('غير محدد') }}</td>
+                            <td>
+                                {% if party.partnership and party.partnership|length > 0 %}
                                 {% for partnership in party.partnership %}
-                                    {{ partnership.name }}{% if not loop.last %}, {% endif %}
+                                {{ partnership.name }}{% if not loop.last %}, {% endif %}
                                 {% endfor %}
-                            {% else %}
+                                {% else %}
                                 <span class="empty-value">غير محدد</span>
-                            {% endif %}
-                        </td>
-                        <td>{{ party.license_no | default('غير محدد', true) }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% endif %}
+                                {% endif %}
+                            </td>
+                            <td>{{ party.license_no | default('غير محدد', true) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% endif %}
 
-            <!-- Management Structure Section -->
-            {% if management %}
-            <div class="table-section">
-                <div class="section-header">الهيكل الإداري</div>
-                <table class="data-table">
-                    <tr>
-                        <th>هيكل الإدارة</th>
-                        <td>{{ management.structure_name | default('غير محدد') }}</td>
-                    </tr>
-                    <tr>
-                        <th>معرف الهيكل</th>
-                        <td>{{ management.structure_id | default('غير محدد') }}</td>
-                    </tr>
-                    {% if management.managers and management.managers|length > 0 %}
-                    <tr>
-                        <th>المديرون</th>
-                        <td>
-                            <table class="nested-table">
-                                <tr>
-                                    <th>الاسم</th>
-                                    <th>المنصب</th>
-                                    <th>الهوية</th>
-                                </tr>
-                                {% for manager in management.managers %}
-                                <tr>
-                                    <td>{{ manager.name | default('غير محدد') }}</td>
-                                    <td>{{ manager.position | default('غير محدد') }}</td>
-                                    <td>{{ manager.identity | default('غير محدد') }}</td>
-                                </tr>
-                                {% endfor %}
-                            </table>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <th>المديرون</th>
-                        <td><span class="empty-value">لا يوجد مديرون مسجلون</span></td>
-                    </tr>
-                    {% endif %}
-                </table>
-            </div>
-            {% endif %}
+                <!-- Management Structure Section -->
+                {% if management %}
+                <div class="table-section">
+                    <div class="section-header">الهيكل الإداري</div>
+                    <table class="data-table">
+                        <tr>
+                            <th>هيكل الإدارة</th>
+                            <td>{{ management.structure_name | default('غير محدد') }}</td>
+                        </tr>
+                        <tr>
+                            <th>معرف الهيكل</th>
+                            <td>{{ management.structure_id | default('غير محدد') }}</td>
+                        </tr>
+                        {% if management.managers and management.managers|length > 0 %}
+                        <tr>
+                            <th>المديرون</th>
+                            <td>
+                                <table class="nested-table">
+                                    <tr>
+                                        <th>الاسم</th>
+                                        <th>المنصب</th>
+                                        <th>الهوية</th>
+                                    </tr>
+                                    {% for manager in management.managers %}
+                                    <tr>
+                                        <td>{{ manager.name | default('غير محدد') }}</td>
+                                        <td>{{ manager.position | default('غير محدد') }}</td>
+                                        <td>{{ manager.identity | default('غير محدد') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <th>المديرون</th>
+                            <td><span class="empty-value">لا يوجد مديرون مسجلون</span></td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+                {% endif %}
 
-            <!-- Activities Section -->
-            {% if activities and activities|length > 0 %}
-            <div class="table-section">
-                <div class="section-header">الأنشطة التجارية</div>
-                <table class="data-table">
-                    <tr>
-                        <th style="width: 15%;">رمز النشاط</th>
-                        <th style="width: 40%;">اسم النشاط</th>
-                        <th style="width: 15%;">النوع</th>
-                        <th style="width: 30%;">الوصف</th>
-                    </tr>
-                    {% for activity in activities %}
-                    <tr>
-                        <td>{{ activity.code | default('غير محدد') }}</td>
-                        <td>{{ activity.name | default('غير محدد') }}</td>
-                        <td>{{ activity.type | default('غير محدد') }}</td>
-                        <td>{{ activity.description | default('غير محدد') }}</td>
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% else %}
-            <div class="table-section">
-                <div class="section-header">الأنشطة التجارية</div>
-                <table class="data-table">
-                    <tr>
-                        <td class="text-center empty-value">لا توجد أنشطة تجارية مسجلة</td>
-                    </tr>
-                </table>
-            </div>
-            {% endif %}
+                <!-- Activities Section -->
+                {% if activities and activities|length > 0 %}
+                <div class="table-section">
+                    <div class="section-header">الأنشطة التجارية</div>
+                    <table class="data-table">
+                        <tr>
+                            <th style="width: 15%;">رمز النشاط</th>
+                            <th style="width: 40%;">اسم النشاط</th>
+                            <th style="width: 15%;">النوع</th>
+                            <th style="width: 30%;">الوصف</th>
+                        </tr>
+                        {% for activity in activities %}
+                        <tr>
+                            <td>{{ activity.code | default('غير محدد') }}</td>
+                            <td>{{ activity.name | default('غير محدد') }}</td>
+                            <td>{{ activity.type | default('غير محدد') }}</td>
+                            <td>{{ activity.description | default('غير محدد') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                {% else %}
+                <div class="table-section">
+                    <div class="section-header">الأنشطة التجارية</div>
+                    <table class="data-table">
+                        <tr>
+                            <td class="text-center empty-value">لا توجد أنشطة تجارية مسجلة</td>
+                        </tr>
+                    </table>
+                </div>
+                {% endif %}
 
-            <!-- Additional Information Section -->
-            <div class="table-section">
-                <div class="section-header">معلومات إضافية</div>
-                <table class="data-table">
-                    <tr>
-                        <th>سجل رئيسي</th>
-                        <td>
-                            {% if is_main %}
+                <!-- Additional Information Section -->
+                <div class="table-section">
+                    <div class="section-header">معلومات إضافية</div>
+                    <table class="data-table">
+                        <tr>
+                            <th>سجل رئيسي</th>
+                            <td>
+                                {% if is_main %}
                                 <span class="status-badge status-active">نعم</span>
-                            {% else %}
+                                {% else %}
                                 <span class="status-badge status-inactive">لا</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>رقم السجل الرئيسي</th>
-                        <td>{{ main_cr_number | default('غير محدد', true) }}</td>
-                    </tr>
-                    <tr>
-                        <th>الرقم الوطني للسجل الرئيسي</th>
-                        <td>{{ main_cr_national_number | default('غير محدد', true) }}</td>
-                    </tr>
-                    <tr>
-                        <th>في عملية تصفية</th>
-                        <td>
-                            {% if in_liquidation_process %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>رقم السجل الرئيسي</th>
+                            <td>{{ main_cr_number | default('غير محدد', true) }}</td>
+                        </tr>
+                        <tr>
+                            <th>الرقم الوطني للسجل الرئيسي</th>
+                            <td>{{ main_cr_national_number | default('غير محدد', true) }}</td>
+                        </tr>
+                        <tr>
+                            <th>في عملية تصفية</th>
+                            <td>
+                                {% if in_liquidation_process %}
                                 <span class="status-badge status-deleted">نعم</span>
-                            {% else %}
+                                {% else %}
                                 <span class="status-badge status-active">لا</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>يحتوي على تجارة إلكترونية</th>
-                        <td>
-                            {% if has_ecommerce %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>يحتوي على تجارة إلكترونية</th>
+                            <td>
+                                {% if has_ecommerce %}
                                 <span class="status-badge status-active">نعم</span>
-                            {% else %}
+                                {% else %}
                                 <span class="status-badge status-inactive">لا</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>مبني على ترخيص</th>
-                        <td>
-                            {% if is_license_based %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>مبني على ترخيص</th>
+                            <td>
+                                {% if is_license_based %}
                                 <span class="status-badge status-active">نعم</span>
-                            {% else %}
+                                {% else %}
                                 <span class="status-badge status-inactive">لا</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% if license_issuer_name %}
-                    <tr>
-                        <th>جهة إصدار الترخيص</th>
-                        <td>{{ license_issuer_name }}</td>
-                    </tr>
-                    {% endif %}
-                    <tr>
-                        <th>جنسية الشركاء</th>
-                        <td>{{ partners_nationality_name | default('غير محدد', true) }}</td>
-                    </tr>
-                </table>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% if license_issuer_name %}
+                        <tr>
+                            <th>جهة إصدار الترخيص</th>
+                            <td>{{ license_issuer_name }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr>
+                            <th>جنسية الشركاء</th>
+                            <td>{{ partners_nationality_name | default('غير محدد', true) }}</td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Footer Section -->
-    {% include 'partials/footer.html' %}
+        <!-- Footer Section -->
+        {% include 'partials/footer.html' %}
     </div>
 </body>
+
 </html>

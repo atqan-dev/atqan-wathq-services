@@ -13,7 +13,7 @@ def test_wathq_template():
 
     # Sample WATHQ data (similar to what would come from live/offline API)
     sample_wathq_data = {
-        "service_name": "السجل التجاري",
+        "service_name": "السجل التجاري ( التشريعات الجديدة )",
         "cr_number": "1010711252",
         "company_name": "شركة مجموعة توثيق العدل للتطوير والاستثمار العقاري",
         "legal_form": "شركة ذات مسؤولية محدودة",
@@ -32,7 +32,7 @@ def test_wathq_template():
             }
         ],
         "managers": [{"name": "فاطمة أحمد السالم", "position": "مدير مالي"}],
-        "description": "هذه وثيقة السجل التجاري الصادرة من منصة وثق الإلكترونية",
+        "description": "هذه وثيقة السجل التجاري ( التشريعات الجديدة ) الصادرة من منصة وثق الإلكترونية",
     }
 
     print("Testing WATHQ Modern Template...")
@@ -42,7 +42,7 @@ def test_wathq_template():
     try:
         html_content = pdf_service.preview_wathq_html(
             wathq_data=sample_wathq_data,
-            document_title="السجل التجاري - شركة مجموعة توثيق العدل",
+            document_title="السجل التجاري ( التشريعات الجديدة ) - شركة مجموعة توثيق العدل",
             show_watermark=True,
             watermark_text="وثق",
             show_signature=True,
@@ -63,7 +63,7 @@ def test_wathq_template():
     try:
         pdf_bytes = pdf_service.generate_wathq_pdf_bytes(
             wathq_data=sample_wathq_data,
-            document_title="السجل التجاري - شركة مجموعة توثيق العدل",
+            document_title="السجل التجاري ( التشريعات الجديدة ) - شركة مجموعة توثيق العدل",
             show_watermark=True,
             watermark_text="وثق",
             show_signature=True,

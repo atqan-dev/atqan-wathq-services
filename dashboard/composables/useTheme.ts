@@ -4,6 +4,7 @@
  */
 export const useTheme = () => {
   const colorMode = useColorMode()
+  const settingsStore = usePageSettingsStore()
 
   // Available theme options
   const themes = [
@@ -18,9 +19,11 @@ export const useTheme = () => {
   // Is dark mode active
   const isDark = computed(() => colorMode.value === 'dark')
 
-  // Set theme
+  // Set theme and persist to store
   const setTheme = (theme: string) => {
     colorMode.preference = theme
+    // Persist to pageSettings store
+    settingsStore.updateAppearance({ theme: theme as 'light' | 'dark' | 'system' })
   }
 
   // Toggle between light and dark (skip system)
