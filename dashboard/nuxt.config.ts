@@ -26,7 +26,7 @@ export default defineNuxtConfig({
   // App configuration
   app: {
     head: {
-      title: "Atqan Management Wathq API's System",
+      title: "TAWTHIQ Management Wathq API's System",
     },
   },
   // Modules

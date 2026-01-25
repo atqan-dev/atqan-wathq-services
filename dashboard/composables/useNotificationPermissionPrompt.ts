@@ -79,7 +79,7 @@ export function useNotificationPermissionPrompt() {
             title: '🎉 Notifications Enabled!',
             message: 'You\'ll now receive important updates from your SaaS app.',
             type: 'success',
-            icon: '/favicon-96x96.png',
+            icon: '/favicon.ico',
             requireInteraction: false
           })
         }, 500)

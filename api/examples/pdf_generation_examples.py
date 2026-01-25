@@ -189,12 +189,12 @@ def example_with_logo():
         document_title="وثيقة رسمية مع الشعار",
         main_content="<p>هذه وثيقة رسمية تحتوي على شعار الشركة.</p>",
         # You would set logo_base64 or logo_url here
-        # logo_url="path/to/logo.png",
+        # logo_url="path/to/logo.avif",
         show_signature=True,
     )
 
     # Add logo from file if it exists
-    logo_path = "assets/logo.png"
+    logo_path = "assets/logo.avif"
     if Path(logo_path).exists():
         pdf_data = pdf_service.add_logo_from_file(pdf_data, logo_path)
 

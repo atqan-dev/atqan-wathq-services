@@ -163,7 +163,7 @@ class TOTPService:
             otpauth:// URI for QR code generation
         """
         if issuer is None:
-            issuer = getattr(settings, "APP_NAME", "Atqan Wathq")
+            issuer = getattr(settings, "APP_NAME", "TAWTHIQ Wathq")
 
         totp = self.get_totp(secret)
         return totp.provisioning_uri(name=email, issuer_name=issuer)

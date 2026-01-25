@@ -264,7 +264,7 @@ function testCustomNotification() {
     title: customTitle.value,
     message: customMessage.value,
     type: 'info',
-    icon: '/favicon-96x96.png',
+    icon: '/favicon.ico',
     onClick: () => {
       console.log('Clicked custom notification')
     }

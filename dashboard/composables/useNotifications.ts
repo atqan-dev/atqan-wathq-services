@@ -293,8 +293,8 @@ export function useNotifications() {
       try {
         new Notification(notification.title || 'New Notification', {
           body: notification.message,
-          icon: '/favicon-96x96.png',
-          badge: '/favicon-96x96.png'
+          icon: '/favicon.ico',
+          badge: '/favicon.ico'
         })
       } catch (error) {
         console.warn('[WebSocket] Failed to show browser notification:', error)

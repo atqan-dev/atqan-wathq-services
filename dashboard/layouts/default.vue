@@ -6,8 +6,8 @@
     <!-- Watermark -->
     <div class="fixed inset-0 flex items-center justify-center pointer-events-none z-0 opacity-30">
       <img 
-        src="/assets/images/atqan-logo.svg" 
-        alt="Atqan Watermark" 
+        src="/assets/images/tawthiq-logo.png" 
+        alt="Tawthiq Watermark" 
         class="w-96 h-96 transform rotate-[-30deg] opacity-50" 
       />
     </div>

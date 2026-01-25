@@ -7,14 +7,14 @@
         <NuxtLink
           to="/"
           class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors p-2"
-          title="Atqan Management Wathq API's System"
+          title="tawthiq Management Wathq API's System"
         >
           <div
             class="flex items-center"
             :class="isRTL ? 'space-x-reverse space-x-4' : 'space-x-4'"
           >
             <!-- <UIcon name="i-heroicons-code-bracket" class="w-8 h-8 text-primary-600" /> -->
-            <img src="/assets/images/fave.svg" alt="Logo" class="w-12 h-12" />
+            <img src="/assets/images/tawthiq-logo.png" alt="Logo" class="w-12 h-12" />
 
             <h1 class="text-xl font-bold text-gray-700 dark:text-white text-shadow-lg">
               {{ t("nav.dashboard") }}

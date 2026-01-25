@@ -464,12 +464,12 @@ const copyBackupCodes = () => {
 const downloadBackupCodes = () => {
   const codes = setupData.value?.backup_codes || newBackupCodes.value
   if (codes.length > 0) {
-    const content = `Atqan Wathq - Backup Codes\n${'='.repeat(30)}\n\n${codes.join('\n')}\n\nKeep these codes safe. Each code can only be used once.`
+    const content = `tawthiq Wathq - Backup Codes\n${'='.repeat(30)}\n\n${codes.join('\n')}\n\nKeep these codes safe. Each code can only be used once.`
     const blob = new Blob([content], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = 'atqan-backup-codes.txt'
+    a.download = 'tawthiq-backup-codes.txt'
     a.click()
     URL.revokeObjectURL(url)
   }
