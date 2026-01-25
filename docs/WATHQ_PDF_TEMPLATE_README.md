@@ -36,16 +36,16 @@ from app.services.wathq_pdf_service import pdf_service
 
 # Sample WATHQ data
 wathq_data = {
-    "service_name": "السجل التجاري",
+    "service_name": "السجل التجاري ( التشريعات الجديدة )",
     "cr_number": "1010711252",
     "company_name": "شركة مجموعة توثيق العدل",
-    "description": "وثيقة السجل التجاري"
+    "description": "وثيقة السجل التجاري ( التشريعات الجديدة )"
 }
 
 # Generate PDF bytes
 pdf_bytes = pdf_service.generate_wathq_pdf_bytes(
     wathq_data=wathq_data,
-    document_title="السجل التجاري",
+    document_title="السجل التجاري ( التشريعات الجديدة )",
     show_watermark=True,
     watermark_text="وثق"
 )
@@ -60,7 +60,7 @@ with open("commercial_registration.pdf", "wb") as f:
 # Generate HTML preview for browser display
 html_content = pdf_service.preview_wathq_html(
     wathq_data=wathq_data,
-    document_title="السجل التجاري",
+    document_title="السجل التجاري ( التشريعات الجديدة )",
     show_watermark=True
 )
 

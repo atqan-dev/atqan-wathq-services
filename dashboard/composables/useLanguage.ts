@@ -4,6 +4,7 @@
  */
 export const useLanguage = () => {
   const { locale, locales, setLocale } = useI18n()
+  const settingsStore = usePageSettingsStore()
 
   // Available languages
   const languages = computed(() => locales.value)
@@ -21,6 +22,8 @@ export const useLanguage = () => {
     if (langCode && (langCode === 'en' || langCode === 'ar')) {
       setLocale(langCode)
       updateDirection()
+      // Persist to pageSettings store
+      settingsStore.updateLanguage({ language: langCode })
     }
   }
 
@@ -30,7 +33,7 @@ export const useLanguage = () => {
       const html = document.documentElement
       const body = document.body
       const currentLang = currentLanguage.value
-      
+
       if (currentLang) {
         html.setAttribute('dir', currentLang.dir)
         html.setAttribute('lang', currentLang.code || 'en')

@@ -256,11 +256,11 @@ class WathqCommercialRegistrationPDF(WathqPDFData):
     def __init__(self, **data):
         # Set default document title for CR documents
         if "document_title" not in data:
-            data["document_title"] = "شهادة السجل التجاري"
+            data["document_title"] = "شهادة السجل التجاري ( التشريعات الجديدة )"
 
         # Set default watermark for CR documents
         if "watermark_text" not in data:
-            data["watermark_text"] = "السجل التجاري"
+            data["watermark_text"] = "السجل التجاري ( التشريعات الجديدة )"
 
         super().__init__(**data)
 

@@ -103,7 +103,7 @@ class WathqPDFService:
         if cr_data.get("crNumber"):
             content_parts.append(
                 PDFHelper.create_styled_paragraph(
-                    f"رقم السجل التجاري: {cr_data['crNumber']}", "highlight"
+                    f"رقم السجل التجاري ( التشريعات الجديدة ): {cr_data['crNumber']}", "highlight"
                 )
             )
 
@@ -291,7 +291,7 @@ class WathqPDFService:
     def _translate_field_name(self, field_name: str) -> str:
         """Translate common field names to Arabic"""
         translations = {
-            "cr_number": "رقم السجل التجاري",
+            "cr_number": "رقم السجل التجاري ( التشريعات الجديدة )",
             "company_name": "اسم الشركة",
             "legal_form": "الشكل القانوني",
             "capital": "رأس المال",

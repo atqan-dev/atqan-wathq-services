@@ -767,13 +767,13 @@ function printCR() {
       </style>
     </head>
     <body>
-      <h1>السجل التجاري - ${crData.value.cr_number}</h1>
+      <h1>السجل التجاري ( التشريعات الجديدة ) - ${crData.value.cr_number}</h1>
       
       <div class="section">
         <h2>المعلومات الأساسية</h2>
         <div class="info-grid">
           <div class="info-field">
-            <div class="info-label">رقم السجل التجاري</div>
+            <div class="info-label">رقم السجل التجاري ( التشريعات الجديدة )</div>
             <div class="info-value">${crData.value.cr_number || '-'}</div>
           </div>
           <div class="info-field">
