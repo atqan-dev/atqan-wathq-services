@@ -8,7 +8,7 @@ export const useAuthenticatedFetch = () => {
   ): Promise<T> => {
     // Check if body is FormData - if so, don't set Content-Type (browser will set it with boundary)
     const isFormData = options.body instanceof FormData;
-    
+
     const headers: Record<string, string> = {
       ...options.headers,
     };
@@ -20,6 +20,8 @@ export const useAuthenticatedFetch = () => {
 
     if (authStore.token) {
       headers.Authorization = `Bearer ${authStore.token}`;
+    } else {
+      console.warn('[AuthenticatedFetch] No token available. User:', authStore.user, 'IsAuthenticated:', authStore.isAuthenticated);
     }
 
     try {

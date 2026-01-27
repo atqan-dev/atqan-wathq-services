@@ -14,6 +14,7 @@ export interface User {
   tenant_id: number
   created_at: string
   updated_at?: string | null
+  roles?: Role[]
 }
 
 export interface Role {
@@ -52,6 +53,35 @@ export interface UpdateUserData {
   logo?: string
   is_active?: boolean
   is_superuser?: boolean
+}
+
+// Enhanced types with roles support
+export interface UserCreate {
+  email: string
+  first_name: string
+  last_name: string
+  name_ar?: string
+  logo?: string
+  password: string
+  is_active?: boolean
+  is_superuser?: boolean
+  role_ids?: number[]
+}
+
+export interface UserUpdate {
+  email?: string
+  first_name?: string
+  last_name?: string
+  name_ar?: string
+  logo?: string
+  password?: string
+  is_active?: boolean
+  is_superuser?: boolean
+  role_ids?: number[]
+}
+
+export interface UserWithRoles extends User {
+  roles: Role[]
 }
 
 export interface UserStats {

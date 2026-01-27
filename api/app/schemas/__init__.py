@@ -86,7 +86,17 @@ from .totp import (
     TOTPVerifyRequest,
     TOTPVerifyResponse,
 )
-from .user import TokenPayload, User, UserCreate, UserInDB, UserUpdate
+from .user import (
+    TokenPayload,
+    User,
+    UserCreate,
+    UserCreateWithRoles,
+    UserInDB,
+    UserUpdate,
+    UserUpdateWithRoles,
+    UserWithRoles,
+    RoleSimple,
+)
 from .wathq_call_log import (
     ServiceUsageStats,
     TenantUsageStats,
@@ -149,8 +159,12 @@ from .cr_request import (
 __all__ = [
     "User",
     "UserCreate",
+    "UserCreateWithRoles",
     "UserInDB",
     "UserUpdate",
+    "UserUpdateWithRoles",
+    "UserWithRoles",
+    "RoleSimple",
     "TokenPayload",
     "Tenant",
     "TenantCreate",

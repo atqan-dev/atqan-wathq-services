@@ -28,9 +28,19 @@ class UserCreate(UserBase):
     password: str
 
 
+# Properties to receive via API on creation with roles
+class UserCreateWithRoles(UserCreate):
+    role_ids: list[int] | None = []
+
+
 # Properties to receive via API on update
 class UserUpdate(UserBase):
     password: str | None = None
+
+
+# Properties to receive via API on update with roles
+class UserUpdateWithRoles(UserUpdate):
+    role_ids: list[int] | None = None
 
 
 class UserInDBBase(UserBase):
@@ -48,6 +58,21 @@ class User(UserInDBBase):
     pass
 
 
+# User with roles information
+class UserWithRoles(UserInDBBase):
+    roles: list["RoleSimple"] = []
+
+
+# Simplified role for user response
+class RoleSimple(BaseModel):
+    id: int
+    name: str
+    description: str | None = None
+    
+    class Config:
+        from_attributes = True
+
+
 # Additional properties stored in DB
 class UserInDB(UserInDBBase):
     hashed_password: str
@@ -60,3 +85,9 @@ class TokenPayload(BaseModel):
     tenant_slug: str | None = None
     is_management_user: bool = False
     is_super_admin: bool = False
+
+
+# Import at the end to avoid circular imports
+from app.schemas.permission import Role  # noqa: E402
+
+UserWithRoles.model_rebuild()
