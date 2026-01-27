@@ -329,6 +329,152 @@ async def export_wathq_data_pdf(
         )
 
 
+@router.get("/database/commercial-registration/{cr_id}/pdf")
+async def export_database_cr_pdf(
+    cr_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Export Commercial Registration PDF from database record
+    Uses stored CR data instead of fetching from Wathq API
+    """
+    try:
+        from app.models.wathq_commercial_registration import CommercialRegistration
+        from jinja2 import Template
+        from datetime import datetime
+        import pdfkit
+        
+        # Fetch CR from database with all relationships
+        cr = db.query(CommercialRegistration).filter(
+            CommercialRegistration.id == cr_id
+        ).first()
+        
+        if not cr:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Commercial Registration with ID {cr_id} not found"
+            )
+        
+        # Load template
+        template_path = pdf_service.templates_dir / "cr_database_template.html"
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500,
+                detail="Database CR template not found"
+            )
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        template = Template(template_content)
+        
+        # Render HTML with CR data
+        html_content = template.render(
+            cr=cr,
+            capital=cr.capital_info,
+            activities=cr.activities,
+            parties=cr.parties,
+            managers=cr.managers,
+            now=datetime.now()
+        )
+        
+        # Generate PDF
+        pdf_options = {
+            'page-size': 'A4',
+            'margin-top': '20mm',
+            'margin-right': '15mm',
+            'margin-bottom': '20mm',
+            'margin-left': '15mm',
+            'encoding': 'UTF-8',
+            'enable-local-file-access': None,
+            'print-media-type': None,
+        }
+        
+        pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
+        
+        filename = f"commercial_registration_{cr.cr_number}_{cr_id}.pdf"
+        
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"'
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate database CR PDF: {str(e)}"
+        )
+
+
+@router.get("/database/commercial-registration/{cr_id}/preview")
+async def preview_database_cr_html(
+    cr_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Preview Commercial Registration HTML from database record
+    """
+    try:
+        from app.models.wathq_commercial_registration import CommercialRegistration
+        from jinja2 import Template
+        from datetime import datetime
+        
+        # Fetch CR from database with all relationships
+        cr = db.query(CommercialRegistration).filter(
+            CommercialRegistration.id == cr_id
+        ).first()
+        
+        if not cr:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Commercial Registration with ID {cr_id} not found"
+            )
+        
+        # Load template
+        template_path = pdf_service.templates_dir / "cr_database_template.html"
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500,
+                detail="Database CR template not found"
+            )
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        template = Template(template_content)
+        
+        # Render HTML with CR data
+        html_content = template.render(
+            cr=cr,
+            capital=cr.capital_info,
+            activities=cr.activities,
+            parties=cr.parties,
+            managers=cr.managers,
+            now=datetime.now()
+        )
+        
+        return Response(content=html_content, media_type="text/html")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate database CR preview: {str(e)}"
+        )
+
+
 @router.get("/templates")
 async def list_available_templates(
     current_user: models.User | models.ManagementUser = Depends(

@@ -651,21 +651,14 @@ async function exportToPdf() {
   try {
     isExportingPdf.value = true
     
-    // Use the dedicated CR PDF export endpoint
-    const pdfUrl = `${config.public.apiBase}/wathq/pdf/commercial-registration/${id.value}/pdf`
-    const queryParams = new URLSearchParams({
-      language: 'ar',
-      include_activities: 'true',
-      include_parties: 'true',
-      include_managers: 'true'
-    })
-    
-    const fullUrl = `${pdfUrl}?${queryParams.toString()}`
+    // Use the database-driven CR PDF export endpoint
+    // This uses the stored CR data from our database instead of fetching from Wathq API
+    const pdfUrl = `${config.public.apiBase}/wathq/pdf/database/commercial-registration/${id.value}/pdf`
     
     // Use fetch to download with authentication
     const token = authStore.token
     if (token) {
-      const response = await fetch(fullUrl, {
+      const response = await fetch(pdfUrl, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -676,7 +669,7 @@ async function exportToPdf() {
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        link.download = `commercial_registration_${crData.value.cr_number}.pdf`
+        link.download = `commercial_registration_${crData.value.cr_number}_${id.value}.pdf`
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -684,8 +677,12 @@ async function exportToPdf() {
         
         showSuccess(t('wathq.actions.exportPdfSuccess'))
       } else {
+        const errorText = await response.text()
+        console.error('PDF generation failed:', errorText)
         throw new Error('Failed to generate PDF')
       }
+    } else {
+      throw new Error('No authentication token available')
     }
   } catch (error) {
     console.error('PDF export failed:', error)

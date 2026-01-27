@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>السجل التجاري - {{ cr.cr_number }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm 1.5cm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #ffffff;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 3px solid #2c5f2d;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 24pt;
+            color: #2c5f2d;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .header .cr-number {
+            font-size: 16pt;
+            color: #555;
+            font-weight: normal;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            background: #2c5f2d;
+            color: white;
+            padding: 10px 15px;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-field {
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #2c5f2d;
+            font-size: 10pt;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 11pt;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 10pt;
+        }
+
+        table th {
+            background: #2c5f2d;
+            color: white;
+            padding: 10px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: right;
+        }
+
+        table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-suspended {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        .badge-yes {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-no {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media print {
+            body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>السجل التجاري (التشريعات الجديدة)</h1>
+        <div class="cr-number">رقم السجل: {{ cr.cr_number }}</div>
+        {% if cr.fetched_at %}
+        <div style="font-size: 9pt; color: #888; margin-top: 10px;">
+            تاريخ الاستعلام: {{ cr.fetched_at.strftime('%Y-%m-%d %H:%M') }}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Basic Information Section -->
+    <div class="section">
+        <div class="section-title">المعلومات الأساسية</div>
+        <div class="info-grid">
+            <div class="info-field">
+                <div class="info-label">رقم السجل التجاري</div>
+                <div class="info-value">{{ cr.cr_number or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">الرقم الوطني للسجل</div>
+                <div class="info-value">{{ cr.cr_national_number or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field full-width">
+                <div class="info-label">اسم المنشأة (بالإنجليزية)</div>
+                <div class="info-value">{{ cr.name or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field full-width">
+                <div class="info-label">اسم المنشأة (بالعربية)</div>
+                <div class="info-value">{{ cr.name_lang_desc or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">رقم الإصدار</div>
+                <div class="info-value">{{ cr.version_no or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">الحالة</div>
+                <div class="info-value">
+                    {% if cr.status_name %}
+                        <span class="status-badge {% if cr.status_name == 'Active' or cr.status_name == 'نشط' %}status-active{% elif cr.status_name == 'Suspended' or cr.status_name == 'موقوف' %}status-suspended{% else %}status-cancelled{% endif %}">
+                            {{ cr.status_name }}
+                        </span>
+                    {% else %}
+                        غير محدد
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entity Information Section -->
+    <div class="section">
+        <div class="section-title">معلومات الكيان</div>
+        <div class="info-grid">
+            <div class="info-field">
+                <div class="info-label">نوع الكيان</div>
+                <div class="info-value">{{ cr.entity_type_name or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">شكل الكيان</div>
+                <div class="info-value">{{ cr.entity_form_name or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">مدة الشركة (بالسنوات)</div>
+                <div class="info-value">{{ cr.company_duration or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">سجل رئيسي</div>
+                <div class="info-value">
+                    {% if cr.is_main is not none %}
+                        <span class="badge {% if cr.is_main %}badge-yes{% else %}badge-no{% endif %}">
+                            {{ 'نعم' if cr.is_main else 'لا' }}
+                        </span>
+                    {% else %}
+                        غير محدد
+                    {% endif %}
+                </div>
+            </div>
+            {% if cr.main_cr_number %}
+            <div class="info-field">
+                <div class="info-label">رقم السجل الرئيسي</div>
+                <div class="info-value">{{ cr.main_cr_number }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">الرقم الوطني للسجل الرئيسي</div>
+                <div class="info-value">{{ cr.main_cr_national_number or 'غير محدد' }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Dates Section -->
+    <div class="section">
+        <div class="section-title">التواريخ المهمة</div>
+        <div class="info-grid">
+            <div class="info-field">
+                <div class="info-label">تاريخ الإصدار (ميلادي)</div>
+                <div class="info-value">{{ cr.issue_date_gregorian.strftime('%Y-%m-%d') if cr.issue_date_gregorian else 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">تاريخ الإصدار (هجري)</div>
+                <div class="info-value">{{ cr.issue_date_hijri or 'غير محدد' }}</div>
+            </div>
+            {% if cr.confirmation_date_gregorian %}
+            <div class="info-field">
+                <div class="info-label">تاريخ التأكيد (ميلادي)</div>
+                <div class="info-value">{{ cr.confirmation_date_gregorian.strftime('%Y-%m-%d') }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">تاريخ التأكيد (هجري)</div>
+                <div class="info-value">{{ cr.confirmation_date_hijri or 'غير محدد' }}</div>
+            </div>
+            {% endif %}
+            {% if cr.suspension_date_gregorian %}
+            <div class="info-field">
+                <div class="info-label">تاريخ الإيقاف (ميلادي)</div>
+                <div class="info-value">{{ cr.suspension_date_gregorian.strftime('%Y-%m-%d') }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">تاريخ الإيقاف (هجري)</div>
+                <div class="info-value">{{ cr.suspension_date_hijri or 'غير محدد' }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Location Information Section -->
+    <div class="section">
+        <div class="section-title">معلومات الموقع</div>
+        <div class="info-grid">
+            <div class="info-field">
+                <div class="info-label">مدينة المقر الرئيسي</div>
+                <div class="info-value">{{ cr.headquarter_city_name or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">جنسية الشركاء</div>
+                <div class="info-value">{{ cr.partners_nationality_name or 'غير محدد' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Information Section -->
+    <div class="section">
+        <div class="section-title">معلومات الاتصال</div>
+        <div class="info-grid">
+            <div class="info-field">
+                <div class="info-label">الهاتف</div>
+                <div class="info-value">{{ cr.contact_phone or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">الجوال</div>
+                <div class="info-value">{{ cr.contact_mobile or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">البريد الإلكتروني</div>
+                <div class="info-value">{{ cr.contact_email or 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">الموقع الإلكتروني</div>
+                <div class="info-value">{{ cr.contact_website or 'غير محدد' }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Capital Information Section -->
+    {% if capital %}
+    <div class="section">
+        <div class="section-title">معلومات رأس المال</div>
+        <div class="info-grid">
+            <div class="info-field">
+                <div class="info-label">رأس المال</div>
+                <div class="info-value">{{ '{:,.2f}'.format(cr.cr_capital) if cr.cr_capital else 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">العملة</div>
+                <div class="info-value">{{ capital.currency_name or 'غير محدد' }}</div>
+            </div>
+            {% if capital.contrib_cash or capital.contrib_in_kind %}
+            <div class="info-field">
+                <div class="info-label">المساهمة النقدية</div>
+                <div class="info-value">{{ '{:,.2f}'.format(capital.contrib_cash) if capital.contrib_cash else 'غير محدد' }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">المساهمة العينية</div>
+                <div class="info-value">{{ '{:,.2f}'.format(capital.contrib_in_kind) if capital.contrib_in_kind else 'غير محدد' }}</div>
+            </div>
+            {% endif %}
+            {% if capital.stock_capital %}
+            <div class="info-field">
+                <div class="info-label">رأس المال السهمي</div>
+                <div class="info-value">{{ '{:,.2f}'.format(capital.stock_capital) }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">رأس المال المدفوع</div>
+                <div class="info-value">{{ '{:,.2f}'.format(capital.stock_paid_capital) if capital.stock_paid_capital else 'غير محدد' }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Fiscal Year Information Section -->
+    {% if cr.fiscal_calendar_type_name %}
+    <div class="section">
+        <div class="section-title">معلومات السنة المالية</div>
+        <div class="info-grid">
+            <div class="info-field">
+                <div class="info-label">نوع التقويم المالي</div>
+                <div class="info-value">{{ cr.fiscal_calendar_type_name }}</div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">نهاية السنة المالية</div>
+                <div class="info-value">
+                    {% if cr.fiscal_end_day and cr.fiscal_end_month %}
+                        {{ cr.fiscal_end_day }}/{{ cr.fiscal_end_month }}
+                    {% else %}
+                        غير محدد
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Management Structure Section -->
+    {% if cr.mgmt_structure_name %}
+    <div class="section">
+        <div class="section-title">الهيكل الإداري</div>
+        <div class="info-grid">
+            <div class="info-field full-width">
+                <div class="info-label">نوع الهيكل الإداري</div>
+                <div class="info-value">{{ cr.mgmt_structure_name }}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Activities Section -->
+    {% if activities and activities|length > 0 %}
+    <div class="section">
+        <div class="section-title">الأنشطة التجارية</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 20%;">رقم النشاط</th>
+                    <th style="width: 80%;">اسم النشاط</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                <tr>
+                    <td>{{ activity.activity_id or '-' }}</td>
+                    <td>{{ activity.activity_name or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Parties/Partners Section -->
+    {% if parties and parties|length > 0 %}
+    <div class="section" style="page-break-before: always;">
+        <div class="section-title">الشركاء / الأطراف</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30%;">الاسم</th>
+                    <th style="width: 20%;">النوع</th>
+                    <th style="width: 20%;">رقم الهوية</th>
+                    <th style="width: 15%;">نوع الهوية</th>
+                    <th style="width: 15%;">إجمالي الأسهم</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for party in parties %}
+                <tr>
+                    <td>{{ party.name or '-' }}</td>
+                    <td>{{ party.type_name or '-' }}</td>
+                    <td>{{ party.identity_id or '-' }}</td>
+                    <td>{{ party.identity_type_name or '-' }}</td>
+                    <td>{{ party.share_total_count or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Managers Section -->
+    {% if managers and managers|length > 0 %}
+    <div class="section">
+        <div class="section-title">المديرون</div>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 30%;">الاسم</th>
+                    <th style="width: 20%;">النوع</th>
+                    <th style="width: 20%;">رقم الهوية</th>
+                    <th style="width: 15%;">نوع الهوية</th>
+                    <th style="width: 15%;">الجنسية</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for manager in managers %}
+                <tr>
+                    <td>{{ manager.name or '-' }}</td>
+                    <td>{{ manager.type_name or '-' }}</td>
+                    <td>{{ manager.identity_id or '-' }}</td>
+                    <td>{{ manager.identity_type_name or '-' }}</td>
+                    <td>{{ manager.nationality_name or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Additional Flags Section -->
+    <div class="section">
+        <div class="section-title">معلومات إضافية</div>
+        <div class="info-grid">
+            <div class="info-field">
+                <div class="info-label">في عملية تصفية</div>
+                <div class="info-value">
+                    {% if cr.in_liquidation_process is not none %}
+                        <span class="badge {% if cr.in_liquidation_process %}badge-yes{% else %}badge-no{% endif %}">
+                            {{ 'نعم' if cr.in_liquidation_process else 'لا' }}
+                        </span>
+                    {% else %}
+                        غير محدد
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">لديه تجارة إلكترونية</div>
+                <div class="info-value">
+                    {% if cr.has_ecommerce is not none %}
+                        <span class="badge {% if cr.has_ecommerce %}badge-yes{% else %}badge-no{% endif %}">
+                            {{ 'نعم' if cr.has_ecommerce else 'لا' }}
+                        </span>
+                    {% else %}
+                        غير محدد
+                    {% endif %}
+                </div>
+            </div>
+            <div class="info-field">
+                <div class="info-label">مبني على ترخيص</div>
+                <div class="info-value">
+                    {% if cr.is_license_based is not none %}
+                        <span class="badge {% if cr.is_license_based %}badge-yes{% else %}badge-no{% endif %}">
+                            {{ 'نعم' if cr.is_license_based else 'لا' }}
+                        </span>
+                    {% else %}
+                        غير محدد
+                    {% endif %}
+                </div>
+            </div>
+            {% if cr.license_issuer_name %}
+            <div class="info-field">
+                <div class="info-label">جهة إصدار الترخيص</div>
+                <div class="info-value">{{ cr.license_issuer_name }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>هذا المستند تم إنشاؤه آليًا من قاعدة البيانات</p>
+        <p>تاريخ الإنشاء: {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    </div>
+</body>
+</html>
