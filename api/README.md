@@ -243,6 +243,9 @@ Using TRUNCATE CASCADE as a fallback for stubborn constraints
 Maintaining proper dependency order for all WATHQ tables
 Your database is now fully refreshed with clean seed data and ready for API testing!
 
+
+# install ubuntu lib 
+apt-get install wkhtmltopdf
 ## License
 
 This project is licensed under the MIT License.

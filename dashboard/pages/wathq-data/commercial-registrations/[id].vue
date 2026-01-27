@@ -400,6 +400,11 @@ const exportMenuItems = computed(() => [[
     icon: 'i-heroicons-document-text',
     click: exportToPdf,
     loading: isExportingPdf.value
+  },
+  {
+    label: 'Preview Template',
+    icon: 'i-heroicons-eye',
+    click: previewTemplate
   }
 ]])
 
@@ -692,6 +697,48 @@ async function exportToPdf() {
   }
 }
 
+// Preview Template
+async function previewTemplate() {
+  if (!crData.value) return
+  
+  try {
+    // Use the database-driven CR HTML preview endpoint
+    const previewUrl = `${config.public.apiBase}/wathq/pdf/database/commercial-registration/${id.value}/preview`
+    
+    // Use fetch to get HTML with authentication
+    const token = authStore.token
+    if (token) {
+      const response = await fetch(previewUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        const htmlContent = await response.text()
+        
+        // Open in new window
+        const previewWindow = window.open('', '_blank')
+        if (previewWindow) {
+          previewWindow.document.write(htmlContent)
+          previewWindow.document.close()
+        } else {
+          showError('Failed to open preview window. Please allow popups.')
+        }
+      } else {
+        const errorText = await response.text()
+        console.error('Template preview failed:', errorText)
+        throw new Error('Failed to preview template')
+      }
+    } else {
+      throw new Error('No authentication token available')
+    }
+  } catch (error) {
+    console.error('Template preview failed:', error)
+    showError('Failed to preview template')
+  }
+}
+
 // Print CR
 function printCR() {
   if (!crData.value) return
@@ -770,15 +817,27 @@ function printCR() {
         <h2>المعلومات الأساسية</h2>
         <div class="info-grid">
           <div class="info-field">
+            <div class="info-label">معرف السجل</div>
+            <div class="info-value">${crData.value.id || '-'}</div>
+          </div>
+          <div class="info-field">
             <div class="info-label">رقم السجل التجاري ( التشريعات الجديدة )</div>
             <div class="info-value">${crData.value.cr_number || '-'}</div>
           </div>
           <div class="info-field">
-            <div class="info-label">الاسم</div>
+            <div class="info-label">رقم السجل التجاري الوطني</div>
+            <div class="info-value">${crData.value.cr_national_number || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">رقم الإصدار</div>
+            <div class="info-value">${crData.value.version_no || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">الاسم (English)</div>
             <div class="info-value">${crData.value.name || '-'}</div>
           </div>
           <div class="info-field">
-            <div class="info-label">الاسم بالعربية</div>
+            <div class="info-label">الاسم (العربية)</div>
             <div class="info-value">${crData.value.name_lang_desc || '-'}</div>
           </div>
           <div class="info-field">
@@ -790,16 +849,56 @@ function printCR() {
             <div class="info-value">${crData.value.entity_type_name || '-'}</div>
           </div>
           <div class="info-field">
+            <div class="info-label">شكل الكيان</div>
+            <div class="info-value">${crData.value.entity_form_name || '-'}</div>
+          </div>
+          <div class="info-field">
             <div class="info-label">رأس المال</div>
             <div class="info-value">${formatCurrency(crData.value.cr_capital)}</div>
           </div>
           <div class="info-field">
-            <div class="info-label">المدينة</div>
+            <div class="info-label">مدة الشركة</div>
+            <div class="info-value">${crData.value.company_duration ? crData.value.company_duration + ' سنة' : '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">سجل رئيسي</div>
+            <div class="info-value">${crData.value.is_main ? 'نعم' : 'لا'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">مدينة المقر الرئيسي</div>
             <div class="info-value">${crData.value.headquarter_city_name || '-'}</div>
           </div>
           <div class="info-field">
-            <div class="info-label">تاريخ الإصدار</div>
+            <div class="info-label">تاريخ الإصدار (ميلادي)</div>
             <div class="info-value">${formatDate(crData.value.issue_date_gregorian)}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">تاريخ الإصدار (هجري)</div>
+            <div class="info-value">${crData.value.issue_date_hijri || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">تاريخ التأكيد (ميلادي)</div>
+            <div class="info-value">${formatDate(crData.value.confirmation_date_gregorian)}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">تاريخ التأكيد (هجري)</div>
+            <div class="info-value">${crData.value.confirmation_date_hijri || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">جنسية الشركاء</div>
+            <div class="info-value">${crData.value.partners_nationality_name || '-'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">لديه تجارة إلكترونية</div>
+            <div class="info-value">${crData.value.has_ecommerce ? 'نعم' : 'لا'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">في عملية التصفية</div>
+            <div class="info-value">${crData.value.in_liquidation_process ? 'نعم' : 'لا'}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">مرخص</div>
+            <div class="info-value">${crData.value.is_license_based ? 'نعم' : 'لا'}</div>
           </div>
         </div>
       </div>
@@ -931,6 +1030,14 @@ function printCR() {
           <div class="info-field">
             <div class="info-label">المساهمة العينية</div>
             <div class="info-value">${formatCurrency(crData.value.capital_info.contrib_in_kind)}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">رأس المال السهمي</div>
+            <div class="info-value">${formatCurrency(crData.value.capital_info.stock_capital)}</div>
+          </div>
+          <div class="info-field">
+            <div class="info-label">إجمالي رأس المال</div>
+            <div class="info-value">${formatCurrency(crData.value.capital_info.total_capital)}</div>
           </div>
         </div>
       </div>
