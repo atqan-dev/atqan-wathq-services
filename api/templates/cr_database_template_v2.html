@@ -82,6 +82,7 @@
       border-bottom: 3px solid #004074;
       padding-bottom: 5px;
       margin-bottom: 5px;
+      
     }
 
     .header h1 {
@@ -89,6 +90,7 @@
       font-size: 17px;
       font-family: "Inter", "Tahoma", "Arial", sans-serif;
       color: #004074;
+      
     }
 
     .header h1 span {
@@ -270,9 +272,10 @@
       }
 
       .page {
-        margin: 0;
+        margin: 0 !important;
         box-shadow: none;
         page-break-after: always;
+
       }
 
       #print-area,
@@ -282,27 +285,28 @@
 
       #print-area {
         position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+
       }
 
       .content {
-        margin: 0;
-        padding: 0;
+        margin: 0 !important;
+        padding: 0 !important;
       }
 
       @page {
         size: A4;
-        margin: 0;
-        padding: 0;
+        margin: 0 !important;
+        padding: 0 !important;
       }
     }
 
     /* WeasyPrint-specific fixes for PDF export */
     /* Watermark background styling */
     .watermark-bg {
-      z-index: -1 !important;
+      z-index: 9999 !important;
     }
 
     /* Fix for WeasyPrint percentage positioning */
@@ -310,8 +314,6 @@
       position: relative;
       overflow: hidden;
       box-sizing: border-box;
-      /* margin-left: -25px; */
-      /* margin-right: 25px; */
     }
   </style>
 </head>
@@ -537,13 +539,13 @@
         <div class="table-data">
           <!-- Header -->
           <header class="header">
-            <h1>السجل التجاري ( التشريعات الجديدة ) <span>(التشريعات الجديدة)</span></h1>
+            <h1>السجل التجاري <span>(التشريعات الجديدة)</span></h1>
             <h1>{{ name | default('غير محدد') }}</h1>
 
             <div class="meta">
 
               <div>
-                رقم السجل التجاري ( التشريعات الجديدة ):
+                رقم السجل التجاري :
                 <strong>{{ cr_number | default('غير محدد') }}</strong>
               </div>
               <div>تاريخ البحث: <strong>{{ search_date }}</strong></div>
@@ -570,7 +572,7 @@
               </tr>
 
               <tr>
-                <td class="label">رقم السجل التجاري ( التشريعات الجديدة )</td>
+                <td class="label">رقم السجل التجاري</td>
                 <td>{{ cr_number | default('غير محدد') }}</td>
                 <td class="label en">CR Number</td>
               </tr>
@@ -1198,12 +1200,12 @@
         <div class="table-data">
           <!-- Header -->
           <header class="header">
-            <h1>تابــع السجل التجاري ( التشريعات الجديدة ) <span>(التشريعات الجديدة)</span></h1>
+            <h1>تابع السجل التجاري  <span>(التشريعات الجديدة)</span></h1>
             <h1>{{ name | default('غير محدد') }}</h1>
             <div class="meta">
 
               <div>
-                رقم السجل التجاري ( التشريعات الجديدة ):
+                رقم السجل التجاري :
                 <strong>{{ cr_number | default('غير محدد') }}</strong>
               </div>
               <div>تاريخ البحث: <strong>{{ search_date }}</strong></div>

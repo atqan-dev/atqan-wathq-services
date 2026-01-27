@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>السجل التجاري - {{ cr.cr_number }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Almarai", 'Arial', 'Helvetica', sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #1a1a1a;
+            background: #f3f4f6;
+            margin: 0;
+        }
+
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            background: #ffffff;
+            position: relative;
+            margin: 0 auto;
+            overflow: hidden;
+            page-break-after: always;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 30mm 20mm 25mm 20mm;
+        }
+
+        /* Watermark */
+        .watermark-bg {
+            position: fixed;
+            left: 84%;
+            top: 71%;
+            transform: translate(-50%, -90%) rotate(0deg) scale(1.7);
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .watermark-bg img {
+            max-width: 500px;
+        }
+
+        /* Header Background */
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 25mm;
+            z-index: 0;
+        }
+
+        /* Footer Background */
+        .footer-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20mm;
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            border-bottom: 3px solid #004074;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 17px;
+            font-family: "Almarai", sans-serif;
+            color: #004074;
+            font-weight: 700;
+        }
+
+        .header .cr-number {
+            font-size: 13px;
+            color: #004074;
+            margin-top: 5px;
+        }
+
+        .meta {
+            display: inline-flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 10px;
+            font-size: 13px;
+            align-items: first baseline;
+        }
+
+        .section {
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+        }
+
+        .section-title {
+            background: #2c5f2d;
+            color: white;
+            padding: 10px 15px;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-field {
+            border: 1px solid #ddd;
+            padding: 12px;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #2c5f2d;
+            font-size: 10pt;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 11pt;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 10pt;
+        }
+
+        table th {
+            background: #2c5f2d;
+            color: white;
+            padding: 10px;
+            text-align: right;
+            font-weight: bold;
+        }
+
+        table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: right;
+        }
+
+        table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-suspended {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+            text-align: center;
+            font-size: 9pt;
+            color: #666;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        .badge-yes {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-no {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        @media print {
+            body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <!-- Watermark -->
+        <div class="watermark-bg">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZcAAAH1CAYAAAA6WrNcAAAgAElEQVR4Xux9B5gc1ZX1re7qOHk0oyyNckARJSQBRoDIXmN2DbZ3vc42DuAEeL3+vc7Z63XARBvjtN618QK2yULBSkgoIqEsRjlMzp2r6z/nvW5JyAozo8l6pW++GXVXeHVf9Tt97z33XEvMZixgLGAsYCxgLNDBFrA6+HzmdMYCxgLGAsYCxgJiwMU8BMYCxgLGAsYCHW4BAy4dblJzwt5ugVmDB19qJY8ee7VSKi1L0r39fsz4jQW6wwIGXLrD6uaaPdoCP7z72qcst8JZtPT1Bw9VybbXK6WiRw/YDM5YoAdawIBLD5wUM6TutcCPPzZ+5ezJhZcnU4k3Vr9y4OXNW2r/FB4gK3+1TGLdOzJzdWOB3mMBAy69Z67MSLvIAg99fOTymWPdK61YjYRzBklNk2ffinUH/rR0c/TxRftllwmVddFEmMv0agsYcOnV02cG39EWcF2xHv3k0MVzxqSuDru14iQ84rhBSQdL5WiT78Di9Qd//uqG5t8sPyqHOvra5nzGAn3JAgZc+tJsmnvpEAs8fNfIv80Y1fSWnHSNeFK2WJZPEl6RlCcoUTdX9lU6a9ZsPPK/q/bK05v2yYEOuag5ibFAH7OAAZc+NqHmdi7MAq6I9dCnxqycOaJ5fk66UmzHVidM4F8KnxaP7Qd9LE+aG/Mqj0aDe19Yf+D+9VujS03S/8Lsbo7uexYw4NL35tTc0QVYQIHLXeNemTUielnYrZF0Ki1e4Itrp8QjrnjTXvEScNIeiVlBaQkWyitbjz65ak3kd/sr5JV1VXL8Ai5vDjUW6DMWMODSZ6bS3EhHWIDg8ugnx70yY0Qc4FIltuWVlOuI402Ix02L3xHxEnBSCJMhVBYN+CQd7i+NscLkmo0VTyxfW/1oU4NsWFYlzR0xHnMOY4HeagEDLr115sy4O80CP79r3NqZw1vm5LoV4vUi35JKScKC5+LxiN+1xYbX4kNppQvgaUrHxA1iHwcvBPMkksxrWfHqwd8t3eg8XDhdtj/xBOJpZjMWuAgtYMDlIpx0c8vntsDDd41fO6esYU5eukJch76MF56LF5EwhMRcj0gS7oubFAtvef0BSbpxCeZ4JJpKSmMEGJM/VI7V5W1atOLAnzcdiPzvkp2yx9CXzVN3sVnAgMvFNuPmfs9rgfvvHr92LsClIH1cfAAQeigJF94JvRXkXDxwW3z+qPg8Ft7Pk5bmOLIxABu/R5LpFBL/XnG9uRJL58vBCnftmo1Hn9q2P/0/L5fLwfNe3OxgLNBHLGDApY9MpLmNjrPA/XePA7g0zslzj4OKDO8E4bC0BIQp/bTHJ5YnIWkrIk5SkIOxkJcJAYAAPB4XwOMiR5OUVJrJGT+8mjyJucXO7n3JFcs3Hvn9a7uTz2yolmMdN1pzJmOBnmkBAy49c17MqLrRAgSX+QQXhMXURuQQGwCDgkpExUAVEy88FQ8rLhWqIGxmgUuW+TSlLbg4FsAF/owN6nIsYQN4+knELYpv3dnw8pJXDvy6+pAsWdwkNd14m+bSxgKdagEDLp1qXnPy3miBnxFchjeqhD6BI836FoTH+Bu+CYAD4EL8AMhYABgXCRUH4OMCYAhAfN8DP4evOglXfD7UyTheeDBhsXOGSUsqv3r1pr3/9+Ka6l+BK7Bz2X6p7412MmM2FjiXBQy4mOfDWOA0C7QFXJRjw3AZwQX+DH9rcHEAPCkJ2AAfUJlT6TRyMJbEPTkgB+SAfRYC4OTLmrWHfr52fd1/7w7Ixl27pMlMhrFAX7GAAZe+MpPmPjrMAm0DF4CH8mFshMZYzY/iFzDKCDdegIqASeYB2DAfAwazYp0x4Z+0/NAsCyGTUyrHapLbnl+759d7d8r/PXtQyjvsRsyJjAW60QIGXLrR+ObSPdMCrQcXB6EwxMuwpVVoD..."
+                style="max-width: 500px" />
+        </div>
+
+        <!-- Header Background -->
+        <div style="position: absolute; left: -0.71%; top: -0.39%; width: 101.09%; height: 1.54%; z-index: 1;">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlIAAAALCAMAAACDH5NXAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAABCUExURQBHcwBCcABHcgBGcgBGcwBGcQBCbgJFbwJEbwJDbwJFcAJEcQJEcAA/bzRnhjRmhjRlhjRmhzRnhzRlhy9ihP///2JdRUkAAAABYktHRBXl2PmjAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH6QwDCBo2W16c/wAAAAFvck5UAc+id5oAAAGZSURBVFjD7VKLTgQhDGSvKuypwKn//60ujxYK7MNIYmI6yXGFttNpt0oJBDOx/LUAwX+DrJRgMmSlBJMhKyWYDFkpwWQs6ga3E8D+A1xNuVgBxj6AK5GXNYyqND1BG/7Djn41Idi5ztYwmSr7wkodhEXftJXarUSOPgLC095KwdkudhWGDQFfqTZkPIQLgINk/sT7Plqp0681fodJa3WyUqHMop4Egol4flHaGB1/ZBhD1mp072eHSYaORjI7luSjJ+4rxPnMvIaxVFTZ0lofSC95NYGJHW1/9/vrG7JQk0PZuirMmOopMGPttTYs/TvlrAPithEiKExp6isXY0bJeqS/ecK+V6qj+3Dd8umk//6urHM2/shwzrvtCFYwPPl9MFx0J5/1MdKGa3gJN5uZfGDIociSDjJycjZSUjIcVnVZgssVHPFZNDAyssRbVcuhdCROdI+Px6evVG15mBJqkJYov9ChYevW+PDKzPA9S2CiqsmObpjs7SiA5l99CFuatDi4Loc3UWR3vZVOKJnmnDspU7WcwX19A+syRsZvtHUAAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDI1LTEyLTAzVDA4OjI2OjM2KzAwOjAwnSAwRQAAACV0RVh0ZGF0ZTptb2RpZnkAMjAyNS0xMi0wM1QwODoyNjozNiswMDowMOx9iPkAAAAodEVYdGRhdGU6dGltZXN0YW1wADIwMjUtMTItMDNUMDg6MjY6NTQrMDA6MDDqmLGIAAAAAElFTkSuQmCC"
+                style="width: 100%; height: 100%; object-fit: cover; display: block;" />
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Header -->
+            <div class="header">
+                <h1>السجل التجاري (التشريعات الجديدة)</h1>
+                <div class="cr-number">رقم السجل: {{ cr.cr_number }}</div>
+                {% if cr.fetched_at %}
+                <div class="meta">
+                    <span>تاريخ الاستعلام: {{ cr.fetched_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Basic Information Section -->
+            <div class="section">
+                <div class="section-title">المعلومات الأساسية</div>
+                <div class="info-grid">
+                    <div class="info-field">
+                        <div class="info-label">رقم السجل التجاري</div>
+                        <div class="info-value">{{ cr.cr_number or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">الرقم الوطني للسجل</div>
+                        <div class="info-value">{{ cr.cr_national_number or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field full-width">
+                        <div class="info-label">اسم المنشأة (بالإنجليزية)</div>
+                        <div class="info-value">{{ cr.name or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field full-width">
+                        <div class="info-label">اسم المنشأة (بالعربية)</div>
+                        <div class="info-value">{{ cr.name_lang_desc or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">رقم الإصدار</div>
+                        <div class="info-value">{{ cr.version_no or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">الحالة</div>
+                        <div class="info-value">
+                            {% if cr.status_name %}
+                            <span
+                                class="status-badge {% if cr.status_name == 'Active' or cr.status_name == 'نشط' %}status-active{% elif cr.status_name == 'Suspended' or cr.status_name == 'موقوف' %}status-suspended{% else %}status-cancelled{% endif %}">
+                                {{ cr.status_name }}
+                            </span>
+                            {% else %}
+                            غير محدد
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entity Information Section -->
+            <div class="section">
+                <div class="section-title">معلومات الكيان</div>
+                <div class="info-grid">
+                    <div class="info-field">
+                        <div class="info-label">نوع الكيان</div>
+                        <div class="info-value">{{ cr.entity_type_name or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">شكل الكيان</div>
+                        <div class="info-value">{{ cr.entity_form_name or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">مدة الشركة (بالسنوات)</div>
+                        <div class="info-value">{{ cr.company_duration or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">سجل رئيسي</div>
+                        <div class="info-value">
+                            {% if cr.is_main is not none %}
+                            <span class="badge {% if cr.is_main %}badge-yes{% else %}badge-no{% endif %}">
+                                {{ 'نعم' if cr.is_main else 'لا' }}
+                            </span>
+                            {% else %}
+                            غير محدد
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if cr.main_cr_number %}
+                    <div class="info-field">
+                        <div class="info-label">رقم السجل الرئيسي</div>
+                        <div class="info-value">{{ cr.main_cr_number }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">الرقم الوطني للسجل الرئيسي</div>
+                        <div class="info-value">{{ cr.main_cr_national_number or 'غير محدد' }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Dates Section -->
+            <div class="section">
+                <div class="section-title">التواريخ المهمة</div>
+                <div class="info-grid">
+                    <div class="info-field">
+                        <div class="info-label">تاريخ الإصدار (ميلادي)</div>
+                        <div class="info-value">{{ cr.issue_date_gregorian.strftime('%Y-%m-%d') if
+                            cr.issue_date_gregorian else
+                            'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">تاريخ الإصدار (هجري)</div>
+                        <div class="info-value">{{ cr.issue_date_hijri or 'غير محدد' }}</div>
+                    </div>
+                    {% if cr.confirmation_date_gregorian %}
+                    <div class="info-field">
+                        <div class="info-label">تاريخ التأكيد (ميلادي)</div>
+                        <div class="info-value">{{ cr.confirmation_date_gregorian.strftime('%Y-%m-%d') }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">تاريخ التأكيد (هجري)</div>
+                        <div class="info-value">{{ cr.confirmation_date_hijri or 'غير محدد' }}</div>
+                    </div>
+                    {% endif %}
+                    {% if cr.suspension_date_gregorian %}
+                    <div class="info-field">
+                        <div class="info-label">تاريخ الإيقاف (ميلادي)</div>
+                        <div class="info-value">{{ cr.suspension_date_gregorian.strftime('%Y-%m-%d') }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">تاريخ الإيقاف (هجري)</div>
+                        <div class="info-value">{{ cr.suspension_date_hijri or 'غير محدد' }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Location Information Section -->
+            <div class="section">
+                <div class="section-title">معلومات الموقع</div>
+                <div class="info-grid">
+                    <div class="info-field">
+                        <div class="info-label">مدينة المقر الرئيسي</div>
+                        <div class="info-value">{{ cr.headquarter_city_name or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">جنسية الشركاء</div>
+                        <div class="info-value">{{ cr.partners_nationality_name or 'غير محدد' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information Section -->
+            <div class="section">
+                <div class="section-title">معلومات الاتصال</div>
+                <div class="info-grid">
+                    <div class="info-field">
+                        <div class="info-label">الهاتف</div>
+                        <div class="info-value">{{ cr.contact_phone or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">الجوال</div>
+                        <div class="info-value">{{ cr.contact_mobile or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">البريد الإلكتروني</div>
+                        <div class="info-value">{{ cr.contact_email or 'غير محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">الموقع الإلكتروني</div>
+                        <div class="info-value">{{ cr.contact_website or 'غير محدد' }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Capital Information Section -->
+            {% if capital %}
+            <div class="section">
+                <div class="section-title">معلومات رأس المال</div>
+                <div class="info-grid">
+                    <div class="info-field">
+                        <div class="info-label">رأس المال</div>
+                        <div class="info-value">{{ '{:,.2f}'.format(cr.cr_capital) if cr.cr_capital else 'غير محدد' }}
+                        </div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">العملة</div>
+                        <div class="info-value">{{ capital.currency_name or 'غير محدد' }}</div>
+                    </div>
+                    {% if capital.contrib_cash or capital.contrib_in_kind %}
+                    <div class="info-field">
+                        <div class="info-label">المساهمة النقدية</div>
+                        <div class="info-value">{{ '{:,.2f}'.format(capital.contrib_cash) if capital.contrib_cash else
+                            'غير
+                            محدد' }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">المساهمة العينية</div>
+                        <div class="info-value">{{ '{:,.2f}'.format(capital.contrib_in_kind) if capital.contrib_in_kind
+                            else
+                            'غير محدد' }}</div>
+                    </div>
+                    {% endif %}
+                    {% if capital.stock_capital %}
+                    <div class="info-field">
+                        <div class="info-label">رأس المال السهمي</div>
+                        <div class="info-value">{{ '{:,.2f}'.format(capital.stock_capital) }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">رأس المال المدفوع</div>
+                        <div class="info-value">{{ '{:,.2f}'.format(capital.stock_paid_capital) if
+                            capital.stock_paid_capital
+                            else 'غير محدد' }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Fiscal Year Information Section -->
+            {% if cr.fiscal_calendar_type_name %}
+            <div class="section">
+                <div class="section-title">معلومات السنة المالية</div>
+                <div class="info-grid">
+                    <div class="info-field">
+                        <div class="info-label">نوع التقويم المالي</div>
+                        <div class="info-value">{{ cr.fiscal_calendar_type_name }}</div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">نهاية السنة المالية</div>
+                        <div class="info-value">
+                            {% if cr.fiscal_end_day and cr.fiscal_end_month %}
+                            {{ cr.fiscal_end_day }}/{{ cr.fiscal_end_month }}
+                            {% else %}
+                            غير محدد
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Management Structure Section -->
+            {% if cr.mgmt_structure_name %}
+            <div class="section">
+                <div class="section-title">الهيكل الإداري</div>
+                <div class="info-grid">
+                    <div class="info-field full-width">
+                        <div class="info-label">نوع الهيكل الإداري</div>
+                        <div class="info-value">{{ cr.mgmt_structure_name }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Activities Section -->
+            {% if activities and activities|length > 0 %}
+            <div class="section">
+                <div class="section-title">الأنشطة التجارية</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 20%;">رقم النشاط</th>
+                            <th style="width: 80%;">اسم النشاط</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for activity in activities %}
+                        <tr>
+                            <td>{{ activity.activity_id or '-' }}</td>
+                            <td>{{ activity.activity_name or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Parties/Partners Section -->
+            {% if parties and parties|length > 0 %}
+            <div class="section" style="page-break-before: always;">
+                <div class="section-title">الشركاء / الأطراف</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">الاسم</th>
+                            <th style="width: 20%;">النوع</th>
+                            <th style="width: 20%;">رقم الهوية</th>
+                            <th style="width: 15%;">نوع الهوية</th>
+                            <th style="width: 15%;">إجمالي الأسهم</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for party in parties %}
+                        <tr>
+                            <td>{{ party.name or '-' }}</td>
+                            <td>{{ party.type_name or '-' }}</td>
+                            <td>{{ party.identity_id or '-' }}</td>
+                            <td>{{ party.identity_type_name or '-' }}</td>
+                            <td>{{ party.share_total_count or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Managers Section -->
+            {% if managers and managers|length > 0 %}
+            <div class="section">
+                <div class="section-title">المديرون</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 30%;">الاسم</th>
+                            <th style="width: 20%;">النوع</th>
+                            <th style="width: 20%;">رقم الهوية</th>
+                            <th style="width: 15%;">نوع الهوية</th>
+                            <th style="width: 15%;">الجنسية</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for manager in managers %}
+                        <tr>
+                            <td>{{ manager.name or '-' }}</td>
+                            <td>{{ manager.type_name or '-' }}</td>
+                            <td>{{ manager.identity_id or '-' }}</td>
+                            <td>{{ manager.identity_type_name or '-' }}</td>
+                            <td>{{ manager.nationality_name or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+
+            <!-- Additional Flags Section -->
+            <div class="section">
+                <div class="section-title">معلومات إضافية</div>
+                <div class="info-grid">
+                    <div class="info-field">
+                        <div class="info-label">في عملية تصفية</div>
+                        <div class="info-value">
+                            {% if cr.in_liquidation_process is not none %}
+                            <span
+                                class="badge {% if cr.in_liquidation_process %}badge-yes{% else %}badge-no{% endif %}">
+                                {{ 'نعم' if cr.in_liquidation_process else 'لا' }}
+                            </span>
+                            {% else %}
+                            غير محدد
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">لديه تجارة إلكترونية</div>
+                        <div class="info-value">
+                            {% if cr.has_ecommerce is not none %}
+                            <span class="badge {% if cr.has_ecommerce %}badge-yes{% else %}badge-no{% endif %}">
+                                {{ 'نعم' if cr.has_ecommerce else 'لا' }}
+                            </span>
+                            {% else %}
+                            غير محدد
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="info-field">
+                        <div class="info-label">مبني على ترخيص</div>
+                        <div class="info-value">
+                            {% if cr.is_license_based is not none %}
+                            <span class="badge {% if cr.is_license_based %}badge-yes{% else %}badge-no{% endif %}">
+                                {{ 'نعم' if cr.is_license_based else 'لا' }}
+                            </span>
+                            {% else %}
+                            غير محدد
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if cr.license_issuer_name %}
+                    <div class="info-field">
+                        <div class="info-label">جهة إصدار الترخيص</div>
+                        <div class="info-value">{{ cr.license_issuer_name }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>هذا المستند تم إنشاؤه آليًا من قاعدة البيانات</p>
+                <p>تاريخ الإنشاء: {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            </div>
+        </div>
+
+        <!-- Footer Background -->
+        <div style="position: absolute; left: -0.50%; bottom: 0; width: 101.09%; height: 2%; z-index: 0;">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlMAAAAQCAYAAAAyEvoDAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAGYktHRAD/AP8A/6C9p5MAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfpDAMIGyJYn3nDAAAAAW9yTlQBz6J3mgAAQwhJREFUeNrt3XdTllm28OEfUUBUFEFQERFJKjnnnHM2xza0OXSye0LPTM90T7c559gGcs4ZnoccJSOKgAFQBAQlqPD+0XO+wZk6VW9xVe1vcO9da6299rpF/n0nbcpwhSo300oor3vCJndTzPQ0uJFaRkVdBwH2q/Cy1eVWTjVFFS3s8bXB1kSbS/H55JQ0sd7dBC8rXe7l1RKfV0OAtS6BTkaklDWSUdzIGicjrAzViSisJ7vkEescjHAx0+F+fg1pgkZ8rVaw3suMBGED0dnVBNnpEexqRLywnsjMcrxMtQhxNiW5pJmkojrMtZey0deC vEdPicutxt9SBz9HY5KFDUTkVOFmsJx1XmZk17ZzI0GIvZ46WwOsKG14xo2kUtyMNNjoa0lubTs3EgVYaquy0cucstZubqaWo6+qwK5gO2qevOJuSjmWOqps8bcmr+EJl2ILcdBW5ctQO0qaOrkQJWT5Qjm+2+hOW88AZyJy0VdVYou/NU1dPVxNFqKtOJetvta09L7lSpyA5Qpz2eZnS/fAENcSBGgulOfQGheaX/Rx/G4mSxXnsi/cgZf9w5yJLWaOBBwMd2LgwzjXkoQozZFlV4AdzweHORudj7KsFF+G2PF6eJSL8QKkRMQ5GO7IRyY5FZmHnKQE32x05/XwCL89yEFyCo5ucOXjJPzzbhYik1McDLFDWkaGi4kCPo5O8PV6V0YnP3HsXiYyEhLsCbJjSkycY5F5jI184LsNbsyeNZNjtzMYHRvn+61ezJKR4m8303j/boTdIQ7MnSPLlUQh3a/62e5jxdLFClxJKmb43Qf2hjogJS3GmRghb14PcijcngUL5vLb/Rxe9faz09cW7WXKXE4s4dmLNxwMsUd5wVxORubR2/uWTZ7mqKkocD2zkubWLrb7WLJKYwk3Ukvp6H7NrgAblqkocCFRwKPmDvYHO7BSU4XzsUWU1z9lh68VDmYruBBbQFXjM/aE2LNq+UJupJZRVveYze5mWBhpcyFOwKPWLtY4G2BnpMXNjArK69s5HOqIpYEmx+5nIahqYZOnBZ42utzOrCQut5pwR2P8HPSJL6ihoOoxIQ5G2BipE1NYS6awgXBnIxxNtYnIqyO7rAlfcx2CXU2JLaonXdhAiKMB7lYriMqvJaWwFj/Llfg6GJFS0kRCUQ22K5cT5myMoP4JiQV1eFho4+9gSKKgibiCajyMNQh0NCKrro17KWW4Gmmz0deC7Io2fk8rx89Ch80BVqSWt3ApMg8nI002+FhQUNtORE41eksU2RlsR0Xbc+4kl+NmpMkGLwtSq5q4mVyMw0p1dgTbUvToKReiitBbqshX61xp7H7D6cgcTNQX8WWYAyVNHdxKLUZn4Xw2+9rQ+qqfK3FFaCvNY2egPS2v3nA3pQwtFXl2hzrwqKOHc5G5aC2cz44ge9p7BrgWX4KCrBj7w5x4MzzK5bhCVOTnsDvIno7+Qc7FFrJQVoptgbYMjoxxNraIuTMk2R7khAxv6a+4ifXMVyanxJhi2rRp0/6XTU0wJTEP8ZVaSzgXW0BqSRN7Au0x1dPgRFQeedWPCXYwxMlch0spxSQXNfClnw06Gov5590sBHXtBDnpYaKrwYnYApKFDWzyssTbSo8baeWkljey2cMMF4sVnEsWEplWQbi7KZYGGtzLreV2ZgWuJlq4W+lyLUVIUlkzoQ7G2JvpcD2lnIjcSkJsdQlyMuF2ZjlRRXXY6Wmx2sucjOo2LsTlE2Sth7...[21360 bytes truncated]"
+                style="width: 100%; height: 100%; object-fit: fill; display: block;" />
+        </div>
+    </div>
+</body>
+
+</html>

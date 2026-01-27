@@ -329,6 +329,328 @@ async def export_wathq_data_pdf(
         )
 
 
+@router.get("/database/commercial-registration/{cr_id}/pdf")
+async def export_database_cr_pdf(
+    cr_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Export Commercial Registration PDF from database record
+    Uses stored CR data instead of fetching from Wathq API
+    """
+    try:
+        from app.models.wathq_commercial_registration import CommercialRegistration
+        from jinja2 import Template
+        from datetime import datetime
+        import pdfkit
+        
+        # Fetch CR from database with all relationships
+        cr = db.query(CommercialRegistration).filter(
+            CommercialRegistration.id == cr_id
+        ).first()
+        
+        if not cr:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Commercial Registration with ID {cr_id} not found"
+            )
+        
+        # Load template - use commercial registration template with database mapping
+        template_path = pdf_service.templates_dir / "cr_database_template_v2.html"
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500,
+                detail="Database CR template not found"
+            )
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        template = Template(template_content)
+        
+        # Map database fields to template variables
+        from datetime import datetime as dt
+        
+        # Create simple namespace objects for nested data
+        class SimpleNamespace:
+            def __init__(self, **kwargs):
+                self.__dict__.update(kwargs)
+        
+        # Prepare entity_type object
+        entity_type = SimpleNamespace(
+            id=cr.entity_type_id,
+            name=cr.entity_type_name,
+            form_name=cr.entity_form_name
+        )
+        
+        # Prepare status object
+        status_obj = None
+        if cr.status_name:
+            confirmation_date = None
+            if cr.confirmation_date_gregorian:
+                confirmation_date = SimpleNamespace(
+                    gregorian=cr.confirmation_date_gregorian.strftime('%Y-%m-%d'),
+                    hijri=cr.confirmation_date_hijri
+                )
+            status_obj = SimpleNamespace(
+                name=cr.status_name,
+                confirmation_date=confirmation_date
+            )
+        
+        # Prepare issue_date object
+        issue_date = None
+        if cr.issue_date_gregorian:
+            issue_date = SimpleNamespace(
+                gregorian=cr.issue_date_gregorian.strftime('%Y-%m-%d'),
+                hijri=cr.issue_date_hijri
+            )
+        
+        # Prepare contact_info object
+        contact_info = SimpleNamespace(
+            phone=cr.contact_phone,
+            mobile=cr.contact_mobile,
+            email=cr.contact_email,
+            website_url=cr.contact_website
+        )
+        
+        # Prepare capital object
+        capital = None
+        if cr.capital_info or cr.cr_capital:
+            capital = SimpleNamespace(
+                currency_name=cr.capital_info.currency_name if cr.capital_info else None,
+                capital=cr.cr_capital
+            )
+        
+        # Prepare activities list
+        activities = []
+        if cr.activities:
+            for a in cr.activities:
+                activities.append(SimpleNamespace(id=a.activity_id, name=a.activity_name))
+        
+        # Prepare parties list
+        parties = []
+        if cr.parties:
+            for p in cr.parties:
+                # Create nested identity object as expected by template
+                identity = SimpleNamespace(
+                    id=p.identity_id,
+                    typeName=p.identity_type_name
+                ) if p.identity_id else None
+                
+                # Create nationality object (template expects party.nationality.name)
+                # We don't have nationality in parties table, so use None
+                nationality = None
+                
+                parties.append(SimpleNamespace(
+                    name=p.name,
+                    type_name=p.type_name,
+                    identity=identity,
+                    nationality=nationality,
+                    partnership=[]  # Empty partnership list
+                ))
+        
+        # Prepare managers list
+        managers = []
+        if cr.managers:
+            for m in cr.managers:
+                managers.append(SimpleNamespace(
+                    name=m.name,
+                    position=m.type_name,  # Map type_name to position
+                    identity=m.identity_id,  # Template expects flat identity for managers
+                    nationality_name=m.nationality_name
+                ))
+        
+        # Prepare management structure object
+        management = SimpleNamespace(
+            structureName=cr.mgmt_structure_name,
+            structureId=cr.mgmt_structure_id,
+            managers=managers  # Use the same managers list
+        )
+        
+        template_data = {
+            'document_title': f'السجل التجاري - {cr.cr_number}',
+            'search_date': cr.fetched_at.strftime('%Y-%m-%d') if cr.fetched_at else dt.now().strftime('%Y-%m-%d'),
+            'print_date': dt.now().strftime('%Y-%m-%d'),
+            'name': cr.name,
+            'name_lang_desc': cr.name_lang_desc,
+            'cr_number': cr.cr_number,
+            'cr_national_number': cr.cr_national_number,
+            'cr_capital': cr.cr_capital,
+            'company_duration': cr.company_duration,
+            'version_no': cr.version_no,
+            'entity_type': entity_type,
+            'status': status_obj,
+            'issue_date': issue_date,
+            'headquarter_city': cr.headquarter_city_name,
+            'contact_info': contact_info,
+            'capital': capital,
+            'activities': activities,
+            'parties': parties,
+            'managers': managers,
+            'partners_nationality_name': cr.partners_nationality_name,
+            'management': management
+        }
+        
+        html_content = template.render(**template_data)
+        
+        # Generate PDF
+        pdf_options = {
+            'page-size': 'A4',
+            'margin-top': '0mm',
+            'margin-right': '0mm',
+            'margin-bottom': '0mm',
+            'margin-left': '0mm',
+            'encoding': 'UTF-8',
+            'enable-local-file-access': None,
+            'print-media-type': None,
+            'orientation': 'portrait',
+        }
+        
+        pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
+        
+        filename = f"commercial_registration_{cr.cr_number}_{cr_id}.pdf"
+        
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"'
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate database CR PDF: {str(e)}"
+        )
+
+
+@router.get("/database/commercial-registration/{cr_id}/preview")
+async def preview_database_cr_html(
+    cr_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Preview Commercial Registration HTML from database record
+    """
+    try:
+        from app.models.wathq_commercial_registration import CommercialRegistration
+        from jinja2 import Template
+        from datetime import datetime as dt
+        
+        # Fetch CR from database with all relationships
+        cr = db.query(CommercialRegistration).filter(
+            CommercialRegistration.id == cr_id
+        ).first()
+        
+        if not cr:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Commercial Registration with ID {cr_id} not found"
+            )
+        
+        # Load template
+        template_path = pdf_service.templates_dir / "cr_database_template_v2.html"
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500,
+                detail="Database CR template not found"
+            )
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        template = Template(template_content)
+        
+        # Create simple namespace objects for nested data (same as PDF endpoint)
+        class SimpleNamespace:
+            def __init__(self, **kwargs):
+                self.__dict__.update(kwargs)
+        
+        entity_type = SimpleNamespace(id=cr.entity_type_id, name=cr.entity_type_name, form_name=cr.entity_form_name)
+        
+        status_obj = None
+        if cr.status_name:
+            confirmation_date = None
+            if cr.confirmation_date_gregorian:
+                confirmation_date = SimpleNamespace(gregorian=cr.confirmation_date_gregorian.strftime('%Y-%m-%d'), hijri=cr.confirmation_date_hijri)
+            status_obj = SimpleNamespace(name=cr.status_name, confirmation_date=confirmation_date)
+        
+        issue_date = None
+        if cr.issue_date_gregorian:
+            issue_date = SimpleNamespace(gregorian=cr.issue_date_gregorian.strftime('%Y-%m-%d'), hijri=cr.issue_date_hijri)
+        
+        contact_info = SimpleNamespace(phone=cr.contact_phone, mobile=cr.contact_mobile, email=cr.contact_email, website_url=cr.contact_website)
+        
+        capital = None
+        if cr.capital_info or cr.cr_capital:
+            capital = SimpleNamespace(currency_name=cr.capital_info.currency_name if cr.capital_info else None, capital=cr.cr_capital)
+        
+        activities = [SimpleNamespace(id=a.activity_id, name=a.activity_name) for a in cr.activities] if cr.activities else []
+        
+        parties = []
+        if cr.parties:
+            for p in cr.parties:
+                identity = SimpleNamespace(id=p.identity_id, typeName=p.identity_type_name) if p.identity_id else None
+                parties.append(SimpleNamespace(name=p.name, type_name=p.type_name, identity=identity, nationality=None, partnership=[]))
+        
+        managers = []
+        if cr.managers:
+            for m in cr.managers:
+                managers.append(SimpleNamespace(name=m.name, position=m.type_name, identity=m.identity_id, nationality_name=m.nationality_name))
+        
+        # Prepare management structure object
+        management = SimpleNamespace(
+            structureName=cr.mgmt_structure_name,
+            structureId=cr.mgmt_structure_id,
+            managers=managers
+        )
+        
+        template_data = {
+            'document_title': f'السجل التجاري - {cr.cr_number}',
+            'search_date': cr.fetched_at.strftime('%Y-%m-%d') if cr.fetched_at else dt.now().strftime('%Y-%m-%d'),
+            'print_date': dt.now().strftime('%Y-%m-%d'),
+            'name': cr.name,
+            'name_lang_desc': cr.name_lang_desc,
+            'cr_number': cr.cr_number,
+            'cr_national_number': cr.cr_national_number,
+            'cr_capital': cr.cr_capital,
+            'company_duration': cr.company_duration,
+            'version_no': cr.version_no,
+            'entity_type': entity_type,
+            'status': status_obj,
+            'issue_date': issue_date,
+            'headquarter_city': cr.headquarter_city_name,
+            'contact_info': contact_info,
+            'capital': capital,
+            'activities': activities,
+            'parties': parties,
+            'managers': managers,
+            'partners_nationality_name': cr.partners_nationality_name,
+            'management': management
+        }
+        
+        html_content = template.render(**template_data)
+        
+        return Response(content=html_content, media_type="text/html")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate database CR preview: {str(e)}"
+        )
+
+
 @router.get("/templates")
 async def list_available_templates(
     current_user: models.User | models.ManagementUser = Depends(

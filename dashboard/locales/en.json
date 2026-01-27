@@ -570,7 +570,8 @@
     "subtitle": "Manage all system users across Apps",
     "list": "Users List",
     "allUsers": "All Users",
-    "search": "Search users...",
+    "search": "Search by name or email...",
+    "addNew": "Add User",
     "addUser": "Add User",
     "editUser": "Edit User",
     "deleteUser": "Delete User",
@@ -583,6 +584,7 @@
     "confirmDelete": "Are you sure you want to delete {name}?",
     "confirmActivate": "Are you sure you want to activate this user?",
     "confirmDeactivate": "Are you sure you want to deactivate this user?",
+    "superuser": "Superuser",
     "stats": {
       "total": "Total Users",
       "active": "Active",
@@ -599,16 +601,24 @@
       "superAdmin": "Super Admin",
       "user": "User"
     },
+    "filters": {
+      "allStatus": "All Status",
+      "active": "Active Only",
+      "inactive": "Inactive Only",
+      "allRoles": "All Roles"
+    },
     "table": {
+      "user": "User",
       "name": "Name",
       "email": "Email",
       "status": "Status",
       "role": "Role",
+      "roles": "Roles",
       "tenant": "Tenant",
+      "created": "Created",
       "createdAt": "Created",
       "actions": "Actions",
       "admin": "Admin",
-      "user": "User",
       "rowsPerPage": "Rows per page",
       "showing": "Showing",
       "to": "to",
@@ -623,6 +633,16 @@
       "activate": "Activate",
       "deactivate": "Deactivate"
     },
+    "create": {
+      "title": "Create New User"
+    },
+    "edit": {
+      "title": "Edit User"
+    },
+    "delete": {
+      "title": "Delete User",
+      "message": "Are you sure you want to delete {name}? This action cannot be undone."
+    },
     "form": {
       "userDetails": "User Details",
       "fillRequiredFields": "Fill in the required information below",
@@ -635,6 +655,9 @@
       "lastNamePlaceholder": "Enter last name",
       "password": "Password",
       "passwordPlaceholder": "Enter password",
+      "newPassword": "New Password",
+      "newPasswordPlaceholder": "Leave blank to keep current password",
+      "passwordHint": "Leave blank to keep current password",
       "passwordHelp": "Minimum 8 characters with uppercase, lowercase, and number",
       "nameAr": "Arabic Name",
       "nameArPlaceholder": "أدخل الاسم بالعربية",
@@ -647,10 +670,13 @@
       "logoTooLarge": "File size exceeds 2MB. Please choose a smaller image.",
       "logoUploadFailed": "Failed to upload image. Please try again.",
       "existingLogo": "Current Avatar",
+      "roles": "Roles",
       "isActive": "Active Status",
+      "isSuperuser": "Superuser",
       "isSuperAdmin": "Super Admin",
       "create": "Create User",
-      "update": "Update User"
+      "update": "Update User",
+      "error": "Failed to save user"
     }
   },
   "websocket": {
