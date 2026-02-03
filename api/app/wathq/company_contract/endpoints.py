@@ -2,14 +2,16 @@
 FastAPI endpoints for Wathq Company Contract API.
 """
 
+import logging
 from typing import Any, List, Optional
 from fastapi import APIRouter, HTTPException, Query, Depends
 
 from app.core.guards import require_management_user
-from app.wathq.company_contract.client import WathqCompanyContractClient
+from app.wathq.company_contract.client import WathqCompanyContractClient, WathqAPIError
 from app.wathq.company_contract import schemas
 from app.core.config import settings
 
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -18,38 +20,76 @@ def get_wathq_company_contract_client() -> WathqCompanyContractClient:
     return WathqCompanyContractClient(settings.WATHQ_API_KEY)
 
 
+def handle_wathq_error(e: Exception) -> HTTPException:
+    """Convert WathqAPIError to HTTPException with proper status code."""
+    if isinstance(e, WathqAPIError):
+        return HTTPException(status_code=e.status_code, detail=e.message)
+    logger.exception(f"Unexpected error in company contract endpoint: {e}")
+    return HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/info/{cr_national_number}", response_model=schemas.CompanyContractInfo)
 async def get_contract_info(
     cr_national_number: str,
     language: str = Query("ar", regex="^(ar|en)$"),
     copy_number: Optional[str] = Query(None),
-    current_user = Depends(require_management_user()),
-    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client)
+    current_user=Depends(require_management_user()),
+    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client),
 ) -> Any:
     """
     Retrieve all company contract info, basic partners, and managers info.
-    
+
     - **cr_national_number**: Commercial Registration National Number
     - **language**: Contract information language (ar/en)
     - **copy_number**: Contract copy number (optional)
     """
     try:
-        result = await client.get_contract_info(cr_national_number, language, copy_number)
+        result = await client.get_contract_info(
+            cr_national_number, language, copy_number
+        )
         return result
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise handle_wathq_error(e)
 
 
-@router.get("/management/{cr_national_number}", response_model=schemas.ManagementResponse)
+@router.get(
+    "/management/info/{cr_national_number}", response_model=schemas.CompanyContractInfo
+)
+async def get_contract_info_management(
+    cr_national_number: str,
+    language: str = Query("ar", regex="^(ar|en)$"),
+    copy_number: Optional[str] = Query(None),
+    current_user=Depends(require_management_user()),
+    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client),
+) -> Any:
+    """
+    Retrieve all company contract info, basic partners, and managers info (management endpoint).
+
+    - **cr_national_number**: Commercial Registration National Number
+    - **language**: Contract information language (ar/en)
+    - **copy_number**: Contract copy number (optional)
+    """
+    try:
+        result = await client.get_contract_info(
+            cr_national_number, language, copy_number
+        )
+        return result
+    except Exception as e:
+        raise handle_wathq_error(e)
+
+
+@router.get(
+    "/management/{cr_national_number}", response_model=schemas.ManagementResponse
+)
 async def get_management_info(
     cr_national_number: str,
     language: str = Query("ar", regex="^(ar|en)$"),
-    current_user = Depends(require_management_user()),
-    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client)
+    current_user=Depends(require_management_user()),
+    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client),
 ) -> Any:
     """
     Retrieve all management information.
-    
+
     - **cr_national_number**: Commercial Registration National Number
     - **language**: Contract information language (ar/en)
     """
@@ -57,22 +97,25 @@ async def get_management_info(
         result = await client.get_management_info(cr_national_number, language)
         return result
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise handle_wathq_error(e)
 
 
-@router.get("/manager/{cr_national_number}/{manager_id}/{id_type}", response_model=schemas.ManagerResponse)
+@router.get(
+    "/manager/{cr_national_number}/{manager_id}/{id_type}",
+    response_model=schemas.ManagerResponse,
+)
 async def get_manager_info(
     cr_national_number: str,
     manager_id: str,
     id_type: str,
     permission_id: Optional[str] = Query(None, min_length=3, max_length=4),
     language: str = Query("ar", regex="^(ar|en)$"),
-    current_user = Depends(require_management_user()),
-    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client)
+    current_user=Depends(require_management_user()),
+    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client),
 ) -> Any:
     """
     Retrieve manager info with permissions.
-    
+
     - **cr_national_number**: Commercial Registration National Number
     - **manager_id**: Manager identification number
     - **id_type**: Identification type (National_ID, Resident_ID, etc.)
@@ -81,58 +124,67 @@ async def get_manager_info(
     """
     # Validate id_type
     valid_id_types = [
-        "National_ID", "Resident_ID", "Passport", "GCC_ID", "Endowment_Deed_No",
-        "License_No", "CR_National_ID", "Foreign_CR_No", "National_Number",
-        "Boarder_Number", "CR_Number", "UndefinedD"
+        "National_ID",
+        "Resident_ID",
+        "Passport",
+        "GCC_ID",
+        "Endowment_Deed_No",
+        "License_No",
+        "CR_National_ID",
+        "Foreign_CR_No",
+        "National_Number",
+        "Boarder_Number",
+        "CR_Number",
+        "UndefinedD",
     ]
-    
+
     if id_type not in valid_id_types:
         raise HTTPException(status_code=400, detail="Invalid ID type")
-    
+
     try:
         result = await client.get_manager_info(
             cr_national_number, manager_id, id_type, permission_id, language
         )
         return result
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise handle_wathq_error(e)
 
 
 # Lookup endpoints
 @router.get("/lookup/articleParts", response_model=List[schemas.Lookup])
 async def get_article_parts_lookup(
-    current_user = Depends(require_management_user()),
-    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client)
+    current_user=Depends(require_management_user()),
+    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client),
 ) -> Any:
     """Retrieve all article parts lookups."""
     try:
         result = await client.get_article_parts_lookup()
         return result
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise handle_wathq_error(e)
 
 
 @router.get("/lookup/partnerDecision", response_model=List[schemas.Lookup])
 async def get_partner_decision_lookup(
-    current_user = Depends(require_management_user()),
-    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client)
+    current_user=Depends(require_management_user()),
+    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client),
 ) -> Any:
     """Retrieve all partner decision lookups."""
     try:
         result = await client.get_partner_decision_lookup()
         return result
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise handle_wathq_error(e)
 
 
 @router.get("/lookup/exerciseMethod", response_model=List[schemas.Lookup])
 async def get_exercise_method_lookup(
-    current_user = Depends(require_management_user()),
-    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client)
+    current_user=Depends(require_management_user()),
+    client: WathqCompanyContractClient = Depends(get_wathq_company_contract_client),
 ) -> Any:
     """Retrieve all exercise method lookups."""
     try:
         result = await client.get_exercise_method_lookup()
         return result
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise handle_wathq_error(e)

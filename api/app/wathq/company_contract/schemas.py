@@ -1,100 +1,112 @@
 """
 Pydantic schemas for Wathq Company Contract API responses.
+
+Based on Wathq OpenAPI Spec v2.0.0
 """
 
-from typing import List, Optional
-from pydantic import BaseModel
+from typing import List, Optional, Any
+from pydantic import BaseModel, Field
 
 
 class Identity(BaseModel):
-    id: str
-    typeId: int
-    typeName: str
+    id: Optional[str] = None
+    typeId: Optional[int] = None
+    typeName: Optional[str] = None
 
 
 class Nationality(BaseModel):
-    id: int
-    name: str
+    id: Optional[int] = None
+    name: Optional[str] = None
+
+
+class Character(BaseModel):
+    id: Optional[int] = None
+    name: Optional[str] = None
 
 
 class EntityType(BaseModel):
-    id: int
-    name: str
-    formId: int
-    formName: str
-    characters: List[dict]
+    id: Optional[int] = None
+    name: Optional[str] = None
+    formId: Optional[int] = None
+    formName: Optional[str] = None
+    characters: Optional[List[Character]] = None
 
 
 class Stock(BaseModel):
-    typeId: int
-    typeName: str
-    count: int
-    value: float
-    classReferenceID: Optional[int] = None
+    typeId: Optional[int] = None
+    typeName: Optional[str] = None
+    count: Optional[int] = None
+    value: Optional[float] = None
+    classReferenceID: Optional[str] = None
     className: Optional[str] = None
 
 
 class StockCapital(BaseModel):
-    typeId: int
-    typeName: str
-    cashCapital: float
-    inKindCapital: float
-    capital: float
-    announcedCapital: float
-    paidCapital: float
-    stocks: List[Stock]
+    typeId: Optional[int] = None
+    typeName: Optional[str] = None
+    cashCapital: Optional[float] = None
+    inKindCapital: Optional[float] = None
+    capital: Optional[float] = None
+    announcedCapital: Optional[float] = None
+    paidCapital: Optional[float] = None
+    stocks: Optional[List[Stock]] = None
 
 
 class ContributionCapital(BaseModel):
-    typeId: int
-    typeName: str
-    cashCapital: float
-    inKindCapital: float
-    contributionValue: float
-    totalCashContribution: int
-    totalInKindContribution: int
+    typeId: Optional[int] = None
+    typeName: Optional[str] = None
+    cashCapital: Optional[float] = None
+    inKindCapital: Optional[float] = None
+    contributionValue: Optional[float] = None
+    totalCashContribution: Optional[int] = None
+    totalInKindContribution: Optional[int] = None
 
 
 class Capital(BaseModel):
-    currencyId: int
-    currencyName: str
+    currencyId: Optional[int] = None
+    currencyName: Optional[str] = None
     contributionCapital: Optional[ContributionCapital] = None
     stockCapital: Optional[StockCapital] = None
 
 
 class FiscalYear(BaseModel):
-    isFirst: bool
-    calendarTypeId: int
-    calendarTypeName: str
-    endMonth: int
-    endDay: int
+    isFirst: Optional[bool] = None
+    calendarTypeId: Optional[int] = None
+    calendarTypeName: Optional[str] = None
+    endMonth: Optional[int] = None
+    endDay: Optional[int] = None
     endYear: Optional[int] = None
 
 
 class Guardian(BaseModel):
-    name: str
-    identity: Identity
-    nationality: Nationality
-    isFatherGuardian: bool
+    name: Optional[str] = None
+    identity: Optional[Identity] = None
+    nationality: Optional[Nationality] = None
+    isFatherGuardian: Optional[bool] = None
+
+
+class Partnership(BaseModel):
+    id: Optional[int] = None
+    name: Optional[str] = None
 
 
 class PartnerShare(BaseModel):
-    cashContributionCount: int
-    inKindContributionCount: int
-    totalContributionCount: int
+    cashContributionCount: Optional[int] = None
+    inKindContributionCount: Optional[int] = None
+    totalContributionCount: Optional[int] = None
 
 
 class PartnerProfitLossDistribution(BaseModel):
-    profitDistribution: int
-    lossDistribution: int
+    profitDistribution: Optional[float] = None
+    lossDistribution: Optional[float] = None
 
 
 class Party(BaseModel):
-    name: str
-    typeId: int
-    typeName: str
-    identity: Identity
-    partnership: List[dict]
+    name: Optional[str] = None
+    typeId: Optional[int] = None
+    typeName: Optional[str] = None
+    identity: Optional[Identity] = None
+    partnership: Optional[List[Partnership]] = None
     partnerShare: Optional[PartnerShare] = None
     partnerProfitLossDistribution: Optional[PartnerProfitLossDistribution] = None
     nationality: Optional[Nationality] = None
@@ -104,146 +116,146 @@ class Party(BaseModel):
 
 
 class Position(BaseModel):
-    id: int
-    name: str
+    id: Optional[int] = None
+    name: Optional[str] = None
 
 
 class Manager(BaseModel):
-    name: str
-    typeId: int
-    typeName: str
-    isLicensed: bool
-    identity: Identity
-    nationality: Nationality
-    positions: List[Position]
+    name: Optional[str] = None
+    typeId: Optional[int] = None
+    typeName: Optional[str] = None
+    isLicensed: Optional[bool] = None
+    identity: Optional[Identity] = None
+    nationality: Optional[Nationality] = None
+    positions: Optional[List[Position]] = None
 
 
 class Permission(BaseModel):
-    id: str
-    name: str
-    canIssuePOA: bool
-    canDelegate: bool
+    id: Optional[str] = None
+    name: Optional[str] = None
+    canIssuePOA: Optional[bool] = None
+    canDelegate: Optional[bool] = None
     specialConditionText: Optional[str] = None
-    exerciseMethodId: int
-    exerciseMethodDescription: str
+    exerciseMethodId: Optional[int] = None
+    exerciseMethodDescription: Optional[str] = None
 
 
 class ManagerWithPermissions(Manager):
-    permissions: List[Permission]
+    permissions: Optional[List[Permission]] = None
 
 
 class ManagementBoard(BaseModel):
-    meetingQuorumId: int
-    meetingQuorumName: str
-    canDelegateAttendance: bool
-    termYears: int
-    wayOfWork: str
-    meetingPlace: str
-    additionalText: str
-    positions: List[Position]
+    meetingQuorumId: Optional[int] = None
+    meetingQuorumName: Optional[str] = None
+    canDelegateAttendance: Optional[bool] = None
+    termYears: Optional[int] = None
+    wayOfWork: Optional[str] = None
+    meetingPlace: Optional[str] = None
+    additionalText: Optional[str] = None
+    positions: Optional[List[Position]] = None
 
 
 class Reward(BaseModel):
-    id: str
-    name: str
+    id: Optional[str] = None
+    name: Optional[str] = None
 
 
 class DirectorsBoard(BaseModel):
-    memberCount: int
-    termYears: int
-    value: int
-    valueMax: int
-    wayOfWork: str
-    meetingPlace: str
-    meetingQuorum: int
-    meetingLegalQuorum: int
-    canDelegateAttendance: bool
-    boardCallMechanism: str
-    membershipExpiryTerms: str
-    additionalText: str
-    rewards: List[Reward]
-    positions: List[Position]
+    memberCount: Optional[int] = None
+    termYears: Optional[int] = None
+    value: Optional[int] = None
+    valueMax: Optional[int] = None
+    wayOfWork: Optional[str] = None
+    meetingPlace: Optional[str] = None
+    meetingQuorum: Optional[int] = None
+    meetingLegalQuorum: Optional[int] = None
+    canDelegateAttendance: Optional[bool] = None
+    boardCallMechanism: Optional[str] = None
+    membershipExpiryTerms: Optional[str] = None
+    additionalText: Optional[str] = None
+    rewards: Optional[List[Reward]] = None
+    positions: Optional[List[Position]] = None
 
 
 class Management(BaseModel):
-    structureId: int
-    structureName: str
+    structureId: Optional[int] = None
+    structureName: Optional[str] = None
     dismissalMethod: Optional[str] = None
-    managers: List[Manager]
+    managers: Optional[List[Manager]] = None
     managementBoard: Optional[ManagementBoard] = None
     directorsBoard: Optional[DirectorsBoard] = None
 
 
 class Activity(BaseModel):
-    id: str
-    name: str
+    id: Optional[str] = None
+    name: Optional[str] = None
 
 
 class Entity(BaseModel):
-    crNationalNumber: str
-    crNumber: Optional[int] = None
-    name: str
-    nameLangId: int
-    nameLangDesc: str
+    crNationalNumber: Optional[str] = None
+    crNumber: Optional[str] = None
+    name: Optional[str] = None
+    nameLangId: Optional[int] = None
+    nameLangDesc: Optional[str] = None
     companyDuration: Optional[int] = None
-    headquarterCityId: int
-    headquarterCityName: str
-    isLicenseBased: bool
+    headquarterCityId: Optional[int] = None
+    headquarterCityName: Optional[str] = None
+    isLicenseBased: Optional[bool] = None
     licenseIssuerNationalNo: Optional[str] = None
     licenseIssuerName: Optional[str] = None
-    entityType: EntityType
-    capital: Capital
+    entityType: Optional[EntityType] = None
+    capital: Optional[Capital] = None
     fiscalYear: Optional[FiscalYear] = None
-    parties: List[Party]
-    management: Management
-    activities: List[Activity]
+    parties: Optional[List[Party]] = None
+    management: Optional[Management] = None
+    activities: Optional[List[Activity]] = None
 
 
 class NotificationChannel(BaseModel):
-    id: int
-    name: str
+    id: Optional[int] = None
+    name: Optional[str] = None
 
 
 class PartnerDecision(BaseModel):
-    id: int
-    name: str
-    approvePercentage: str
+    id: Optional[int] = None
+    name: Optional[str] = None
+    approvePercentage: Optional[str] = None
     approveAdditionalText: Optional[str] = None
 
 
 class ProfitAllocation(BaseModel):
-    percentage: int
-    purpose: str
+    percentage: Optional[int] = None
+    purpose: Optional[str] = None
 
 
 class SetAsideDetails(BaseModel):
-    isSetAsideEnabled: bool
+    isSetAsideEnabled: Optional[bool] = None
     profitAllocation: Optional[ProfitAllocation] = None
 
 
 class Article(BaseModel):
-    id: int
-    text: str
+    id: Optional[int] = None
+    text: Optional[str] = None
     partId: Optional[int] = None
     partName: Optional[str] = None
 
 
 class AdditionalArticle(BaseModel):
-    title: str
-    text: str
-    partId: int
-    partName: str
+    title: Optional[str] = None
+    text: Optional[str] = None
+    partId: Optional[int] = None
+    partName: Optional[str] = None
 
 
 class CompanyContractInfo(BaseModel):
-    contractCopyNumber: int
-    contractDate: str
-    entity: Entity
-    notificationChannel: List[NotificationChannel]
-    partnerDecision: List[PartnerDecision]
+    contractCopyNumber: Optional[int] = None
+    contractDate: Optional[str] = None
+    entity: Optional[Entity] = None
+    notificationChannel: Optional[List[NotificationChannel]] = None
+    partnerDecision: Optional[List[PartnerDecision]] = None
     additionalDecisionText: Optional[str] = None
     setAsideDetails: Optional[SetAsideDetails] = None
-    articles: List[Article]
+    articles: Optional[List[Article]] = None
     additionalArticles: Optional[List[AdditionalArticle]] = None
 
 
@@ -256,11 +268,11 @@ ManagerResponse = List[ManagerWithPermissions]
 
 
 class Lookup(BaseModel):
-    id: int
-    nameAr: str
-    nameEn: str
+    id: Optional[int] = None
+    nameAr: Optional[str] = None
+    nameEn: Optional[str] = None
 
 
 class ErrorResponse(BaseModel):
-    code: str
-    message: str
+    code: Optional[str] = None
+    message: Optional[str] = None

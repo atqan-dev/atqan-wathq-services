@@ -43,8 +43,25 @@
       </UCard>
     </div>
 
+    <!-- Action Bar -->
+    <div class="flex justify-between items-center mb-4">
+      <div></div>
+      <div class="flex gap-3">
+        <UButton
+          icon="i-heroicons-arrow-path"
+          color="green"
+          size="lg"
+          :loading="isSyncing"
+          @click="handleSync"
+        >
+          {{ t('wathqData.syncFromLogs') }}
+        </UButton>
+      </div>
+    </div>
+
     <!-- Advanced DataTable -->
     <AdvancedDataTable
+      ref="dataTableRef"
       :config="tableConfig"
       :title="t('sidebar.employees')"
       :description="t('employees.subtitle')"
@@ -58,11 +75,20 @@
 import { ref } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useRouter } from 'vue-router'
+import { useAuthenticatedFetch } from '@/composables/useAuthenticatedFetch'
+import { useEmployeeExport } from '@/composables/useEmployeeExport'
 import type { DataTableConfig } from '~/types/datatable'
 import AdvancedDataTable from '~/components/ui/AdvancedDataTable.vue'
 
 const { t } = useI18n()
 const router = useRouter()
+const toast = useToast()
+const { authenticatedFetch } = useAuthenticatedFetch()
+const { exportToPDF, exportToJSON, exportToCSV, exportToExcel, previewEmployee } = useEmployeeExport()
+
+// Sync state
+const isSyncing = ref(false)
+const dataTableRef = ref<InstanceType<typeof AdvancedDataTable> | null>(null)
 
 definePageMeta({
   layout: 'default',
@@ -344,6 +370,39 @@ const tableConfig: DataTableConfig<any> = {
       }
     },
     {
+      key: 'preview',
+      label: '',
+      icon: 'i-heroicons-document-magnifying-glass',
+      color: 'blue' as const,
+      variant: 'ghost',
+      size: 'sm',
+      handler: (row) => {
+        previewEmployee(row.employee_id)
+      }
+    },
+    {
+      key: 'export-pdf',
+      label: '',
+      icon: 'i-heroicons-document-text',
+      color: 'red' as const,
+      variant: 'ghost',
+      size: 'sm',
+      handler: async (row) => {
+        await exportToPDF(row.employee_id, row.name)
+      }
+    },
+    {
+      key: 'export-excel',
+      label: '',
+      icon: 'i-heroicons-document-chart-bar',
+      color: 'green' as const,
+      variant: 'ghost',
+      size: 'sm',
+      handler: async (row) => {
+        await exportToExcel(row.employee_id, row.name)
+      }
+    },
+    {
       key: 'edit',
       label: '',
       icon: 'i-heroicons-pencil',
@@ -379,13 +438,39 @@ const tableConfig: DataTableConfig<any> = {
 
   bulkActions: [
     {
-      key: 'export',
-      label: 'Export Selected',
-      icon: 'i-heroicons-arrow-down-tray',
-      color: 'primary' as const,
+      key: 'export-pdf',
+      label: 'Export Selected as PDF',
+      icon: 'i-heroicons-document-text',
+      color: 'red' as const,
       variant: 'outline',
       handler: async (selectedRows) => {
-        console.log('Export selected:', selectedRows)
+        for (const row of selectedRows) {
+          await exportToPDF(row.employee_id, row.name)
+        }
+      }
+    },
+    {
+      key: 'export-excel',
+      label: 'Export Selected as Excel',
+      icon: 'i-heroicons-document-chart-bar',
+      color: 'green' as const,
+      variant: 'outline',
+      handler: async (selectedRows) => {
+        for (const row of selectedRows) {
+          await exportToExcel(row.employee_id, row.name)
+        }
+      }
+    },
+    {
+      key: 'export-json',
+      label: 'Export Selected as JSON',
+      icon: 'i-heroicons-code-bracket',
+      color: 'blue' as const,
+      variant: 'outline',
+      handler: async (selectedRows) => {
+        for (const row of selectedRows) {
+          await exportToJSON(row.employee_id, row.name)
+        }
       }
     }
   ],
@@ -427,5 +512,66 @@ function handleRowClick(row: any, index: number, event: Event) {
 
 function handleActionClick(action: any, row: any, index: number) {
   console.log('Action clicked:', action.key, row)
+}
+
+// Sync handler
+async function handleSync() {
+  isSyncing.value = true
+  
+  try {
+    const response = await authenticatedFetch<{
+      success: boolean
+      message: string
+      synced_count: number
+      total_logs: number
+      errors: any[]
+    }>('/api/v1/wathq/sync/employee/sync', {
+      method: 'POST'
+    })
+    
+    console.log('Sync response:', response)
+    
+    if (response.success) {
+      const message = response.synced_count > 0
+        ? `Synced ${response.synced_count} of ${response.total_logs} records from call logs`
+        : `No new records to sync. Found ${response.total_logs} call logs but all records already exist.`
+      
+      toast.add({
+        title: t('common.success'),
+        description: message,
+        color: 'green'
+      })
+      
+      // Show errors if any
+      if (response.errors && response.errors.length > 0) {
+        console.warn('Sync errors:', response.errors)
+        toast.add({
+          title: 'Some records had errors',
+          description: `${response.errors.length} records failed to sync. Check console for details.`,
+          color: 'orange'
+        })
+      }
+      
+      // Refresh the table data
+      if (response.synced_count > 0 && dataTableRef.value) {
+        dataTableRef.value.refresh()
+      }
+    } else {
+      toast.add({
+        title: t('common.error'),
+        description: response.message || 'Failed to sync data',
+        color: 'red'
+      })
+    }
+  } catch (error: any) {
+    console.error('Sync error:', error)
+    toast.add({
+      title: t('common.error'),
+      description: error.message || 'An error occurred during sync',
+      color: 'red'
+    })
+  } finally {
+    isSyncing.value = false
+  }
 }
 </script>

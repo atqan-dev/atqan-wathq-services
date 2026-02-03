@@ -43,8 +43,25 @@
       </UCard>
     </div>
 
+    <!-- Action Bar -->
+    <div class="flex justify-between items-center mb-4">
+      <div></div>
+      <div class="flex gap-3">
+        <UButton
+          icon="i-heroicons-arrow-path"
+          color="green"
+          size="lg"
+          :loading="isSyncing"
+          @click="handleSync"
+        >
+          {{ t('wathqData.syncFromLogs') }}
+        </UButton>
+      </div>
+    </div>
+
     <!-- Advanced DataTable -->
     <AdvancedDataTable
+      ref="dataTableRef"
       :config="tableConfig"
       :title="t('sidebar.powerOfAttorney')"
       :description="t('powerOfAttorney.subtitle')"
@@ -58,11 +75,18 @@
 import { ref } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useRouter } from 'vue-router'
+import { useAuthenticatedFetch } from '@/composables/useAuthenticatedFetch'
 import type { DataTableConfig } from '~/types/datatable'
 import AdvancedDataTable from '~/components/ui/AdvancedDataTable.vue'
 
 const { t } = useI18n()
 const router = useRouter()
+const toast = useToast()
+const { authenticatedFetch } = useAuthenticatedFetch()
+
+// Sync state
+const isSyncing = ref(false)
+const dataTableRef = ref<InstanceType<typeof AdvancedDataTable> | null>(null)
 
 // Define page metadata
 definePageMeta({
@@ -534,5 +558,66 @@ function handleRowClick(row: any, index: number, event: Event) {
 
 function handleActionClick(action: any, row: any, index: number) {
   console.log('Action clicked:', action.key, row)
+}
+
+// Sync handler
+async function handleSync() {
+  isSyncing.value = true
+  
+  try {
+    const response = await authenticatedFetch<{
+      success: boolean
+      message: string
+      synced_count: number
+      total_logs: number
+      errors: any[]
+    }>('/api/v1/wathq/sync/power-of-attorney/sync', {
+      method: 'POST'
+    })
+    
+    console.log('Sync response:', response)
+    
+    if (response.success) {
+      const message = response.synced_count > 0
+        ? `Synced ${response.synced_count} of ${response.total_logs} records from call logs`
+        : `No new records to sync. Found ${response.total_logs} call logs but all records already exist.`
+      
+      toast.add({
+        title: t('common.success'),
+        description: message,
+        color: 'green'
+      })
+      
+      // Show errors if any
+      if (response.errors && response.errors.length > 0) {
+        console.warn('Sync errors:', response.errors)
+        toast.add({
+          title: 'Some records had errors',
+          description: `${response.errors.length} records failed to sync. Check console for details.`,
+          color: 'orange'
+        })
+      }
+      
+      // Refresh the table data
+      if (response.synced_count > 0 && dataTableRef.value) {
+        dataTableRef.value.refresh()
+      }
+    } else {
+      toast.add({
+        title: t('common.error'),
+        description: response.message || 'Failed to sync data',
+        color: 'red'
+      })
+    }
+  } catch (error: any) {
+    console.error('Sync error:', error)
+    toast.add({
+      title: t('common.error'),
+      description: error.message || 'An error occurred during sync',
+      color: 'red'
+    })
+  } finally {
+    isSyncing.value = false
+  }
 }
 </script>

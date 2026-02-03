@@ -70,26 +70,30 @@ async def export_commercial_registration_pdf(
     """
     try:
         from app.models.wathq_commercial_registration import CommercialRegistration
-        
+
         # Try to get CR record from database first
         # Check if cr_id is a numeric database ID
         cr_number = cr_id
         try:
             db_id = int(cr_id)
             # It's a database ID, look up the CR record
-            cr_record = db.query(CommercialRegistration).filter(
-                CommercialRegistration.id == db_id
-            ).first()
-            
+            cr_record = (
+                db.query(CommercialRegistration)
+                .filter(CommercialRegistration.id == db_id)
+                .first()
+            )
+
             if cr_record and cr_record.cr_number:
                 cr_number = cr_record.cr_number
-                print(f"Found CR record with database ID {db_id}, using cr_number: {cr_number}")
+                print(
+                    f"Found CR record with database ID {db_id}, using cr_number: {cr_number}"
+                )
             else:
                 print(f"No CR record found for database ID {db_id}, using as cr_number")
         except ValueError:
             # It's not a number, assume it's already a cr_number
             print(f"Using provided cr_id as cr_number: {cr_id}")
-        
+
         client = get_wathq_client_for_user("commercial-registration", db, current_user)
 
         # Fetch CR data using the actual cr_number
@@ -346,187 +350,197 @@ async def export_database_cr_pdf(
         from jinja2 import Template
         from datetime import datetime
         import pdfkit
-        
+
         # Fetch CR from database with all relationships
-        cr = db.query(CommercialRegistration).filter(
-            CommercialRegistration.id == cr_id
-        ).first()
-        
+        cr = (
+            db.query(CommercialRegistration)
+            .filter(CommercialRegistration.id == cr_id)
+            .first()
+        )
+
         if not cr:
             raise HTTPException(
                 status_code=404,
-                detail=f"Commercial Registration with ID {cr_id} not found"
+                detail=f"Commercial Registration with ID {cr_id} not found",
             )
-        
+
         # Load template - use commercial registration template with database mapping
         template_path = pdf_service.templates_dir / "cr_database_template_v2.html"
         if not template_path.exists():
             raise HTTPException(
-                status_code=500,
-                detail="Database CR template not found"
+                status_code=500, detail="Database CR template not found"
             )
-        
-        with open(template_path, 'r', encoding='utf-8') as f:
+
+        with open(template_path, "r", encoding="utf-8") as f:
             template_content = f.read()
-        
+
         template = Template(template_content)
-        
+
         # Map database fields to template variables
         from datetime import datetime as dt
-        
+
         # Create simple namespace objects for nested data
         class SimpleNamespace:
             def __init__(self, **kwargs):
                 self.__dict__.update(kwargs)
-        
+
         # Prepare entity_type object
         entity_type = SimpleNamespace(
             id=cr.entity_type_id,
             name=cr.entity_type_name,
-            form_name=cr.entity_form_name
+            form_name=cr.entity_form_name,
         )
-        
+
         # Prepare status object
         status_obj = None
         if cr.status_name:
             confirmation_date = None
             if cr.confirmation_date_gregorian:
                 confirmation_date = SimpleNamespace(
-                    gregorian=cr.confirmation_date_gregorian.strftime('%Y-%m-%d'),
-                    hijri=cr.confirmation_date_hijri
+                    gregorian=cr.confirmation_date_gregorian.strftime("%Y-%m-%d"),
+                    hijri=cr.confirmation_date_hijri,
                 )
             status_obj = SimpleNamespace(
-                name=cr.status_name,
-                confirmation_date=confirmation_date
+                name=cr.status_name, confirmation_date=confirmation_date
             )
-        
+
         # Prepare issue_date object
         issue_date = None
         if cr.issue_date_gregorian:
             issue_date = SimpleNamespace(
-                gregorian=cr.issue_date_gregorian.strftime('%Y-%m-%d'),
-                hijri=cr.issue_date_hijri
+                gregorian=cr.issue_date_gregorian.strftime("%Y-%m-%d"),
+                hijri=cr.issue_date_hijri,
             )
-        
+
         # Prepare contact_info object
         contact_info = SimpleNamespace(
             phone=cr.contact_phone,
             mobile=cr.contact_mobile,
             email=cr.contact_email,
-            website_url=cr.contact_website
+            website_url=cr.contact_website,
         )
-        
+
         # Prepare capital object
         capital = None
         if cr.capital_info or cr.cr_capital:
             capital = SimpleNamespace(
-                currency_name=cr.capital_info.currency_name if cr.capital_info else None,
-                capital=cr.cr_capital
+                currency_name=(
+                    cr.capital_info.currency_name if cr.capital_info else None
+                ),
+                capital=cr.cr_capital,
             )
-        
+
         # Prepare activities list
         activities = []
         if cr.activities:
             for a in cr.activities:
-                activities.append(SimpleNamespace(id=a.activity_id, name=a.activity_name))
-        
+                activities.append(
+                    SimpleNamespace(id=a.activity_id, name=a.activity_name)
+                )
+
         # Prepare parties list
         parties = []
         if cr.parties:
             for p in cr.parties:
                 # Create nested identity object as expected by template
-                identity = SimpleNamespace(
-                    id=p.identity_id,
-                    typeName=p.identity_type_name
-                ) if p.identity_id else None
-                
+                identity = (
+                    SimpleNamespace(id=p.identity_id, typeName=p.identity_type_name)
+                    if p.identity_id
+                    else None
+                )
+
                 # Create nationality object (template expects party.nationality.name)
                 # We don't have nationality in parties table, so use None
                 nationality = None
-                
-                parties.append(SimpleNamespace(
-                    name=p.name,
-                    type_name=p.type_name,
-                    identity=identity,
-                    nationality=nationality,
-                    partnership=[]  # Empty partnership list
-                ))
-        
+
+                parties.append(
+                    SimpleNamespace(
+                        name=p.name,
+                        type_name=p.type_name,
+                        identity=identity,
+                        nationality=nationality,
+                        partnership=[],  # Empty partnership list
+                    )
+                )
+
         # Prepare managers list
         managers = []
         if cr.managers:
             for m in cr.managers:
-                managers.append(SimpleNamespace(
-                    name=m.name,
-                    position=m.type_name,  # Map type_name to position
-                    identity=m.identity_id,  # Template expects flat identity for managers
-                    nationality_name=m.nationality_name
-                ))
-        
+                managers.append(
+                    SimpleNamespace(
+                        name=m.name,
+                        position=m.type_name,  # Map type_name to position
+                        identity=m.identity_id,  # Template expects flat identity for managers
+                        nationality_name=m.nationality_name,
+                    )
+                )
+
         # Prepare management structure object
         management = SimpleNamespace(
             structureName=cr.mgmt_structure_name,
             structureId=cr.mgmt_structure_id,
-            managers=managers  # Use the same managers list
+            managers=managers,  # Use the same managers list
         )
-        
+
         template_data = {
-            'document_title': f'السجل التجاري - {cr.cr_number}',
-            'search_date': cr.fetched_at.strftime('%Y-%m-%d') if cr.fetched_at else dt.now().strftime('%Y-%m-%d'),
-            'print_date': dt.now().strftime('%Y-%m-%d'),
-            'name': cr.name,
-            'name_lang_desc': cr.name_lang_desc,
-            'cr_number': cr.cr_number,
-            'cr_national_number': cr.cr_national_number,
-            'cr_capital': cr.cr_capital,
-            'company_duration': cr.company_duration,
-            'version_no': cr.version_no,
-            'entity_type': entity_type,
-            'status': status_obj,
-            'issue_date': issue_date,
-            'headquarter_city': cr.headquarter_city_name,
-            'contact_info': contact_info,
-            'capital': capital,
-            'activities': activities,
-            'parties': parties,
-            'managers': managers,
-            'partners_nationality_name': cr.partners_nationality_name,
-            'management': management
+            "document_title": f"السجل التجاري - {cr.cr_number}",
+            "search_date": (
+                cr.fetched_at.strftime("%Y-%m-%d")
+                if cr.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "name": cr.name,
+            "name_lang_desc": cr.name_lang_desc,
+            "cr_number": cr.cr_number,
+            "cr_national_number": cr.cr_national_number,
+            "cr_capital": cr.cr_capital,
+            "company_duration": cr.company_duration,
+            "version_no": cr.version_no,
+            "entity_type": entity_type,
+            "status": status_obj,
+            "issue_date": issue_date,
+            "headquarter_city": cr.headquarter_city_name,
+            "contact_info": contact_info,
+            "capital": capital,
+            "activities": activities,
+            "parties": parties,
+            "managers": managers,
+            "partners_nationality_name": cr.partners_nationality_name,
+            "management": management,
         }
-        
+
         html_content = template.render(**template_data)
-        
+
         # Generate PDF
         pdf_options = {
-            'page-size': 'A4',
-            'margin-top': '0mm',
-            'margin-right': '0mm',
-            'margin-bottom': '0mm',
-            'margin-left': '0mm',
-            'encoding': 'UTF-8',
-            'enable-local-file-access': None,
-            'print-media-type': None,
-            'orientation': 'portrait',
+            "page-size": "A4",
+            "margin-top": "0mm",
+            "margin-right": "0mm",
+            "margin-bottom": "0mm",
+            "margin-left": "0mm",
+            "encoding": "UTF-8",
+            "enable-local-file-access": None,
+            "print-media-type": None,
+            "orientation": "portrait",
         }
-        
+
         pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
-        
+
         filename = f"commercial_registration_{cr.cr_number}_{cr_id}.pdf"
-        
+
         return Response(
             content=pdf_bytes,
             media_type="application/pdf",
-            headers={
-                "Content-Disposition": f'attachment; filename="{filename}"'
-            }
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
         )
-        
+
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Failed to generate database CR PDF: {str(e)}"
+            status_code=500, detail=f"Failed to generate database CR PDF: {str(e)}"
         )
 
 
@@ -545,109 +559,606 @@ async def preview_database_cr_html(
         from app.models.wathq_commercial_registration import CommercialRegistration
         from jinja2 import Template
         from datetime import datetime as dt
-        
+
         # Fetch CR from database with all relationships
-        cr = db.query(CommercialRegistration).filter(
-            CommercialRegistration.id == cr_id
-        ).first()
-        
+        cr = (
+            db.query(CommercialRegistration)
+            .filter(CommercialRegistration.id == cr_id)
+            .first()
+        )
+
         if not cr:
             raise HTTPException(
                 status_code=404,
-                detail=f"Commercial Registration with ID {cr_id} not found"
+                detail=f"Commercial Registration with ID {cr_id} not found",
             )
-        
+
         # Load template
         template_path = pdf_service.templates_dir / "cr_database_template_v2.html"
         if not template_path.exists():
             raise HTTPException(
-                status_code=500,
-                detail="Database CR template not found"
+                status_code=500, detail="Database CR template not found"
             )
-        
-        with open(template_path, 'r', encoding='utf-8') as f:
+
+        with open(template_path, "r", encoding="utf-8") as f:
             template_content = f.read()
-        
+
         template = Template(template_content)
-        
+
         # Create simple namespace objects for nested data (same as PDF endpoint)
         class SimpleNamespace:
             def __init__(self, **kwargs):
                 self.__dict__.update(kwargs)
-        
-        entity_type = SimpleNamespace(id=cr.entity_type_id, name=cr.entity_type_name, form_name=cr.entity_form_name)
-        
+
+        entity_type = SimpleNamespace(
+            id=cr.entity_type_id,
+            name=cr.entity_type_name,
+            form_name=cr.entity_form_name,
+        )
+
         status_obj = None
         if cr.status_name:
             confirmation_date = None
             if cr.confirmation_date_gregorian:
-                confirmation_date = SimpleNamespace(gregorian=cr.confirmation_date_gregorian.strftime('%Y-%m-%d'), hijri=cr.confirmation_date_hijri)
-            status_obj = SimpleNamespace(name=cr.status_name, confirmation_date=confirmation_date)
-        
+                confirmation_date = SimpleNamespace(
+                    gregorian=cr.confirmation_date_gregorian.strftime("%Y-%m-%d"),
+                    hijri=cr.confirmation_date_hijri,
+                )
+            status_obj = SimpleNamespace(
+                name=cr.status_name, confirmation_date=confirmation_date
+            )
+
         issue_date = None
         if cr.issue_date_gregorian:
-            issue_date = SimpleNamespace(gregorian=cr.issue_date_gregorian.strftime('%Y-%m-%d'), hijri=cr.issue_date_hijri)
-        
-        contact_info = SimpleNamespace(phone=cr.contact_phone, mobile=cr.contact_mobile, email=cr.contact_email, website_url=cr.contact_website)
-        
+            issue_date = SimpleNamespace(
+                gregorian=cr.issue_date_gregorian.strftime("%Y-%m-%d"),
+                hijri=cr.issue_date_hijri,
+            )
+
+        contact_info = SimpleNamespace(
+            phone=cr.contact_phone,
+            mobile=cr.contact_mobile,
+            email=cr.contact_email,
+            website_url=cr.contact_website,
+        )
+
         capital = None
         if cr.capital_info or cr.cr_capital:
-            capital = SimpleNamespace(currency_name=cr.capital_info.currency_name if cr.capital_info else None, capital=cr.cr_capital)
-        
-        activities = [SimpleNamespace(id=a.activity_id, name=a.activity_name) for a in cr.activities] if cr.activities else []
-        
+            capital = SimpleNamespace(
+                currency_name=(
+                    cr.capital_info.currency_name if cr.capital_info else None
+                ),
+                capital=cr.cr_capital,
+            )
+
+        activities = (
+            [
+                SimpleNamespace(id=a.activity_id, name=a.activity_name)
+                for a in cr.activities
+            ]
+            if cr.activities
+            else []
+        )
+
         parties = []
         if cr.parties:
             for p in cr.parties:
-                identity = SimpleNamespace(id=p.identity_id, typeName=p.identity_type_name) if p.identity_id else None
-                parties.append(SimpleNamespace(name=p.name, type_name=p.type_name, identity=identity, nationality=None, partnership=[]))
-        
+                identity = (
+                    SimpleNamespace(id=p.identity_id, typeName=p.identity_type_name)
+                    if p.identity_id
+                    else None
+                )
+                parties.append(
+                    SimpleNamespace(
+                        name=p.name,
+                        type_name=p.type_name,
+                        identity=identity,
+                        nationality=None,
+                        partnership=[],
+                    )
+                )
+
         managers = []
         if cr.managers:
             for m in cr.managers:
-                managers.append(SimpleNamespace(name=m.name, position=m.type_name, identity=m.identity_id, nationality_name=m.nationality_name))
-        
+                managers.append(
+                    SimpleNamespace(
+                        name=m.name,
+                        position=m.type_name,
+                        identity=m.identity_id,
+                        nationality_name=m.nationality_name,
+                    )
+                )
+
         # Prepare management structure object
         management = SimpleNamespace(
             structureName=cr.mgmt_structure_name,
             structureId=cr.mgmt_structure_id,
-            managers=managers
+            managers=managers,
         )
-        
+
         template_data = {
-            'document_title': f'السجل التجاري - {cr.cr_number}',
-            'search_date': cr.fetched_at.strftime('%Y-%m-%d') if cr.fetched_at else dt.now().strftime('%Y-%m-%d'),
-            'print_date': dt.now().strftime('%Y-%m-%d'),
-            'name': cr.name,
-            'name_lang_desc': cr.name_lang_desc,
-            'cr_number': cr.cr_number,
-            'cr_national_number': cr.cr_national_number,
-            'cr_capital': cr.cr_capital,
-            'company_duration': cr.company_duration,
-            'version_no': cr.version_no,
-            'entity_type': entity_type,
-            'status': status_obj,
-            'issue_date': issue_date,
-            'headquarter_city': cr.headquarter_city_name,
-            'contact_info': contact_info,
-            'capital': capital,
-            'activities': activities,
-            'parties': parties,
-            'managers': managers,
-            'partners_nationality_name': cr.partners_nationality_name,
-            'management': management
+            "document_title": f"السجل التجاري - {cr.cr_number}",
+            "search_date": (
+                cr.fetched_at.strftime("%Y-%m-%d")
+                if cr.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "name": cr.name,
+            "name_lang_desc": cr.name_lang_desc,
+            "cr_number": cr.cr_number,
+            "cr_national_number": cr.cr_national_number,
+            "cr_capital": cr.cr_capital,
+            "company_duration": cr.company_duration,
+            "version_no": cr.version_no,
+            "entity_type": entity_type,
+            "status": status_obj,
+            "issue_date": issue_date,
+            "headquarter_city": cr.headquarter_city_name,
+            "contact_info": contact_info,
+            "capital": capital,
+            "activities": activities,
+            "parties": parties,
+            "managers": managers,
+            "partners_nationality_name": cr.partners_nationality_name,
+            "management": management,
         }
-        
+
         html_content = template.render(**template_data)
-        
+
         return Response(content=html_content, media_type="text/html")
-        
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate database CR preview: {str(e)}"
+        )
+
+
+@router.get("/database/corporate-contract/{contract_id}/pdf")
+async def export_database_corporate_contract_pdf(
+    contract_id: int,
+    db: Session = Depends(deps.get_db),
+) -> Response:
+    """
+    Export Corporate Contract PDF from database record
+    Uses stored contract data instead of fetching from Wathq API
+    """
+    try:
+        from app.models.wathq_corporate_contract import CorporateContract
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from sqlalchemy.orm import joinedload
+        import pdfkit
+
+        # Fetch contract from database with all relationships using eager loading
+        contract = (
+            db.query(CorporateContract)
+            .options(
+                joinedload(CorporateContract.stocks),
+                joinedload(CorporateContract.parties),
+                joinedload(CorporateContract.managers),
+                joinedload(CorporateContract.management_config),
+                joinedload(CorporateContract.activities),
+                joinedload(CorporateContract.articles),
+                joinedload(CorporateContract.decisions),
+                joinedload(CorporateContract.notification_channels),
+            )
+            .filter(CorporateContract.id == contract_id)
+            .first()
+        )
+
+        if not contract:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Corporate Contract with ID {contract_id} not found",
+            )
+
+        # Load template
+        template_path = (
+            pdf_service.templates_dir / "corporate_contracts_database_template.html"
+        )
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500, detail="Corporate Contract template not found"
+            )
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        # Prepare template data
+        template_data = {
+            "document_title": f"عقد تأسيس الشركة - {contract.entity_name or contract.cr_number}",
+            "contract_date": (
+                contract.contract_date.strftime("%Y-%m-%d")
+                if contract.contract_date
+                else "غير محدد"
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "contract_id": contract.contract_id,
+            "contract_copy_number": contract.contract_copy_number,
+            "cr_national_number": contract.cr_national_number,
+            "cr_number": contract.cr_number,
+            "entity_name": contract.entity_name,
+            "entity_name_lang_desc": contract.entity_name_lang_desc,
+            "company_duration": contract.company_duration,
+            "headquarter_city_name": contract.headquarter_city_name,
+            "is_license_based": contract.is_license_based,
+            "entity_type_name": contract.entity_type_name,
+            "entity_form_name": contract.entity_form_name,
+            "fiscal_calendar_type": contract.fiscal_calendar_type,
+            "fiscal_year_end_month": contract.fiscal_year_end_month,
+            "fiscal_year_end_day": contract.fiscal_year_end_day,
+            "fiscal_year_end_year": contract.fiscal_year_end_year,
+            "currency_name": contract.currency_name,
+            "total_capital": contract.total_capital,
+            "paid_capital": contract.paid_capital,
+            "cash_capital": contract.cash_capital,
+            "in_kind_capital": contract.in_kind_capital,
+            "is_set_aside_enabled": contract.is_set_aside_enabled,
+            "profit_allocation_percentage": contract.profit_allocation_percentage,
+            "profit_allocation_purpose": contract.profit_allocation_purpose,
+            "additional_decision_text": contract.additional_decision_text,
+            "stocks": (
+                [
+                    {
+                        "stock_type_name": getattr(s, "stock_type_name", None),
+                        "stock_count": getattr(s, "stock_count", None),
+                        "stock_value": getattr(s, "stock_value", None),
+                    }
+                    for s in (contract.stocks or [])
+                ]
+                if hasattr(contract, "stocks")
+                else []
+            ),
+            "parties": (
+                [
+                    {
+                        "name": getattr(p, "name", None),
+                        "type_name": getattr(p, "type_name", None),
+                        "identity_number": getattr(p, "identity_number", None),
+                        "identity_type": getattr(p, "identity_type", None),
+                        "nationality": getattr(p, "nationality", None),
+                    }
+                    for p in (contract.parties or [])
+                ]
+                if hasattr(contract, "parties")
+                else []
+            ),
+            "managers": (
+                [
+                    {
+                        "name": getattr(m, "name", None),
+                        "type_name": getattr(m, "type_name", None),
+                        "is_licensed": getattr(m, "is_licensed", None),
+                        "identity_number": getattr(m, "identity_number", None),
+                        "nationality": getattr(m, "nationality", None),
+                        "position_name": getattr(m, "position_name", None),
+                    }
+                    for m in (contract.managers or [])
+                ]
+                if hasattr(contract, "managers")
+                else []
+            ),
+            "management_config": (
+                {
+                    "structure_name": getattr(
+                        contract.management_config, "structure_name", None
+                    ),
+                    "meeting_quorum_name": getattr(
+                        contract.management_config, "meeting_quorum_name", None
+                    ),
+                    "can_delegate_attendance": getattr(
+                        contract.management_config, "can_delegate_attendance", None
+                    ),
+                    "term_years": getattr(
+                        contract.management_config, "term_years", None
+                    ),
+                }
+                if hasattr(contract, "management_config") and contract.management_config
+                else None
+            ),
+            "activities": (
+                [
+                    {
+                        "activity_id": getattr(a, "activity_id", None),
+                        "activity_name": getattr(a, "activity_name", None),
+                    }
+                    for a in (contract.activities or [])
+                ]
+                if hasattr(contract, "activities")
+                else []
+            ),
+            "articles": (
+                [
+                    {
+                        "original_id": getattr(art, "original_id", None),
+                        "article_text": getattr(art, "article_text", None),
+                        "part_name": getattr(art, "part_name", None),
+                    }
+                    for art in (contract.articles or [])
+                ]
+                if hasattr(contract, "articles")
+                else []
+            ),
+            "decisions": (
+                [
+                    {
+                        "decision_name": getattr(d, "decision_name", None),
+                        "approve_percentage": getattr(d, "approve_percentage", None),
+                    }
+                    for d in (contract.decisions or [])
+                ]
+                if hasattr(contract, "decisions")
+                else []
+            ),
+            "notification_channels": (
+                [
+                    {"channel_name": getattr(nc, "channel_name", None)}
+                    for nc in (contract.notification_channels or [])
+                ]
+                if hasattr(contract, "notification_channels")
+                else []
+            ),
+            "contact_info": {
+                "phone_no": None,
+                "mobile_no": None,
+                "email": None,
+                "website_url": None,
+            },
+        }
+
+        html_content = template.render(**template_data)
+
+        # Generate PDF
+        pdf_options = {
+            "page-size": "A4",
+            "margin-top": "0mm",
+            "margin-right": "0mm",
+            "margin-bottom": "0mm",
+            "margin-left": "0mm",
+            "encoding": "UTF-8",
+            "enable-local-file-access": None,
+            "print-media-type": None,
+            "orientation": "portrait",
+        }
+
+        pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
+
+        filename = f"corporate_contract_{contract.cr_number}_{contract_id}.pdf"
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to generate database CR preview: {str(e)}"
+            detail=f"Failed to generate corporate contract PDF: {str(e)}",
+        )
+
+
+@router.get("/database/corporate-contract/{contract_id}/preview")
+async def preview_database_corporate_contract_html(
+    contract_id: int,
+    db: Session = Depends(deps.get_db),
+) -> Response:
+    """
+    Preview Corporate Contract HTML from database record
+    """
+    try:
+        from app.models.wathq_corporate_contract import CorporateContract
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from sqlalchemy.orm import joinedload
+
+        # Fetch contract from database with all relationships using eager loading
+        contract = (
+            db.query(CorporateContract)
+            .options(
+                joinedload(CorporateContract.stocks),
+                joinedload(CorporateContract.parties),
+                joinedload(CorporateContract.managers),
+                joinedload(CorporateContract.management_config),
+                joinedload(CorporateContract.activities),
+                joinedload(CorporateContract.articles),
+                joinedload(CorporateContract.decisions),
+                joinedload(CorporateContract.notification_channels),
+            )
+            .filter(CorporateContract.id == contract_id)
+            .first()
+        )
+
+        if not contract:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Corporate Contract with ID {contract_id} not found",
+            )
+
+        # Load template
+        template_path = (
+            pdf_service.templates_dir / "corporate_contracts_database_template.html"
+        )
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500, detail="Corporate Contract template not found"
+            )
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        # Prepare template data (same as PDF endpoint)
+        template_data = {
+            "document_title": f"عقد تأسيس الشركة - {contract.entity_name or contract.cr_number}",
+            "contract_date": (
+                contract.contract_date.strftime("%Y-%m-%d")
+                if contract.contract_date
+                else "غير محدد"
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "contract_id": contract.contract_id,
+            "contract_copy_number": contract.contract_copy_number,
+            "cr_national_number": contract.cr_national_number,
+            "cr_number": contract.cr_number,
+            "entity_name": contract.entity_name,
+            "entity_name_lang_desc": contract.entity_name_lang_desc,
+            "company_duration": contract.company_duration,
+            "headquarter_city_name": contract.headquarter_city_name,
+            "is_license_based": contract.is_license_based,
+            "entity_type_name": contract.entity_type_name,
+            "entity_form_name": contract.entity_form_name,
+            "fiscal_calendar_type": contract.fiscal_calendar_type,
+            "fiscal_year_end_month": contract.fiscal_year_end_month,
+            "fiscal_year_end_day": contract.fiscal_year_end_day,
+            "fiscal_year_end_year": contract.fiscal_year_end_year,
+            "currency_name": contract.currency_name,
+            "total_capital": contract.total_capital,
+            "paid_capital": contract.paid_capital,
+            "cash_capital": contract.cash_capital,
+            "in_kind_capital": contract.in_kind_capital,
+            "is_set_aside_enabled": contract.is_set_aside_enabled,
+            "profit_allocation_percentage": contract.profit_allocation_percentage,
+            "profit_allocation_purpose": contract.profit_allocation_purpose,
+            "additional_decision_text": contract.additional_decision_text,
+            "stocks": (
+                [
+                    {
+                        "stock_type_name": getattr(s, "stock_type_name", None),
+                        "stock_count": getattr(s, "stock_count", None),
+                        "stock_value": getattr(s, "stock_value", None),
+                    }
+                    for s in (contract.stocks or [])
+                ]
+                if hasattr(contract, "stocks")
+                else []
+            ),
+            "parties": (
+                [
+                    {
+                        "name": getattr(p, "name", None),
+                        "type_name": getattr(p, "type_name", None),
+                        "identity_number": getattr(p, "identity_number", None),
+                        "identity_type": getattr(p, "identity_type", None),
+                        "nationality": getattr(p, "nationality", None),
+                    }
+                    for p in (contract.parties or [])
+                ]
+                if hasattr(contract, "parties")
+                else []
+            ),
+            "managers": (
+                [
+                    {
+                        "name": getattr(m, "name", None),
+                        "type_name": getattr(m, "type_name", None),
+                        "is_licensed": getattr(m, "is_licensed", None),
+                        "identity_number": getattr(m, "identity_number", None),
+                        "nationality": getattr(m, "nationality", None),
+                        "position_name": getattr(m, "position_name", None),
+                    }
+                    for m in (contract.managers or [])
+                ]
+                if hasattr(contract, "managers")
+                else []
+            ),
+            "management_config": (
+                {
+                    "structure_name": getattr(
+                        contract.management_config, "structure_name", None
+                    ),
+                    "meeting_quorum_name": getattr(
+                        contract.management_config, "meeting_quorum_name", None
+                    ),
+                    "can_delegate_attendance": getattr(
+                        contract.management_config, "can_delegate_attendance", None
+                    ),
+                    "term_years": getattr(
+                        contract.management_config, "term_years", None
+                    ),
+                }
+                if hasattr(contract, "management_config") and contract.management_config
+                else None
+            ),
+            "activities": (
+                [
+                    {
+                        "activity_id": getattr(a, "activity_id", None),
+                        "activity_name": getattr(a, "activity_name", None),
+                    }
+                    for a in (contract.activities or [])
+                ]
+                if hasattr(contract, "activities")
+                else []
+            ),
+            "articles": (
+                [
+                    {
+                        "original_id": getattr(art, "original_id", None),
+                        "article_text": getattr(art, "article_text", None),
+                        "part_name": getattr(art, "part_name", None),
+                    }
+                    for art in (contract.articles or [])
+                ]
+                if hasattr(contract, "articles")
+                else []
+            ),
+            "decisions": (
+                [
+                    {
+                        "decision_name": getattr(d, "decision_name", None),
+                        "approve_percentage": getattr(d, "approve_percentage", None),
+                    }
+                    for d in (contract.decisions or [])
+                ]
+                if hasattr(contract, "decisions")
+                else []
+            ),
+            "notification_channels": (
+                [
+                    {"channel_name": getattr(nc, "channel_name", None)}
+                    for nc in (contract.notification_channels or [])
+                ]
+                if hasattr(contract, "notification_channels")
+                else []
+            ),
+            "contact_info": {
+                "phone_no": None,
+                "mobile_no": None,
+                "email": None,
+                "website_url": None,
+            },
+        }
+
+        # Add JavaScript for export functionality
+        export_script = f"""
+        <script>
+            function exportToPDF() {{
+                window.location.href = '/api/v1/wathq/pdf/database/corporate-contract/{contract_id}/pdf';
+            }}
+        </script>
+        """
+
+        html_content = template.render(**template_data)
+        html_content = html_content.replace("</body>", f"{export_script}</body>")
+
+        return Response(content=html_content, media_type="text/html")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate corporate contract preview: {str(e)}",
         )
 
 
@@ -682,4 +1193,2410 @@ async def list_available_templates(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Failed to list templates: {str(e)}"
+        )
+
+
+@router.get("/database/employee/{employee_id}/pdf")
+async def export_database_employee_pdf(
+    employee_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Export Employee PDF from database record
+    Uses stored employee data from wathq schema
+    """
+    try:
+        from app.models.wathq_employee import Employee, EmploymentDetail
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from sqlalchemy.orm import joinedload
+        import pdfkit
+
+        # Fetch employee from database with employment details
+        employee = (
+            db.query(Employee)
+            .options(joinedload(Employee.employment_details))
+            .filter(Employee.employee_id == employee_id)
+            .first()
+        )
+
+        if not employee:
+            raise HTTPException(
+                status_code=404, detail=f"Employee with ID {employee_id} not found"
+            )
+
+        # Load template
+        template_path = pdf_service.templates_dir / "employee_database_template_v2.html"
+        if not template_path.exists():
+            raise HTTPException(status_code=500, detail="Employee template not found")
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        # Prepare employment details
+        employment_details = []
+        if employee.employment_details:
+            for detail in employee.employment_details:
+                employment_details.append(
+                    {
+                        "employer": detail.employer,
+                        "status": detail.status,
+                        "basic_wage": (
+                            f"{detail.basic_wage:.2f}" if detail.basic_wage else "0.00"
+                        ),
+                        "housing_allowance": (
+                            f"{detail.housing_allowance:.2f}"
+                            if detail.housing_allowance
+                            else "0.00"
+                        ),
+                        "other_allowance": (
+                            f"{detail.other_allowance:.2f}"
+                            if detail.other_allowance
+                            else "0.00"
+                        ),
+                        "full_wage": (
+                            f"{detail.full_wage:.2f}" if detail.full_wage else "0.00"
+                        ),
+                    }
+                )
+
+        template_data = {
+            "document_title": f"بيانات الموظف - {employee.name or employee_id}",
+            "search_date": (
+                employee.fetched_at.strftime("%Y-%m-%d")
+                if employee.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "employee_id": employee.employee_id,
+            "employee_name": employee.name,
+            "nationality": employee.nationality,
+            "working_months": employee.working_months,
+            "fetched_at": (
+                employee.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                if employee.fetched_at
+                else "غير محدد"
+            ),
+            "employment_details": employment_details,
+        }
+
+        html_content = template.render(**template_data)
+
+        # Generate PDF
+        pdf_options = {
+            "page-size": "A4",
+            "margin-top": "0mm",
+            "margin-right": "0mm",
+            "margin-bottom": "0mm",
+            "margin-left": "0mm",
+            "encoding": "UTF-8",
+            "enable-local-file-access": None,
+            "print-media-type": None,
+            "orientation": "portrait",
+        }
+
+        pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
+
+        # Use only employee_id in filename to avoid encoding issues
+        from urllib.parse import quote
+
+        filename = f"employee_{employee_id}.pdf"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate employee PDF: {str(e)}"
+        )
+
+
+@router.get("/database/employee/{employee_id}/preview")
+async def preview_database_employee_html(
+    employee_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Preview Employee HTML from database record
+    """
+    try:
+        from app.models.wathq_employee import Employee, EmploymentDetail
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from sqlalchemy.orm import joinedload
+
+        # Fetch employee from database with employment details
+        employee = (
+            db.query(Employee)
+            .options(joinedload(Employee.employment_details))
+            .filter(Employee.employee_id == employee_id)
+            .first()
+        )
+
+        if not employee:
+            raise HTTPException(
+                status_code=404, detail=f"Employee with ID {employee_id} not found"
+            )
+
+        # Load template
+        template_path = pdf_service.templates_dir / "employee_database_template_v2.html"
+        if not template_path.exists():
+            raise HTTPException(status_code=500, detail="Employee template not found")
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        # Prepare employment details
+        employment_details = []
+        if employee.employment_details:
+            for detail in employee.employment_details:
+                employment_details.append(
+                    {
+                        "employer": detail.employer,
+                        "status": detail.status,
+                        "basic_wage": (
+                            f"{detail.basic_wage:.2f}" if detail.basic_wage else "0.00"
+                        ),
+                        "housing_allowance": (
+                            f"{detail.housing_allowance:.2f}"
+                            if detail.housing_allowance
+                            else "0.00"
+                        ),
+                        "other_allowance": (
+                            f"{detail.other_allowance:.2f}"
+                            if detail.other_allowance
+                            else "0.00"
+                        ),
+                        "full_wage": (
+                            f"{detail.full_wage:.2f}" if detail.full_wage else "0.00"
+                        ),
+                    }
+                )
+
+        template_data = {
+            "document_title": f"بيانات الموظف - {employee.name or employee_id}",
+            "search_date": (
+                employee.fetched_at.strftime("%Y-%m-%d")
+                if employee.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "employee_id": employee.employee_id,
+            "employee_name": employee.name,
+            "nationality": employee.nationality,
+            "working_months": employee.working_months,
+            "fetched_at": (
+                employee.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                if employee.fetched_at
+                else "غير محدد"
+            ),
+            "employment_details": employment_details,
+        }
+
+        # Add JavaScript for export functionality
+        export_script = f"""
+        <script>
+            function exportToPDF() {{
+                window.location.href = '/api/v1/wathq/pdf/database/employee/{employee_id}/pdf';
+            }}
+            
+            function exportToJSON() {{
+                window.location.href = '/api/v1/wathq/pdf/database/employee/{employee_id}/json';
+            }}
+            
+            function exportToCSV() {{
+                window.location.href = '/api/v1/wathq/pdf/database/employee/{employee_id}/csv';
+            }}
+            
+            function exportToExcel() {{
+                window.location.href = '/api/v1/wathq/pdf/database/employee/{employee_id}/excel';
+            }}
+        </script>
+        """
+
+        html_content = template.render(**template_data)
+        html_content = html_content.replace("</body>", f"{export_script}</body>")
+
+        return Response(content=html_content, media_type="text/html")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate employee preview: {str(e)}"
+        )
+
+
+@router.get("/database/employee/{employee_id}/json")
+async def export_database_employee_json(
+    employee_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Export Employee data as JSON
+    """
+    try:
+        from app.models.wathq_employee import Employee
+        from sqlalchemy.orm import joinedload
+        from urllib.parse import quote
+        import json
+
+        # Fetch employee from database with employment details
+        employee = (
+            db.query(Employee)
+            .options(joinedload(Employee.employment_details))
+            .filter(Employee.employee_id == employee_id)
+            .first()
+        )
+
+        if not employee:
+            raise HTTPException(
+                status_code=404, detail=f"Employee with ID {employee_id} not found"
+            )
+
+        # Prepare data
+        employee_data = {
+            "employee_id": employee.employee_id,
+            "name": employee.name,
+            "nationality": employee.nationality,
+            "working_months": employee.working_months,
+            "fetched_at": (
+                employee.fetched_at.isoformat() if employee.fetched_at else None
+            ),
+            "created_at": (
+                employee.created_at.isoformat() if employee.created_at else None
+            ),
+            "updated_at": (
+                employee.updated_at.isoformat() if employee.updated_at else None
+            ),
+            "employment_details": [],
+        }
+
+        if employee.employment_details:
+            for detail in employee.employment_details:
+                employee_data["employment_details"].append(
+                    {
+                        "employment_id": detail.employment_id,
+                        "employer": detail.employer,
+                        "status": detail.status,
+                        "basic_wage": (
+                            float(detail.basic_wage) if detail.basic_wage else 0.0
+                        ),
+                        "housing_allowance": (
+                            float(detail.housing_allowance)
+                            if detail.housing_allowance
+                            else 0.0
+                        ),
+                        "other_allowance": (
+                            float(detail.other_allowance)
+                            if detail.other_allowance
+                            else 0.0
+                        ),
+                        "full_wage": (
+                            float(detail.full_wage) if detail.full_wage else 0.0
+                        ),
+                    }
+                )
+
+        json_content = json.dumps(employee_data, ensure_ascii=False, indent=2)
+
+        filename = f"employee_{employee_id}.json"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=json_content,
+            media_type="application/json; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export employee JSON: {str(e)}"
+        )
+
+
+@router.get("/database/employee/{employee_id}/csv")
+async def export_database_employee_csv(
+    employee_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Export Employee data as CSV with UTF-8 encoding for Arabic support
+    """
+    try:
+        from app.models.wathq_employee import Employee
+        from sqlalchemy.orm import joinedload
+        from urllib.parse import quote
+        import csv
+        from io import StringIO, BytesIO
+
+        # Fetch employee from database with employment details
+        employee = (
+            db.query(Employee)
+            .options(joinedload(Employee.employment_details))
+            .filter(Employee.employee_id == employee_id)
+            .first()
+        )
+
+        if not employee:
+            raise HTTPException(
+                status_code=404, detail=f"Employee with ID {employee_id} not found"
+            )
+
+        # Create CSV with UTF-8 encoding
+        output = StringIO()
+        writer = csv.writer(output)
+
+        # Write employee basic info
+        writer.writerow(["Employee Information"])
+        writer.writerow(["Field", "Value"])
+        writer.writerow(["Employee ID", employee.employee_id])
+        writer.writerow(["Name", employee.name or ""])
+        writer.writerow(["Nationality", employee.nationality or ""])
+        writer.writerow(["Working Months", employee.working_months or ""])
+        writer.writerow(
+            [
+                "Fetched At",
+                (
+                    employee.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                    if employee.fetched_at
+                    else ""
+                ),
+            ]
+        )
+        writer.writerow([])
+
+        # Write employment details
+        if employee.employment_details:
+            writer.writerow(["Employment Details"])
+            writer.writerow(
+                [
+                    "Employer",
+                    "Status",
+                    "Basic Wage",
+                    "Housing Allowance",
+                    "Other Allowance",
+                    "Full Wage",
+                ]
+            )
+
+            for detail in employee.employment_details:
+                writer.writerow(
+                    [
+                        detail.employer or "",
+                        detail.status or "",
+                        f"{detail.basic_wage:.2f}" if detail.basic_wage else "0.00",
+                        (
+                            f"{detail.housing_allowance:.2f}"
+                            if detail.housing_allowance
+                            else "0.00"
+                        ),
+                        (
+                            f"{detail.other_allowance:.2f}"
+                            if detail.other_allowance
+                            else "0.00"
+                        ),
+                        f"{detail.full_wage:.2f}" if detail.full_wage else "0.00",
+                    ]
+                )
+
+        # Get CSV content and encode as UTF-8 with BOM for Excel compatibility
+        csv_content = output.getvalue()
+        output.close()
+
+        # Add UTF-8 BOM for Excel to recognize encoding
+        csv_bytes = "\ufeff".encode("utf-8") + csv_content.encode("utf-8")
+
+        filename = f"employee_{employee_id}.csv"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=csv_bytes,
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export employee CSV: {str(e)}"
+        )
+
+
+@router.get("/database/employee/{employee_id}/excel")
+async def export_database_employee_excel(
+    employee_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """
+    Export Employee data as Excel (XLSX)
+    """
+    try:
+        from app.models.wathq_employee import Employee
+        from sqlalchemy.orm import joinedload
+        from urllib.parse import quote
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from io import BytesIO
+
+        # Fetch employee from database with employment details
+        employee = (
+            db.query(Employee)
+            .options(joinedload(Employee.employment_details))
+            .filter(Employee.employee_id == employee_id)
+            .first()
+        )
+
+        if not employee:
+            raise HTTPException(
+                status_code=404, detail=f"Employee with ID {employee_id} not found"
+            )
+
+        # Create workbook
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Employee Data"
+
+        # Styling
+        header_fill = PatternFill(
+            start_color="004074", end_color="004074", fill_type="solid"
+        )
+        header_font = Font(color="FFFFFF", bold=True)
+        section_fill = PatternFill(
+            start_color="E0ECFF", end_color="E0ECFF", fill_type="solid"
+        )
+        section_font = Font(bold=True, color="004074")
+
+        # Employee Information Section
+        ws["A1"] = "Employee Information"
+        ws["A1"].fill = section_fill
+        ws["A1"].font = section_font
+        ws.merge_cells("A1:B1")
+
+        row = 2
+        ws[f"A{row}"] = "Field"
+        ws[f"B{row}"] = "Value"
+        ws[f"A{row}"].fill = header_fill
+        ws[f"B{row}"].fill = header_fill
+        ws[f"A{row}"].font = header_font
+        ws[f"B{row}"].font = header_font
+
+        row += 1
+        ws[f"A{row}"] = "Employee ID"
+        ws[f"B{row}"] = employee.employee_id
+
+        row += 1
+        ws[f"A{row}"] = "Name"
+        ws[f"B{row}"] = employee.name or ""
+
+        row += 1
+        ws[f"A{row}"] = "Nationality"
+        ws[f"B{row}"] = employee.nationality or ""
+
+        row += 1
+        ws[f"A{row}"] = "Working Months"
+        ws[f"B{row}"] = employee.working_months or ""
+
+        row += 1
+        ws[f"A{row}"] = "Fetched At"
+        ws[f"B{row}"] = (
+            employee.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+            if employee.fetched_at
+            else ""
+        )
+
+        # Employment Details Section
+        if employee.employment_details:
+            row += 2
+            ws[f"A{row}"] = "Employment Details"
+            ws[f"A{row}"].fill = section_fill
+            ws[f"A{row}"].font = section_font
+            ws.merge_cells(f"A{row}:F{row}")
+
+            row += 1
+            headers = [
+                "Employer",
+                "Status",
+                "Basic Wage",
+                "Housing Allowance",
+                "Other Allowance",
+                "Full Wage",
+            ]
+            for col, header in enumerate(headers, start=1):
+                cell = ws.cell(row=row, column=col, value=header)
+                cell.fill = header_fill
+                cell.font = header_font
+                cell.alignment = Alignment(horizontal="center")
+
+            for detail in employee.employment_details:
+                row += 1
+                ws[f"A{row}"] = detail.employer or ""
+                ws[f"B{row}"] = detail.status or ""
+                ws[f"C{row}"] = float(detail.basic_wage) if detail.basic_wage else 0.0
+                ws[f"D{row}"] = (
+                    float(detail.housing_allowance) if detail.housing_allowance else 0.0
+                )
+                ws[f"E{row}"] = (
+                    float(detail.other_allowance) if detail.other_allowance else 0.0
+                )
+                ws[f"F{row}"] = float(detail.full_wage) if detail.full_wage else 0.0
+
+        # Adjust column widths
+        ws.column_dimensions["A"].width = 20
+        ws.column_dimensions["B"].width = 30
+        ws.column_dimensions["C"].width = 15
+        ws.column_dimensions["D"].width = 18
+        ws.column_dimensions["E"].width = 18
+        ws.column_dimensions["F"].width = 15
+
+        # Save to BytesIO
+        excel_file = BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
+
+        filename = f"employee_{employee_id}.xlsx"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=excel_file.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export employee Excel: {str(e)}"
+        )
+
+
+# ============================================================================
+# NATIONAL ADDRESS EXPORT ENDPOINTS
+# ============================================================================
+
+
+@router.get("/database/national-address/{address_id}/pdf")
+async def export_database_national_address_pdf(
+    address_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export National Address PDF from database record"""
+    try:
+        from app.models.wathq_national_address import Address
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from urllib.parse import quote
+        import pdfkit
+
+        address = db.query(Address).filter(Address.pk_address_id == address_id).first()
+
+        if not address:
+            raise HTTPException(
+                status_code=404, detail=f"Address with ID {address_id} not found"
+            )
+
+        template_path = (
+            pdf_service.templates_dir / "national_address_database_template_v2.html"
+        )
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500, detail="National address template not found"
+            )
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        template_data = {
+            "document_title": f"العنوان الوطني - {address.title or address_id}",
+            "search_date": (
+                address.fetched_at.strftime("%Y-%m-%d")
+                if address.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "pk_address_id": address.pk_address_id,
+            "title": address.title,
+            "address": address.address,
+            "address2": address.address2,
+            "building_number": address.building_number,
+            "street": address.street,
+            "unit_number": address.unit_number,
+            "additional_number": address.additional_number,
+            "district": address.district,
+            "district_id": address.district_id,
+            "city": address.city,
+            "city_id": address.city_id,
+            "post_code": address.post_code,
+            "region_name": address.region_name,
+            "region_id": address.region_id,
+            "latitude": f"{address.latitude:.6f}" if address.latitude else None,
+            "longitude": f"{address.longitude:.6f}" if address.longitude else None,
+            "is_primary_address": address.is_primary_address,
+            "status": address.status,
+            "restriction": address.restriction,
+            "fetched_at": (
+                address.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                if address.fetched_at
+                else "غير محدد"
+            ),
+        }
+
+        html_content = template.render(**template_data)
+
+        pdf_options = {
+            "page-size": "A4",
+            "margin-top": "0mm",
+            "margin-right": "0mm",
+            "margin-bottom": "0mm",
+            "margin-left": "0mm",
+            "encoding": "UTF-8",
+            "enable-local-file-access": None,
+            "print-media-type": None,
+            "orientation": "portrait",
+        }
+
+        pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
+
+        filename = f"national_address_{address_id}.pdf"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate national address PDF: {str(e)}"
+        )
+
+
+@router.get("/database/national-address/{address_id}/preview")
+async def preview_database_national_address_html(
+    address_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Preview National Address HTML"""
+    try:
+        from app.models.wathq_national_address import Address
+        from jinja2 import Template
+        from datetime import datetime as dt
+
+        address = db.query(Address).filter(Address.pk_address_id == address_id).first()
+
+        if not address:
+            raise HTTPException(
+                status_code=404, detail=f"Address with ID {address_id} not found"
+            )
+
+        template_path = (
+            pdf_service.templates_dir / "national_address_database_template_v2.html"
+        )
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500, detail="National address template not found"
+            )
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        template_data = {
+            "document_title": f"العنوان الوطني - {address.title or address_id}",
+            "search_date": (
+                address.fetched_at.strftime("%Y-%m-%d")
+                if address.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "pk_address_id": address.pk_address_id,
+            "title": address.title,
+            "address": address.address,
+            "address2": address.address2,
+            "building_number": address.building_number,
+            "street": address.street,
+            "unit_number": address.unit_number,
+            "additional_number": address.additional_number,
+            "district": address.district,
+            "district_id": address.district_id,
+            "city": address.city,
+            "city_id": address.city_id,
+            "post_code": address.post_code,
+            "region_name": address.region_name,
+            "region_id": address.region_id,
+            "latitude": f"{address.latitude:.6f}" if address.latitude else None,
+            "longitude": f"{address.longitude:.6f}" if address.longitude else None,
+            "is_primary_address": address.is_primary_address,
+            "status": address.status,
+            "restriction": address.restriction,
+            "fetched_at": (
+                address.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                if address.fetched_at
+                else "غير محدد"
+            ),
+        }
+
+        html_content = template.render(**template_data)
+
+        return Response(content=html_content, media_type="text/html")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate national address preview: {str(e)}",
+        )
+
+
+@router.get("/database/national-address/{address_id}/json")
+async def export_database_national_address_json(
+    address_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export National Address data as JSON"""
+    try:
+        from app.models.wathq_national_address import Address
+        from urllib.parse import quote
+        import json
+
+        address = db.query(Address).filter(Address.pk_address_id == address_id).first()
+
+        if not address:
+            raise HTTPException(
+                status_code=404, detail=f"Address with ID {address_id} not found"
+            )
+
+        address_data = {
+            "pk_address_id": address.pk_address_id,
+            "title": address.title,
+            "address": address.address,
+            "address2": address.address2,
+            "building_number": address.building_number,
+            "street": address.street,
+            "unit_number": address.unit_number,
+            "additional_number": address.additional_number,
+            "district": address.district,
+            "district_id": address.district_id,
+            "city": address.city,
+            "city_id": address.city_id,
+            "post_code": address.post_code,
+            "region_name": address.region_name,
+            "region_id": address.region_id,
+            "latitude": float(address.latitude) if address.latitude else None,
+            "longitude": float(address.longitude) if address.longitude else None,
+            "is_primary_address": address.is_primary_address,
+            "status": address.status,
+            "restriction": address.restriction,
+            "fetched_at": (
+                address.fetched_at.isoformat() if address.fetched_at else None
+            ),
+            "created_at": (
+                address.created_at.isoformat() if address.created_at else None
+            ),
+            "updated_at": (
+                address.updated_at.isoformat() if address.updated_at else None
+            ),
+        }
+
+        json_content = json.dumps(address_data, ensure_ascii=False, indent=2)
+
+        filename = f"national_address_{address_id}.json"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=json_content,
+            media_type="application/json; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export national address JSON: {str(e)}"
+        )
+
+
+@router.get("/database/national-address/{address_id}/csv")
+async def export_database_national_address_csv(
+    address_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export National Address data as CSV with UTF-8 encoding"""
+    try:
+        from app.models.wathq_national_address import Address
+        from urllib.parse import quote
+        import csv
+        from io import StringIO
+
+        address = db.query(Address).filter(Address.pk_address_id == address_id).first()
+
+        if not address:
+            raise HTTPException(
+                status_code=404, detail=f"Address with ID {address_id} not found"
+            )
+
+        output = StringIO()
+        writer = csv.writer(output)
+
+        writer.writerow(["National Address Information"])
+        writer.writerow(["Field", "Value"])
+        writer.writerow(["Address ID", address.pk_address_id or ""])
+        writer.writerow(["Title", address.title or ""])
+        writer.writerow(["Address", address.address or ""])
+        writer.writerow(["Address 2", address.address2 or ""])
+        writer.writerow(["Building Number", address.building_number or ""])
+        writer.writerow(["Street", address.street or ""])
+        writer.writerow(["Unit Number", address.unit_number or ""])
+        writer.writerow(["Additional Number", address.additional_number or ""])
+        writer.writerow(["District", address.district or ""])
+        writer.writerow(["District ID", address.district_id or ""])
+        writer.writerow(["City", address.city or ""])
+        writer.writerow(["City ID", address.city_id or ""])
+        writer.writerow(["Post Code", address.post_code or ""])
+        writer.writerow(["Region", address.region_name or ""])
+        writer.writerow(["Region ID", address.region_id or ""])
+        writer.writerow(
+            ["Latitude", f"{address.latitude:.6f}" if address.latitude else ""]
+        )
+        writer.writerow(
+            ["Longitude", f"{address.longitude:.6f}" if address.longitude else ""]
+        )
+        writer.writerow(
+            ["Primary Address", "Yes" if address.is_primary_address else "No"]
+        )
+        writer.writerow(["Status", address.status or ""])
+        writer.writerow(["Restriction", address.restriction or ""])
+        writer.writerow(
+            [
+                "Fetched At",
+                (
+                    address.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                    if address.fetched_at
+                    else ""
+                ),
+            ]
+        )
+
+        csv_content = output.getvalue()
+        output.close()
+
+        csv_bytes = "\ufeff".encode("utf-8") + csv_content.encode("utf-8")
+
+        filename = f"national_address_{address_id}.csv"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=csv_bytes,
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export national address CSV: {str(e)}"
+        )
+
+
+@router.get("/database/national-address/{address_id}/excel")
+async def export_database_national_address_excel(
+    address_id: str,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export National Address data as Excel (XLSX)"""
+    try:
+        from app.models.wathq_national_address import Address
+        from urllib.parse import quote
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from io import BytesIO
+
+        address = db.query(Address).filter(Address.pk_address_id == address_id).first()
+
+        if not address:
+            raise HTTPException(
+                status_code=404, detail=f"Address with ID {address_id} not found"
+            )
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "National Address"
+
+        header_fill = PatternFill(
+            start_color="004074", end_color="004074", fill_type="solid"
+        )
+        header_font = Font(color="FFFFFF", bold=True, size=12)
+        header_alignment = Alignment(horizontal="center", vertical="center")
+
+        ws.merge_cells("A1:B1")
+        ws["A1"] = "National Address Information"
+        ws["A1"].fill = header_fill
+        ws["A1"].font = header_font
+        ws["A1"].alignment = header_alignment
+
+        row = 3
+        data_rows = [
+            ("Address ID", address.pk_address_id),
+            ("Title", address.title),
+            ("Address", address.address),
+            ("Address 2", address.address2),
+            ("Building Number", address.building_number),
+            ("Street", address.street),
+            ("Unit Number", address.unit_number),
+            ("Additional Number", address.additional_number),
+            ("District", address.district),
+            ("District ID", address.district_id),
+            ("City", address.city),
+            ("City ID", address.city_id),
+            ("Post Code", address.post_code),
+            ("Region", address.region_name),
+            ("Region ID", address.region_id),
+            ("Latitude", f"{address.latitude:.6f}" if address.latitude else ""),
+            ("Longitude", f"{address.longitude:.6f}" if address.longitude else ""),
+            ("Primary Address", "Yes" if address.is_primary_address else "No"),
+            ("Status", address.status),
+            ("Restriction", address.restriction),
+            (
+                "Fetched At",
+                (
+                    address.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                    if address.fetched_at
+                    else ""
+                ),
+            ),
+        ]
+
+        for label, value in data_rows:
+            ws[f"A{row}"] = label
+            ws[f"B{row}"] = value or ""
+            ws[f"A{row}"].font = Font(bold=True)
+            row += 1
+
+        ws.column_dimensions["A"].width = 25
+        ws.column_dimensions["B"].width = 50
+
+        excel_file = BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
+
+        filename = f"national_address_{address_id}.xlsx"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=excel_file.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export national address Excel: {str(e)}"
+        )
+
+
+# ============================================================================
+# REAL ESTATE DEED EXPORT ENDPOINTS
+# ============================================================================
+
+
+@router.get("/database/real-estate-deed/{deed_id}/pdf")
+async def export_database_real_estate_deed_pdf(
+    deed_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export Real Estate Deed PDF from database record"""
+    try:
+        from app.models.wathq_real_estate_deed import Deed
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from urllib.parse import quote
+        import pdfkit
+
+        deed = db.query(Deed).filter(Deed.id == deed_id).first()
+
+        if not deed:
+            raise HTTPException(
+                status_code=404, detail=f"Deed with ID {deed_id} not found"
+            )
+
+        template_path = (
+            pdf_service.templates_dir / "real_estate_deed_database_template_v2.html"
+        )
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500, detail="Real estate deed template not found"
+            )
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        owners_data = []
+        if deed.owners:
+            for owner in deed.owners:
+                owners_data.append(
+                    {
+                        "owner_name": owner.owner_name,
+                        "birth_date": owner.birth_date,
+                        "id_number": owner.id_number,
+                        "id_type_text": owner.id_type_text,
+                        "nationality": owner.nationality,
+                        "owning_area": (
+                            float(owner.owning_area) if owner.owning_area else None
+                        ),
+                        "owning_amount": (
+                            float(owner.owning_amount) if owner.owning_amount else None
+                        ),
+                    }
+                )
+
+        real_estates_data = []
+        if deed.real_estates:
+            for re in deed.real_estates:
+                real_estates_data.append(
+                    {
+                        "region_name": re.region_name,
+                        "city_name": re.city_name,
+                        "district_name": re.district_name,
+                        "real_estate_type_name": re.real_estate_type_name,
+                        "land_number": re.land_number,
+                        "plan_number": re.plan_number,
+                        "area": float(re.area) if re.area else None,
+                        "area_text": re.area_text,
+                        "location_description": re.location_description,
+                    }
+                )
+
+        template_data = {
+            "document_title": f"صك عقاري - {deed.deed_number or deed_id}",
+            "search_date": (
+                deed.fetched_at.strftime("%Y-%m-%d")
+                if deed.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "deed_id": deed.id,
+            "deed_number": deed.deed_number,
+            "deed_serial": deed.deed_serial,
+            "deed_date": deed.deed_date,
+            "deed_text": deed.deed_text,
+            "deed_source": deed.deed_source,
+            "deed_city": deed.deed_city,
+            "deed_status": deed.deed_status,
+            "deed_area": float(deed.deed_area) if deed.deed_area else None,
+            "deed_area_text": deed.deed_area_text,
+            "is_real_estate_constrained": deed.is_real_estate_constrained,
+            "is_real_estate_halted": deed.is_real_estate_halted,
+            "is_real_estate_mortgaged": deed.is_real_estate_mortgaged,
+            "is_real_estate_testamented": deed.is_real_estate_testamented,
+            "limit_north_name": deed.limit_north_name,
+            "limit_north_description": deed.limit_north_description,
+            "limit_north_length": (
+                float(deed.limit_north_length) if deed.limit_north_length else None
+            ),
+            "limit_south_name": deed.limit_south_name,
+            "limit_south_description": deed.limit_south_description,
+            "limit_south_length": (
+                float(deed.limit_south_length) if deed.limit_south_length else None
+            ),
+            "limit_east_name": deed.limit_east_name,
+            "limit_east_description": deed.limit_east_description,
+            "limit_east_length": (
+                float(deed.limit_east_length) if deed.limit_east_length else None
+            ),
+            "limit_west_name": deed.limit_west_name,
+            "limit_west_description": deed.limit_west_description,
+            "limit_west_length": (
+                float(deed.limit_west_length) if deed.limit_west_length else None
+            ),
+            "owners": owners_data,
+            "real_estates": real_estates_data,
+            "fetched_at": (
+                deed.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                if deed.fetched_at
+                else "غير محدد"
+            ),
+        }
+
+        html_content = template.render(**template_data)
+
+        pdf_options = {
+            "page-size": "A4",
+            "margin-top": "0mm",
+            "margin-right": "0mm",
+            "margin-bottom": "0mm",
+            "margin-left": "0mm",
+            "encoding": "UTF-8",
+            "enable-local-file-access": None,
+            "print-media-type": None,
+            "orientation": "portrait",
+        }
+
+        pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
+
+        filename = f"real_estate_deed_{deed_id}.pdf"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to generate real estate deed PDF: {str(e)}"
+        )
+
+
+@router.get("/database/real-estate-deed/{deed_id}/preview")
+async def preview_database_real_estate_deed_html(
+    deed_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Preview Real Estate Deed HTML"""
+    try:
+        from app.models.wathq_real_estate_deed import Deed
+        from jinja2 import Template
+        from datetime import datetime as dt
+
+        deed = db.query(Deed).filter(Deed.id == deed_id).first()
+
+        if not deed:
+            raise HTTPException(
+                status_code=404, detail=f"Deed with ID {deed_id} not found"
+            )
+
+        template_path = (
+            pdf_service.templates_dir / "real_estate_deed_database_template_v2.html"
+        )
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500, detail="Real estate deed template not found"
+            )
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        owners_data = []
+        if deed.owners:
+            for owner in deed.owners:
+                owners_data.append(
+                    {
+                        "owner_name": owner.owner_name,
+                        "birth_date": owner.birth_date,
+                        "id_number": owner.id_number,
+                        "id_type_text": owner.id_type_text,
+                        "nationality": owner.nationality,
+                        "owning_area": (
+                            float(owner.owning_area) if owner.owning_area else None
+                        ),
+                        "owning_amount": (
+                            float(owner.owning_amount) if owner.owning_amount else None
+                        ),
+                    }
+                )
+
+        real_estates_data = []
+        if deed.real_estates:
+            for re in deed.real_estates:
+                real_estates_data.append(
+                    {
+                        "region_name": re.region_name,
+                        "city_name": re.city_name,
+                        "district_name": re.district_name,
+                        "real_estate_type_name": re.real_estate_type_name,
+                        "land_number": re.land_number,
+                        "plan_number": re.plan_number,
+                        "area": float(re.area) if re.area else None,
+                        "area_text": re.area_text,
+                        "location_description": re.location_description,
+                    }
+                )
+
+        template_data = {
+            "document_title": f"صك عقاري - {deed.deed_number or deed_id}",
+            "search_date": (
+                deed.fetched_at.strftime("%Y-%m-%d")
+                if deed.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "deed_id": deed.id,
+            "deed_number": deed.deed_number,
+            "deed_serial": deed.deed_serial,
+            "deed_date": deed.deed_date,
+            "deed_text": deed.deed_text,
+            "deed_source": deed.deed_source,
+            "deed_city": deed.deed_city,
+            "deed_status": deed.deed_status,
+            "deed_area": float(deed.deed_area) if deed.deed_area else None,
+            "deed_area_text": deed.deed_area_text,
+            "is_real_estate_constrained": deed.is_real_estate_constrained,
+            "is_real_estate_halted": deed.is_real_estate_halted,
+            "is_real_estate_mortgaged": deed.is_real_estate_mortgaged,
+            "is_real_estate_testamented": deed.is_real_estate_testamented,
+            "limit_north_name": deed.limit_north_name,
+            "limit_north_description": deed.limit_north_description,
+            "limit_north_length": (
+                float(deed.limit_north_length) if deed.limit_north_length else None
+            ),
+            "limit_south_name": deed.limit_south_name,
+            "limit_south_description": deed.limit_south_description,
+            "limit_south_length": (
+                float(deed.limit_south_length) if deed.limit_south_length else None
+            ),
+            "limit_east_name": deed.limit_east_name,
+            "limit_east_description": deed.limit_east_description,
+            "limit_east_length": (
+                float(deed.limit_east_length) if deed.limit_east_length else None
+            ),
+            "limit_west_name": deed.limit_west_name,
+            "limit_west_description": deed.limit_west_description,
+            "limit_west_length": (
+                float(deed.limit_west_length) if deed.limit_west_length else None
+            ),
+            "owners": owners_data,
+            "real_estates": real_estates_data,
+            "fetched_at": (
+                deed.fetched_at.strftime("%Y-%m-%d %H:%M:%S")
+                if deed.fetched_at
+                else "غير محدد"
+            ),
+        }
+
+        html_content = template.render(**template_data)
+
+        return Response(content=html_content, media_type="text/html")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate real estate deed preview: {str(e)}",
+        )
+
+
+@router.get("/database/real-estate-deed/{deed_id}/json")
+async def export_database_real_estate_deed_json(
+    deed_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export Real Estate Deed data as JSON"""
+    try:
+        from app.models.wathq_real_estate_deed import Deed
+        from urllib.parse import quote
+        import json
+
+        deed = db.query(Deed).filter(Deed.id == deed_id).first()
+
+        if not deed:
+            raise HTTPException(
+                status_code=404, detail=f"Deed with ID {deed_id} not found"
+            )
+
+        owners_data = []
+        if deed.owners:
+            for owner in deed.owners:
+                owners_data.append(
+                    {
+                        "owner_name": owner.owner_name,
+                        "birth_date": owner.birth_date,
+                        "id_number": owner.id_number,
+                        "id_type": owner.id_type,
+                        "id_type_text": owner.id_type_text,
+                        "owner_type": owner.owner_type,
+                        "nationality": owner.nationality,
+                        "owning_area": (
+                            float(owner.owning_area) if owner.owning_area else None
+                        ),
+                        "owning_amount": (
+                            float(owner.owning_amount) if owner.owning_amount else None
+                        ),
+                    }
+                )
+
+        real_estates_data = []
+        if deed.real_estates:
+            for re in deed.real_estates:
+                real_estates_data.append(
+                    {
+                        "region_code": re.region_code,
+                        "region_name": re.region_name,
+                        "city_code": re.city_code,
+                        "city_name": re.city_name,
+                        "district_code": re.district_code,
+                        "district_name": re.district_name,
+                        "real_estate_type_name": re.real_estate_type_name,
+                        "land_number": re.land_number,
+                        "plan_number": re.plan_number,
+                        "area": float(re.area) if re.area else None,
+                        "area_text": re.area_text,
+                        "location_description": re.location_description,
+                    }
+                )
+
+        deed_data = {
+            "id": deed.id,
+            "deed_number": deed.deed_number,
+            "deed_serial": deed.deed_serial,
+            "deed_date": deed.deed_date,
+            "deed_text": deed.deed_text,
+            "deed_source": deed.deed_source,
+            "deed_city": deed.deed_city,
+            "deed_status": deed.deed_status,
+            "deed_area": float(deed.deed_area) if deed.deed_area else None,
+            "deed_area_text": deed.deed_area_text,
+            "is_real_estate_constrained": deed.is_real_estate_constrained,
+            "is_real_estate_halted": deed.is_real_estate_halted,
+            "is_real_estate_mortgaged": deed.is_real_estate_mortgaged,
+            "is_real_estate_testamented": deed.is_real_estate_testamented,
+            "limits": {
+                "north": {
+                    "name": deed.limit_north_name,
+                    "description": deed.limit_north_description,
+                    "length": (
+                        float(deed.limit_north_length)
+                        if deed.limit_north_length
+                        else None
+                    ),
+                },
+                "south": {
+                    "name": deed.limit_south_name,
+                    "description": deed.limit_south_description,
+                    "length": (
+                        float(deed.limit_south_length)
+                        if deed.limit_south_length
+                        else None
+                    ),
+                },
+                "east": {
+                    "name": deed.limit_east_name,
+                    "description": deed.limit_east_description,
+                    "length": (
+                        float(deed.limit_east_length)
+                        if deed.limit_east_length
+                        else None
+                    ),
+                },
+                "west": {
+                    "name": deed.limit_west_name,
+                    "description": deed.limit_west_description,
+                    "length": (
+                        float(deed.limit_west_length)
+                        if deed.limit_west_length
+                        else None
+                    ),
+                },
+            },
+            "owners": owners_data,
+            "real_estates": real_estates_data,
+            "fetched_at": deed.fetched_at.isoformat() if deed.fetched_at else None,
+            "created_at": deed.created_at.isoformat() if deed.created_at else None,
+            "updated_at": deed.updated_at.isoformat() if deed.updated_at else None,
+        }
+
+        json_content = json.dumps(deed_data, ensure_ascii=False, indent=2)
+
+        filename = f"real_estate_deed_{deed_id}.json"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=json_content,
+            media_type="application/json; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export real estate deed JSON: {str(e)}"
+        )
+
+
+@router.get("/database/real-estate-deed/{deed_id}/csv")
+async def export_database_real_estate_deed_csv(
+    deed_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export Real Estate Deed data as CSV with UTF-8 encoding"""
+    try:
+        from app.models.wathq_real_estate_deed import Deed
+        from urllib.parse import quote
+        import csv
+        from io import StringIO
+
+        deed = db.query(Deed).filter(Deed.id == deed_id).first()
+
+        if not deed:
+            raise HTTPException(
+                status_code=404, detail=f"Deed with ID {deed_id} not found"
+            )
+
+        output = StringIO()
+        writer = csv.writer(output)
+
+        writer.writerow(["Real Estate Deed Information"])
+        writer.writerow(["Field", "Value"])
+        writer.writerow(["Deed ID", deed.id or ""])
+        writer.writerow(["Deed Number", deed.deed_number or ""])
+        writer.writerow(["Deed Serial", deed.deed_serial or ""])
+        writer.writerow(["Deed Date", deed.deed_date or ""])
+        writer.writerow(["Deed City", deed.deed_city or ""])
+        writer.writerow(["Deed Status", deed.deed_status or ""])
+        writer.writerow(["Deed Area", f"{deed.deed_area}" if deed.deed_area else ""])
+        writer.writerow(["Deed Area Text", deed.deed_area_text or ""])
+        writer.writerow(
+            ["Constrained", "Yes" if deed.is_real_estate_constrained else "No"]
+        )
+        writer.writerow(["Halted", "Yes" if deed.is_real_estate_halted else "No"])
+        writer.writerow(["Mortgaged", "Yes" if deed.is_real_estate_mortgaged else "No"])
+        writer.writerow(
+            ["Testamented", "Yes" if deed.is_real_estate_testamented else "No"]
+        )
+        writer.writerow([])
+
+        if deed.owners:
+            writer.writerow(["Owners"])
+            writer.writerow(
+                ["Name", "ID Number", "Nationality", "Owning Area", "Owning Amount"]
+            )
+            for owner in deed.owners:
+                writer.writerow(
+                    [
+                        owner.owner_name or "",
+                        owner.id_number or "",
+                        owner.nationality or "",
+                        f"{owner.owning_area}" if owner.owning_area else "",
+                        f"{owner.owning_amount}" if owner.owning_amount else "",
+                    ]
+                )
+            writer.writerow([])
+
+        if deed.real_estates:
+            writer.writerow(["Real Estates"])
+            writer.writerow(
+                ["Region", "City", "District", "Type", "Land Number", "Area"]
+            )
+            for re in deed.real_estates:
+                writer.writerow(
+                    [
+                        re.region_name or "",
+                        re.city_name or "",
+                        re.district_name or "",
+                        re.real_estate_type_name or "",
+                        re.land_number or "",
+                        f"{re.area}" if re.area else "",
+                    ]
+                )
+
+        csv_content = output.getvalue()
+        output.close()
+
+        csv_bytes = "\ufeff".encode("utf-8") + csv_content.encode("utf-8")
+
+        filename = f"real_estate_deed_{deed_id}.csv"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=csv_bytes,
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export real estate deed CSV: {str(e)}"
+        )
+
+
+@router.get("/database/real-estate-deed/{deed_id}/excel")
+async def export_database_real_estate_deed_excel(
+    deed_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export Real Estate Deed data as Excel (XLSX)"""
+    try:
+        from app.models.wathq_real_estate_deed import Deed
+        from urllib.parse import quote
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from io import BytesIO
+
+        deed = db.query(Deed).filter(Deed.id == deed_id).first()
+
+        if not deed:
+            raise HTTPException(
+                status_code=404, detail=f"Deed with ID {deed_id} not found"
+            )
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Real Estate Deed"
+
+        header_fill = PatternFill(
+            start_color="004074", end_color="004074", fill_type="solid"
+        )
+        header_font = Font(color="FFFFFF", bold=True, size=12)
+        header_alignment = Alignment(horizontal="center", vertical="center")
+
+        ws.merge_cells("A1:B1")
+        ws["A1"] = "Real Estate Deed Information"
+        ws["A1"].fill = header_fill
+        ws["A1"].font = header_font
+        ws["A1"].alignment = header_alignment
+
+        row = 3
+        data_rows = [
+            ("Deed ID", deed.id),
+            ("Deed Number", deed.deed_number),
+            ("Deed Serial", deed.deed_serial),
+            ("Deed Date", deed.deed_date),
+            ("Deed City", deed.deed_city),
+            ("Deed Status", deed.deed_status),
+            ("Deed Area", f"{deed.deed_area}" if deed.deed_area else ""),
+            ("Constrained", "Yes" if deed.is_real_estate_constrained else "No"),
+            ("Halted", "Yes" if deed.is_real_estate_halted else "No"),
+            ("Mortgaged", "Yes" if deed.is_real_estate_mortgaged else "No"),
+            ("Testamented", "Yes" if deed.is_real_estate_testamented else "No"),
+        ]
+
+        for label, value in data_rows:
+            ws[f"A{row}"] = label
+            ws[f"B{row}"] = value or ""
+            ws[f"A{row}"].font = Font(bold=True)
+            row += 1
+
+        if deed.owners:
+            row += 2
+            ws.merge_cells(f"A{row}:E{row}")
+            ws[f"A{row}"] = "Owners"
+            ws[f"A{row}"].fill = header_fill
+            ws[f"A{row}"].font = header_font
+            row += 1
+
+            headers = [
+                "Name",
+                "ID Number",
+                "Nationality",
+                "Owning Area",
+                "Owning Amount",
+            ]
+            for col, header in enumerate(headers, start=1):
+                cell = ws.cell(row=row, column=col)
+                cell.value = header
+                cell.font = Font(bold=True)
+            row += 1
+
+            for owner in deed.owners:
+                ws[f"A{row}"] = owner.owner_name or ""
+                ws[f"B{row}"] = owner.id_number or ""
+                ws[f"C{row}"] = owner.nationality or ""
+                ws[f"D{row}"] = f"{owner.owning_area}" if owner.owning_area else ""
+                ws[f"E{row}"] = f"{owner.owning_amount}" if owner.owning_amount else ""
+                row += 1
+
+        ws.column_dimensions["A"].width = 25
+        ws.column_dimensions["B"].width = 30
+        ws.column_dimensions["C"].width = 20
+        ws.column_dimensions["D"].width = 15
+        ws.column_dimensions["E"].width = 15
+
+        excel_file = BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
+
+        filename = f"real_estate_deed_{deed_id}.xlsx"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=excel_file.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export real estate deed Excel: {str(e)}"
+        )
+
+
+# ============================================================================
+# POWER OF ATTORNEY EXPORT ENDPOINTS
+# ============================================================================
+
+
+@router.get("/database/power-of-attorney/{poa_id}/pdf")
+async def export_database_poa_pdf(
+    poa_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export Power of Attorney PDF from database record"""
+    try:
+        from app.models.wathq_power_of_attorney import PowerOfAttorney
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from urllib.parse import quote
+        import pdfkit
+
+        poa = db.query(PowerOfAttorney).filter(PowerOfAttorney.id == poa_id).first()
+
+        if not poa:
+            raise HTTPException(
+                status_code=404, detail=f"Power of Attorney with ID {poa_id} not found"
+            )
+
+        template_path = (
+            pdf_service.templates_dir / "power_of_attorney_database_template_v2.html"
+        )
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500, detail="Power of attorney template not found"
+            )
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        principals_data = []
+        if poa.principals:
+            for principal in poa.principals:
+                principals_data.append(
+                    {
+                        "name": principal.name,
+                        "principal_identity_id": principal.principal_identity_id,
+                        "birthday": (
+                            principal.birthday.strftime("%Y-%m-%d")
+                            if principal.birthday
+                            else None
+                        ),
+                        "sefa_name": principal.sefa_name,
+                    }
+                )
+
+        agents_data = []
+        if poa.agents:
+            for agent in poa.agents:
+                agents_data.append(
+                    {
+                        "name": agent.name,
+                        "agent_identity_id": agent.agent_identity_id,
+                        "birthday": (
+                            agent.birthday.strftime("%Y-%m-%d")
+                            if agent.birthday
+                            else None
+                        ),
+                        "sefa_name": agent.sefa_name,
+                    }
+                )
+
+        allowed_actors_data = []
+        if poa.allowed_actors:
+            for actor in poa.allowed_actors:
+                allowed_actors_data.append(
+                    {
+                        "name": actor.name,
+                        "identity_no": actor.identity_no,
+                        "type_name": actor.type_name,
+                        "cr_number": actor.cr_number,
+                    }
+                )
+
+        text_list_items_data = []
+        if poa.text_list_items:
+            for item in poa.text_list_items:
+                text_list_items_data.append(
+                    {
+                        "item_type": item.item_type,
+                        "text_content": item.text_content,
+                    }
+                )
+
+        template_data = {
+            "document_title": f"وكالة - {poa.code or poa_id}",
+            "search_date": (
+                poa.fetched_at.strftime("%Y-%m-%d")
+                if poa.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "poa_id": poa.id,
+            "code": poa.code,
+            "status": poa.status,
+            "issue_hijri_date": poa.issue_hijri_date,
+            "issue_greg_date": (
+                poa.issue_greg_date.strftime("%Y-%m-%d")
+                if poa.issue_greg_date
+                else None
+            ),
+            "expiry_hijri_date": poa.expiry_hijri_date,
+            "expiry_greg_date": (
+                poa.expiry_greg_date.strftime("%Y-%m-%d")
+                if poa.expiry_greg_date
+                else None
+            ),
+            "attorney_type": poa.attorney_type,
+            "location_name": poa.location_name,
+            "agents_behavior_ar": poa.agents_behavior_ar,
+            "agents_behavior_en": poa.agents_behavior_en,
+            "document_text": poa.document_text,
+            "principals": principals_data,
+            "agents": agents_data,
+            "allowed_actors": allowed_actors_data,
+            "text_list_items": text_list_items_data,
+        }
+
+        html_content = template.render(**template_data)
+
+        pdf_options = {
+            "page-size": "A4",
+            "margin-top": "0mm",
+            "margin-right": "0mm",
+            "margin-bottom": "0mm",
+            "margin-left": "0mm",
+            "encoding": "UTF-8",
+            "enable-local-file-access": None,
+            "print-media-type": None,
+            "orientation": "portrait",
+        }
+
+        pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
+
+        filename = f"power_of_attorney_{poa_id}.pdf"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate power of attorney PDF: {str(e)}",
+        )
+
+
+@router.get("/database/power-of-attorney/{poa_id}/preview")
+async def preview_database_poa_html(
+    poa_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Preview Power of Attorney HTML"""
+    try:
+        from app.models.wathq_power_of_attorney import PowerOfAttorney
+        from jinja2 import Template
+        from datetime import datetime as dt
+
+        poa = db.query(PowerOfAttorney).filter(PowerOfAttorney.id == poa_id).first()
+
+        if not poa:
+            raise HTTPException(
+                status_code=404, detail=f"Power of Attorney with ID {poa_id} not found"
+            )
+
+        template_path = (
+            pdf_service.templates_dir / "power_of_attorney_database_template_v2.html"
+        )
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500, detail="Power of attorney template not found"
+            )
+
+        with open(template_path, "r", encoding="utf-8") as f:
+            template_content = f.read()
+
+        template = Template(template_content)
+
+        principals_data = []
+        if poa.principals:
+            for principal in poa.principals:
+                principals_data.append(
+                    {
+                        "name": principal.name,
+                        "principal_identity_id": principal.principal_identity_id,
+                        "birthday": (
+                            principal.birthday.strftime("%Y-%m-%d")
+                            if principal.birthday
+                            else None
+                        ),
+                        "sefa_name": principal.sefa_name,
+                    }
+                )
+
+        agents_data = []
+        if poa.agents:
+            for agent in poa.agents:
+                agents_data.append(
+                    {
+                        "name": agent.name,
+                        "agent_identity_id": agent.agent_identity_id,
+                        "birthday": (
+                            agent.birthday.strftime("%Y-%m-%d")
+                            if agent.birthday
+                            else None
+                        ),
+                        "sefa_name": agent.sefa_name,
+                    }
+                )
+
+        allowed_actors_data = []
+        if poa.allowed_actors:
+            for actor in poa.allowed_actors:
+                allowed_actors_data.append(
+                    {
+                        "name": actor.name,
+                        "identity_no": actor.identity_no,
+                        "type_name": actor.type_name,
+                        "cr_number": actor.cr_number,
+                    }
+                )
+
+        text_list_items_data = []
+        if poa.text_list_items:
+            for item in poa.text_list_items:
+                text_list_items_data.append(
+                    {
+                        "item_type": item.item_type,
+                        "text_content": item.text_content,
+                    }
+                )
+
+        template_data = {
+            "document_title": f"وكالة - {poa.code or poa_id}",
+            "search_date": (
+                poa.fetched_at.strftime("%Y-%m-%d")
+                if poa.fetched_at
+                else dt.now().strftime("%Y-%m-%d")
+            ),
+            "print_date": dt.now().strftime("%Y-%m-%d"),
+            "poa_id": poa.id,
+            "code": poa.code,
+            "status": poa.status,
+            "issue_hijri_date": poa.issue_hijri_date,
+            "issue_greg_date": (
+                poa.issue_greg_date.strftime("%Y-%m-%d")
+                if poa.issue_greg_date
+                else None
+            ),
+            "expiry_hijri_date": poa.expiry_hijri_date,
+            "expiry_greg_date": (
+                poa.expiry_greg_date.strftime("%Y-%m-%d")
+                if poa.expiry_greg_date
+                else None
+            ),
+            "attorney_type": poa.attorney_type,
+            "location_name": poa.location_name,
+            "agents_behavior_ar": poa.agents_behavior_ar,
+            "agents_behavior_en": poa.agents_behavior_en,
+            "document_text": poa.document_text,
+            "principals": principals_data,
+            "agents": agents_data,
+            "allowed_actors": allowed_actors_data,
+            "text_list_items": text_list_items_data,
+        }
+
+        html_content = template.render(**template_data)
+
+        return Response(content=html_content, media_type="text/html")
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate power of attorney preview: {str(e)}",
+        )
+
+
+@router.get("/database/power-of-attorney/{poa_id}/json")
+async def export_database_poa_json(
+    poa_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export Power of Attorney data as JSON"""
+    try:
+        from app.models.wathq_power_of_attorney import PowerOfAttorney
+        from urllib.parse import quote
+        import json
+
+        poa = db.query(PowerOfAttorney).filter(PowerOfAttorney.id == poa_id).first()
+
+        if not poa:
+            raise HTTPException(
+                status_code=404, detail=f"Power of Attorney with ID {poa_id} not found"
+            )
+
+        principals_data = []
+        if poa.principals:
+            for principal in poa.principals:
+                principals_data.append(
+                    {
+                        "name": principal.name,
+                        "principal_identity_id": principal.principal_identity_id,
+                        "birthday": (
+                            principal.birthday.isoformat()
+                            if principal.birthday
+                            else None
+                        ),
+                        "sefa_id": principal.sefa_id,
+                        "sefa_name": principal.sefa_name,
+                    }
+                )
+
+        agents_data = []
+        if poa.agents:
+            for agent in poa.agents:
+                agents_data.append(
+                    {
+                        "name": agent.name,
+                        "agent_identity_id": agent.agent_identity_id,
+                        "birthday": (
+                            agent.birthday.isoformat() if agent.birthday else None
+                        ),
+                        "sefa_id": agent.sefa_id,
+                        "sefa_name": agent.sefa_name,
+                    }
+                )
+
+        allowed_actors_data = []
+        if poa.allowed_actors:
+            for actor in poa.allowed_actors:
+                allowed_actors_data.append(
+                    {
+                        "name": actor.name,
+                        "identity_no": actor.identity_no,
+                        "type_id": actor.type_id,
+                        "type_name": actor.type_name,
+                        "cr_number": actor.cr_number,
+                        "national_number": actor.national_number,
+                    }
+                )
+
+        text_list_items_data = []
+        if poa.text_list_items:
+            for item in poa.text_list_items:
+                text_list_items_data.append(
+                    {
+                        "list_item_id": item.list_item_id,
+                        "item_type": item.item_type,
+                        "text_content": item.text_content,
+                    }
+                )
+
+        poa_data = {
+            "id": poa.id,
+            "code": poa.code,
+            "status": poa.status,
+            "issue_hijri_date": poa.issue_hijri_date,
+            "issue_greg_date": (
+                poa.issue_greg_date.isoformat() if poa.issue_greg_date else None
+            ),
+            "expiry_hijri_date": poa.expiry_hijri_date,
+            "expiry_greg_date": (
+                poa.expiry_greg_date.isoformat() if poa.expiry_greg_date else None
+            ),
+            "attorney_type": poa.attorney_type,
+            "location_id": poa.location_id,
+            "location_name": poa.location_name,
+            "agents_behavior_ar": poa.agents_behavior_ar,
+            "agents_behavior_en": poa.agents_behavior_en,
+            "document_text": poa.document_text,
+            "principals": principals_data,
+            "agents": agents_data,
+            "allowed_actors": allowed_actors_data,
+            "text_list_items": text_list_items_data,
+            "fetched_at": poa.fetched_at.isoformat() if poa.fetched_at else None,
+            "created_at": poa.created_at.isoformat() if poa.created_at else None,
+            "updated_at": poa.updated_at.isoformat() if poa.updated_at else None,
+        }
+
+        json_content = json.dumps(poa_data, ensure_ascii=False, indent=2)
+
+        filename = f"power_of_attorney_{poa_id}.json"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=json_content,
+            media_type="application/json; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export power of attorney JSON: {str(e)}"
+        )
+
+
+@router.get("/database/power-of-attorney/{poa_id}/csv")
+async def export_database_poa_csv(
+    poa_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export Power of Attorney data as CSV with UTF-8 encoding"""
+    try:
+        from app.models.wathq_power_of_attorney import PowerOfAttorney
+        from urllib.parse import quote
+        import csv
+        from io import StringIO
+
+        poa = db.query(PowerOfAttorney).filter(PowerOfAttorney.id == poa_id).first()
+
+        if not poa:
+            raise HTTPException(
+                status_code=404, detail=f"Power of Attorney with ID {poa_id} not found"
+            )
+
+        output = StringIO()
+        writer = csv.writer(output)
+
+        writer.writerow(["Power of Attorney Information"])
+        writer.writerow(["Field", "Value"])
+        writer.writerow(["POA ID", poa.id or ""])
+        writer.writerow(["Code", poa.code or ""])
+        writer.writerow(["Status", poa.status or ""])
+        writer.writerow(["Attorney Type", poa.attorney_type or ""])
+        writer.writerow(["Location", poa.location_name or ""])
+        writer.writerow(["Issue Hijri Date", poa.issue_hijri_date or ""])
+        writer.writerow(["Issue Greg Date", poa.issue_greg_date or ""])
+        writer.writerow(["Expiry Hijri Date", poa.expiry_hijri_date or ""])
+        writer.writerow(["Expiry Greg Date", poa.expiry_greg_date or ""])
+        writer.writerow(["Agents Behavior (AR)", poa.agents_behavior_ar or ""])
+        writer.writerow(["Agents Behavior (EN)", poa.agents_behavior_en or ""])
+        writer.writerow([])
+
+        if poa.principals:
+            writer.writerow(["Principals"])
+            writer.writerow(["Name", "Identity ID", "Birthday", "Sefa Name"])
+            for principal in poa.principals:
+                writer.writerow(
+                    [
+                        principal.name or "",
+                        principal.principal_identity_id or "",
+                        principal.birthday or "",
+                        principal.sefa_name or "",
+                    ]
+                )
+            writer.writerow([])
+
+        if poa.agents:
+            writer.writerow(["Agents"])
+            writer.writerow(["Name", "Identity ID", "Birthday", "Sefa Name"])
+            for agent in poa.agents:
+                writer.writerow(
+                    [
+                        agent.name or "",
+                        agent.agent_identity_id or "",
+                        agent.birthday or "",
+                        agent.sefa_name or "",
+                    ]
+                )
+            writer.writerow([])
+
+        if poa.allowed_actors:
+            writer.writerow(["Allowed Actors"])
+            writer.writerow(["Name", "Identity No", "Type", "CR Number"])
+            for actor in poa.allowed_actors:
+                writer.writerow(
+                    [
+                        actor.name or "",
+                        actor.identity_no or "",
+                        actor.type_name or "",
+                        actor.cr_number or "",
+                    ]
+                )
+            writer.writerow([])
+
+        if poa.text_list_items:
+            writer.writerow(["Text List Items"])
+            writer.writerow(["Type", "Content"])
+            for item in poa.text_list_items:
+                writer.writerow(
+                    [
+                        item.item_type or "",
+                        item.text_content or "",
+                    ]
+                )
+
+        csv_content = output.getvalue()
+        output.close()
+
+        csv_bytes = "\ufeff".encode("utf-8") + csv_content.encode("utf-8")
+
+        filename = f"power_of_attorney_{poa_id}.csv"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=csv_bytes,
+            media_type="text/csv; charset=utf-8",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to export power of attorney CSV: {str(e)}"
+        )
+
+
+@router.get("/database/power-of-attorney/{poa_id}/excel")
+async def export_database_poa_excel(
+    poa_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: models.User | models.ManagementUser = Depends(
+        deps.get_current_active_user_or_management
+    ),
+) -> Response:
+    """Export Power of Attorney data as Excel (XLSX)"""
+    try:
+        from app.models.wathq_power_of_attorney import PowerOfAttorney
+        from urllib.parse import quote
+        import openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from io import BytesIO
+
+        poa = db.query(PowerOfAttorney).filter(PowerOfAttorney.id == poa_id).first()
+
+        if not poa:
+            raise HTTPException(
+                status_code=404, detail=f"Power of Attorney with ID {poa_id} not found"
+            )
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Power of Attorney"
+
+        header_fill = PatternFill(
+            start_color="004074", end_color="004074", fill_type="solid"
+        )
+        header_font = Font(color="FFFFFF", bold=True, size=12)
+        header_alignment = Alignment(horizontal="center", vertical="center")
+
+        ws.merge_cells("A1:B1")
+        ws["A1"] = "Power of Attorney Information"
+        ws["A1"].fill = header_fill
+        ws["A1"].font = header_font
+        ws["A1"].alignment = header_alignment
+
+        row = 3
+        data_rows = [
+            ("POA ID", poa.id),
+            ("Code", poa.code),
+            ("Status", poa.status),
+            ("Attorney Type", poa.attorney_type),
+            ("Location", poa.location_name),
+            ("Issue Hijri Date", poa.issue_hijri_date),
+            ("Issue Greg Date", poa.issue_greg_date),
+            ("Expiry Hijri Date", poa.expiry_hijri_date),
+            ("Expiry Greg Date", poa.expiry_greg_date),
+            ("Agents Behavior (AR)", poa.agents_behavior_ar),
+            ("Agents Behavior (EN)", poa.agents_behavior_en),
+        ]
+
+        for label, value in data_rows:
+            ws[f"A{row}"] = label
+            ws[f"B{row}"] = value or ""
+            ws[f"A{row}"].font = Font(bold=True)
+            row += 1
+
+        if poa.principals:
+            row += 2
+            ws.merge_cells(f"A{row}:D{row}")
+            ws[f"A{row}"] = "Principals"
+            ws[f"A{row}"].fill = header_fill
+            ws[f"A{row}"].font = header_font
+            row += 1
+
+            headers = ["Name", "Identity ID", "Birthday", "Sefa Name"]
+            for col, header in enumerate(headers, start=1):
+                cell = ws.cell(row=row, column=col)
+                cell.value = header
+                cell.font = Font(bold=True)
+            row += 1
+
+            for principal in poa.principals:
+                ws[f"A{row}"] = principal.name or ""
+                ws[f"B{row}"] = principal.principal_identity_id or ""
+                ws[f"C{row}"] = str(principal.birthday) if principal.birthday else ""
+                ws[f"D{row}"] = principal.sefa_name or ""
+                row += 1
+
+        if poa.agents:
+            row += 2
+            ws.merge_cells(f"A{row}:D{row}")
+            ws[f"A{row}"] = "Agents"
+            ws[f"A{row}"].fill = header_fill
+            ws[f"A{row}"].font = header_font
+            row += 1
+
+            headers = ["Name", "Identity ID", "Birthday", "Sefa Name"]
+            for col, header in enumerate(headers, start=1):
+                cell = ws.cell(row=row, column=col)
+                cell.value = header
+                cell.font = Font(bold=True)
+            row += 1
+
+            for agent in poa.agents:
+                ws[f"A{row}"] = agent.name or ""
+                ws[f"B{row}"] = agent.agent_identity_id or ""
+                ws[f"C{row}"] = str(agent.birthday) if agent.birthday else ""
+                ws[f"D{row}"] = agent.sefa_name or ""
+                row += 1
+
+        ws.column_dimensions["A"].width = 25
+        ws.column_dimensions["B"].width = 30
+        ws.column_dimensions["C"].width = 20
+        ws.column_dimensions["D"].width = 20
+
+        excel_file = BytesIO()
+        wb.save(excel_file)
+        excel_file.seek(0)
+
+        filename = f"power_of_attorney_{poa_id}.xlsx"
+        encoded_filename = quote(filename)
+
+        return Response(
+            content=excel_file.getvalue(),
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            headers={
+                "Content-Disposition": f"attachment; filename*=UTF-8''{encoded_filename}"
+            },
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to export power of attorney Excel: {str(e)}",
         )

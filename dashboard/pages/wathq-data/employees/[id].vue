@@ -29,12 +29,26 @@
         >
           {{ t('employees.view.edit') }}
         </UButton>
+        
+        <!-- Export Dropdown -->
+        <UDropdown :items="exportMenuItems" :popper="{ placement: 'bottom-end' }">
+          <UButton
+            icon="i-heroicons-arrow-down-tray"
+            color="primary"
+            trailing-icon="i-heroicons-chevron-down"
+          >
+            {{ t('employees.view.export') }}
+          </UButton>
+        </UDropdown>
+
+        <!-- Print Button -->
         <UButton
-          icon="i-heroicons-arrow-down-tray"
-          color="primary"
-          @click="handleExport"
+          icon="i-heroicons-printer"
+          color="gray"
+          variant="outline"
+          @click="handlePrint"
         >
-          {{ t('employees.view.export') }}
+          {{ t('employees.view.print') }}
         </UButton>
       </div>
     </div>
@@ -211,11 +225,20 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
+import { useEmployeeExport } from '@/composables/useEmployeeExport'
 import InfoField from '~/components/ui/InfoField.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const { 
+  exportToPDF, 
+  exportToJSON, 
+  exportToCSV, 
+  exportToExcel, 
+  previewEmployee,
+  printEmployee 
+} = useEmployeeExport()
 
 definePageMeta({
   layout: 'default',
@@ -298,12 +321,71 @@ async function fetchEmployeeData() {
   }
 }
 
+// Export menu items
+const exportMenuItems = computed(() => [
+  [
+    {
+      label: 'Preview HTML',
+      icon: 'i-heroicons-eye',
+      click: () => handlePreview()
+    },
+    {
+      label: 'Export PDF',
+      icon: 'i-heroicons-document-text',
+      click: () => handleExportPDF()
+    }
+  ],
+  [
+    {
+      label: 'Export JSON',
+      icon: 'i-heroicons-code-bracket',
+      click: () => handleExportJSON()
+    },
+    {
+      label: 'Export CSV',
+      icon: 'i-heroicons-table-cells',
+      click: () => handleExportCSV()
+    },
+    {
+      label: 'Export Excel',
+      icon: 'i-heroicons-document-chart-bar',
+      click: () => handleExportExcel()
+    }
+  ]
+])
+
 function handleEdit() {
   console.log('Edit employee:', employeeData.value)
 }
 
-function handleExport() {
-  console.log('Export employee:', employeeData.value)
+async function handleExportPDF() {
+  if (!employeeData.value) return
+  await exportToPDF(employeeData.value.employee_id, employeeData.value.name)
+}
+
+async function handleExportJSON() {
+  if (!employeeData.value) return
+  await exportToJSON(employeeData.value.employee_id, employeeData.value.name)
+}
+
+async function handleExportCSV() {
+  if (!employeeData.value) return
+  await exportToCSV(employeeData.value.employee_id, employeeData.value.name)
+}
+
+async function handleExportExcel() {
+  if (!employeeData.value) return
+  await exportToExcel(employeeData.value.employee_id, employeeData.value.name)
+}
+
+function handlePreview() {
+  if (!employeeData.value) return
+  previewEmployee(employeeData.value.employee_id)
+}
+
+function handlePrint() {
+  if (!employeeData.value) return
+  printEmployee(employeeData.value.employee_id)
 }
 
 function formatCurrency(amount: number | string | null | undefined) {
