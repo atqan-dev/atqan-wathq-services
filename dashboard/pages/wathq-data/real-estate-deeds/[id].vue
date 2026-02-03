@@ -29,12 +29,26 @@
         >
           {{ t('realEstateDeeds.view.edit') }}
         </UButton>
+        
+        <!-- Export Dropdown -->
+        <UDropdown :items="exportMenuItems" :popper="{ placement: 'bottom-end' }">
+          <UButton
+            icon="i-heroicons-arrow-down-tray"
+            color="primary"
+            trailing-icon="i-heroicons-chevron-down"
+          >
+            {{ t('realEstateDeeds.view.export') }}
+          </UButton>
+        </UDropdown>
+
+        <!-- Print Button -->
         <UButton
-          icon="i-heroicons-arrow-down-tray"
-          color="primary"
-          @click="handleExport"
+          icon="i-heroicons-printer"
+          color="gray"
+          variant="outline"
+          @click="handlePrint"
         >
-          {{ t('realEstateDeeds.view.export') }}
+          Print
         </UButton>
       </div>
     </div>
@@ -317,11 +331,20 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
+import { useRealEstateDeedExport } from '@/composables/useRealEstateDeedExport'
 import InfoField from '~/components/ui/InfoField.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const { 
+  exportToPDF, 
+  exportToJSON, 
+  exportToCSV, 
+  exportToExcel, 
+  previewDeed,
+  printDeed 
+} = useRealEstateDeedExport()
 
 definePageMeta({
   layout: 'default',
@@ -461,12 +484,71 @@ async function fetchDeedData() {
   }
 }
 
+// Export menu items
+const exportMenuItems = computed(() => [
+  [
+    {
+      label: 'Preview HTML',
+      icon: 'i-heroicons-eye',
+      click: () => handlePreview()
+    },
+    {
+      label: 'Export PDF',
+      icon: 'i-heroicons-document-text',
+      click: () => handleExportPDF()
+    }
+  ],
+  [
+    {
+      label: 'Export JSON',
+      icon: 'i-heroicons-code-bracket',
+      click: () => handleExportJSON()
+    },
+    {
+      label: 'Export CSV',
+      icon: 'i-heroicons-table-cells',
+      click: () => handleExportCSV()
+    },
+    {
+      label: 'Export Excel',
+      icon: 'i-heroicons-document-chart-bar',
+      click: () => handleExportExcel()
+    }
+  ]
+])
+
 function handleEdit() {
   console.log('Edit deed:', deedData.value)
 }
 
-function handleExport() {
-  console.log('Export deed:', deedData.value)
+async function handleExportPDF() {
+  if (!deedData.value) return
+  await exportToPDF(deedData.value.id)
+}
+
+async function handleExportJSON() {
+  if (!deedData.value) return
+  await exportToJSON(deedData.value.id)
+}
+
+async function handleExportCSV() {
+  if (!deedData.value) return
+  await exportToCSV(deedData.value.id)
+}
+
+async function handleExportExcel() {
+  if (!deedData.value) return
+  await exportToExcel(deedData.value.id)
+}
+
+function handlePreview() {
+  if (!deedData.value) return
+  previewDeed(deedData.value.id)
+}
+
+function handlePrint() {
+  if (!deedData.value) return
+  printDeed(deedData.value.id)
 }
 
 function formatArea(area: number | null | undefined) {

@@ -29,12 +29,22 @@
         >
           {{ t('powerOfAttorney.view.edit') }}
         </UButton>
+        <UDropdown :items="exportMenuItems" :popper="{ placement: 'bottom-end' }">
+          <UButton
+            icon="i-heroicons-arrow-down-tray"
+            color="primary"
+            trailing-icon="i-heroicons-chevron-down-20-solid"
+          >
+            {{ t('powerOfAttorney.view.export') }}
+          </UButton>
+        </UDropdown>
         <UButton
-          icon="i-heroicons-arrow-down-tray"
-          color="primary"
-          @click="handleExport"
+          icon="i-heroicons-printer"
+          color="gray"
+          variant="outline"
+          @click="handlePrint"
         >
-          {{ t('powerOfAttorney.view.export') }}
+          Print
         </UButton>
       </div>
     </div>
@@ -336,11 +346,20 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
+import { usePoaExport } from '@/composables/usePoaExport'
 import InfoField from '~/components/ui/InfoField.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const {
+  exportToPDF,
+  exportToJSON,
+  exportToCSV,
+  exportToExcel,
+  previewPoa,
+  printPoa
+} = usePoaExport()
 
 // Define page metadata
 definePageMeta({
@@ -355,6 +374,39 @@ const poaData = ref<any>(null)
 
 // Get ID from route
 const id = computed(() => route.params.id)
+
+// Export menu items
+const exportMenuItems = computed(() => [
+  [
+    {
+      label: 'Preview HTML',
+      icon: 'i-heroicons-eye',
+      click: () => handlePreview()
+    },
+    {
+      label: 'Export PDF',
+      icon: 'i-heroicons-document-text',
+      click: () => handleExportPDF()
+    }
+  ],
+  [
+    {
+      label: 'Export JSON',
+      icon: 'i-heroicons-code-bracket',
+      click: () => handleExportJSON()
+    },
+    {
+      label: 'Export CSV',
+      icon: 'i-heroicons-table-cells',
+      click: () => handleExportCSV()
+    },
+    {
+      label: 'Export Excel',
+      icon: 'i-heroicons-document-chart-bar',
+      click: () => handleExportExcel()
+    }
+  ]
+])
 
 // Fetch data on mount
 onMounted(() => {
@@ -483,12 +535,36 @@ async function fetchPoaData() {
 
 function handleEdit() {
   console.log('Edit POA:', poaData.value)
-  // TODO: Implement edit functionality
 }
 
-function handleExport() {
-  console.log('Export POA:', poaData.value)
-  // TODO: Implement export functionality
+async function handleExportPDF() {
+  if (!poaData.value) return
+  await exportToPDF(poaData.value.id)
+}
+
+async function handleExportJSON() {
+  if (!poaData.value) return
+  await exportToJSON(poaData.value.id)
+}
+
+async function handleExportCSV() {
+  if (!poaData.value) return
+  await exportToCSV(poaData.value.id)
+}
+
+async function handleExportExcel() {
+  if (!poaData.value) return
+  await exportToExcel(poaData.value.id)
+}
+
+function handlePreview() {
+  if (!poaData.value) return
+  previewPoa(poaData.value.id)
+}
+
+function handlePrint() {
+  if (!poaData.value) return
+  printPoa(poaData.value.id)
 }
 
 function formatDate(dateString: string | null | undefined) {

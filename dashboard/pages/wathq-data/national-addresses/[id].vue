@@ -29,12 +29,26 @@
         >
           {{ t('nationalAddresses.view.edit') }}
         </UButton>
+        
+        <!-- Export Dropdown -->
+        <UDropdown :items="exportMenuItems" :popper="{ placement: 'bottom-end' }">
+          <UButton
+            icon="i-heroicons-arrow-down-tray"
+            color="primary"
+            trailing-icon="i-heroicons-chevron-down"
+          >
+            {{ t('nationalAddresses.view.export') }}
+          </UButton>
+        </UDropdown>
+
+        <!-- Print Button -->
         <UButton
-          icon="i-heroicons-arrow-down-tray"
-          color="primary"
-          @click="handleExport"
+          icon="i-heroicons-printer"
+          color="gray"
+          variant="outline"
+          @click="handlePrint"
         >
-          {{ t('nationalAddresses.view.export') }}
+          Print
         </UButton>
       </div>
     </div>
@@ -239,11 +253,20 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from '@/composables/useI18n'
+import { useNationalAddressExport } from '@/composables/useNationalAddressExport'
 import InfoField from '~/components/ui/InfoField.vue'
 
 const { t } = useI18n()
 const route = useRoute()
 const router = useRouter()
+const { 
+  exportToPDF, 
+  exportToJSON, 
+  exportToCSV, 
+  exportToExcel, 
+  previewAddress,
+  printAddress 
+} = useNationalAddressExport()
 
 definePageMeta({
   layout: 'default',
@@ -386,12 +409,71 @@ async function fetchAddressData() {
   }
 }
 
+// Export menu items
+const exportMenuItems = computed(() => [
+  [
+    {
+      label: 'Preview HTML',
+      icon: 'i-heroicons-eye',
+      click: () => handlePreview()
+    },
+    {
+      label: 'Export PDF',
+      icon: 'i-heroicons-document-text',
+      click: () => handleExportPDF()
+    }
+  ],
+  [
+    {
+      label: 'Export JSON',
+      icon: 'i-heroicons-code-bracket',
+      click: () => handleExportJSON()
+    },
+    {
+      label: 'Export CSV',
+      icon: 'i-heroicons-table-cells',
+      click: () => handleExportCSV()
+    },
+    {
+      label: 'Export Excel',
+      icon: 'i-heroicons-document-chart-bar',
+      click: () => handleExportExcel()
+    }
+  ]
+])
+
 function handleEdit() {
   console.log('Edit address:', addressData.value)
 }
 
-function handleExport() {
-  console.log('Export address:', addressData.value)
+async function handleExportPDF() {
+  if (!addressData.value) return
+  await exportToPDF(addressData.value.pk_address_id)
+}
+
+async function handleExportJSON() {
+  if (!addressData.value) return
+  await exportToJSON(addressData.value.pk_address_id)
+}
+
+async function handleExportCSV() {
+  if (!addressData.value) return
+  await exportToCSV(addressData.value.pk_address_id)
+}
+
+async function handleExportExcel() {
+  if (!addressData.value) return
+  await exportToExcel(addressData.value.pk_address_id)
+}
+
+function handlePreview() {
+  if (!addressData.value) return
+  previewAddress(addressData.value.pk_address_id)
+}
+
+function handlePrint() {
+  if (!addressData.value) return
+  printAddress(addressData.value.pk_address_id)
 }
 
 function formatCoordinate(coord: number | string | null | undefined) {
