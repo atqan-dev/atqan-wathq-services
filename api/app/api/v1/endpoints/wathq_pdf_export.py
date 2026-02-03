@@ -651,6 +651,241 @@ async def preview_database_cr_html(
         )
 
 
+@router.get("/database/corporate-contract/{contract_id}/pdf")
+async def export_database_corporate_contract_pdf(
+    contract_id: int,
+    db: Session = Depends(deps.get_db),
+) -> Response:
+    """
+    Export Corporate Contract PDF from database record
+    Uses stored contract data instead of fetching from Wathq API
+    """
+    try:
+        from app.models.wathq_corporate_contract import CorporateContract
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from sqlalchemy.orm import joinedload
+        import pdfkit
+        
+        # Fetch contract from database with all relationships using eager loading
+        contract = db.query(CorporateContract).options(
+            joinedload(CorporateContract.stocks),
+            joinedload(CorporateContract.parties),
+            joinedload(CorporateContract.managers),
+            joinedload(CorporateContract.management_config),
+            joinedload(CorporateContract.activities),
+            joinedload(CorporateContract.articles),
+            joinedload(CorporateContract.decisions),
+            joinedload(CorporateContract.notification_channels)
+        ).filter(
+            CorporateContract.id == contract_id
+        ).first()
+        
+        if not contract:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Corporate Contract with ID {contract_id} not found"
+            )
+        
+        # Load template
+        template_path = pdf_service.templates_dir / "corporate_contracts_database_template.html"
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500,
+                detail="Corporate Contract template not found"
+            )
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        template = Template(template_content)
+        
+        # Prepare template data
+        template_data = {
+            'document_title': f'عقد تأسيس الشركة - {contract.entity_name or contract.cr_number}',
+            'contract_date': contract.contract_date.strftime('%Y-%m-%d') if contract.contract_date else 'غير محدد',
+            'print_date': dt.now().strftime('%Y-%m-%d'),
+            'contract_id': contract.contract_id,
+            'contract_copy_number': contract.contract_copy_number,
+            'cr_national_number': contract.cr_national_number,
+            'cr_number': contract.cr_number,
+            'entity_name': contract.entity_name,
+            'entity_name_lang_desc': contract.entity_name_lang_desc,
+            'company_duration': contract.company_duration,
+            'headquarter_city_name': contract.headquarter_city_name,
+            'is_license_based': contract.is_license_based,
+            'entity_type_name': contract.entity_type_name,
+            'entity_form_name': contract.entity_form_name,
+            'fiscal_calendar_type': contract.fiscal_calendar_type,
+            'fiscal_year_end_month': contract.fiscal_year_end_month,
+            'fiscal_year_end_day': contract.fiscal_year_end_day,
+            'fiscal_year_end_year': contract.fiscal_year_end_year,
+            'currency_name': contract.currency_name,
+            'total_capital': contract.total_capital,
+            'paid_capital': contract.paid_capital,
+            'cash_capital': contract.cash_capital,
+            'in_kind_capital': contract.in_kind_capital,
+            'is_set_aside_enabled': contract.is_set_aside_enabled,
+            'profit_allocation_percentage': contract.profit_allocation_percentage,
+            'profit_allocation_purpose': contract.profit_allocation_purpose,
+            'additional_decision_text': contract.additional_decision_text,
+            'stocks': [{'stock_type_name': getattr(s, 'stock_type_name', None), 'stock_count': getattr(s, 'stock_count', None), 'stock_value': getattr(s, 'stock_value', None)} for s in (contract.stocks or [])] if hasattr(contract, 'stocks') else [],
+            'parties': [{'name': getattr(p, 'name', None), 'type_name': getattr(p, 'type_name', None), 'identity_number': getattr(p, 'identity_number', None), 'identity_type': getattr(p, 'identity_type', None), 'nationality': getattr(p, 'nationality', None)} for p in (contract.parties or [])] if hasattr(contract, 'parties') else [],
+            'managers': [{'name': getattr(m, 'name', None), 'type_name': getattr(m, 'type_name', None), 'is_licensed': getattr(m, 'is_licensed', None), 'identity_number': getattr(m, 'identity_number', None), 'nationality': getattr(m, 'nationality', None), 'position_name': getattr(m, 'position_name', None)} for m in (contract.managers or [])] if hasattr(contract, 'managers') else [],
+            'management_config': {'structure_name': getattr(contract.management_config, 'structure_name', None), 'meeting_quorum_name': getattr(contract.management_config, 'meeting_quorum_name', None), 'can_delegate_attendance': getattr(contract.management_config, 'can_delegate_attendance', None), 'term_years': getattr(contract.management_config, 'term_years', None)} if hasattr(contract, 'management_config') and contract.management_config else None,
+            'activities': [{'activity_id': getattr(a, 'activity_id', None), 'activity_name': getattr(a, 'activity_name', None)} for a in (contract.activities or [])] if hasattr(contract, 'activities') else [],
+            'articles': [{'original_id': getattr(art, 'original_id', None), 'article_text': getattr(art, 'article_text', None), 'part_name': getattr(art, 'part_name', None)} for art in (contract.articles or [])] if hasattr(contract, 'articles') else [],
+            'decisions': [{'decision_name': getattr(d, 'decision_name', None), 'approve_percentage': getattr(d, 'approve_percentage', None)} for d in (contract.decisions or [])] if hasattr(contract, 'decisions') else [],
+            'notification_channels': [{'channel_name': getattr(nc, 'channel_name', None)} for nc in (contract.notification_channels or [])] if hasattr(contract, 'notification_channels') else [],
+            'contact_info': {'phone_no': None, 'mobile_no': None, 'email': None, 'website_url': None}
+        }
+        
+        html_content = template.render(**template_data)
+        
+        # Generate PDF
+        pdf_options = {
+            'page-size': 'A4',
+            'margin-top': '0mm',
+            'margin-right': '0mm',
+            'margin-bottom': '0mm',
+            'margin-left': '0mm',
+            'encoding': 'UTF-8',
+            'enable-local-file-access': None,
+            'print-media-type': None,
+            'orientation': 'portrait',
+        }
+        
+        pdf_bytes = pdfkit.from_string(html_content, False, options=pdf_options)
+        
+        filename = f"corporate_contract_{contract.cr_number}_{contract_id}.pdf"
+        
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"'
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate corporate contract PDF: {str(e)}"
+        )
+
+
+@router.get("/database/corporate-contract/{contract_id}/preview")
+async def preview_database_corporate_contract_html(
+    contract_id: int,
+    db: Session = Depends(deps.get_db),
+) -> Response:
+    """
+    Preview Corporate Contract HTML from database record
+    """
+    try:
+        from app.models.wathq_corporate_contract import CorporateContract
+        from jinja2 import Template
+        from datetime import datetime as dt
+        from sqlalchemy.orm import joinedload
+        
+        # Fetch contract from database with all relationships using eager loading
+        contract = db.query(CorporateContract).options(
+            joinedload(CorporateContract.stocks),
+            joinedload(CorporateContract.parties),
+            joinedload(CorporateContract.managers),
+            joinedload(CorporateContract.management_config),
+            joinedload(CorporateContract.activities),
+            joinedload(CorporateContract.articles),
+            joinedload(CorporateContract.decisions),
+            joinedload(CorporateContract.notification_channels)
+        ).filter(
+            CorporateContract.id == contract_id
+        ).first()
+        
+        if not contract:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Corporate Contract with ID {contract_id} not found"
+            )
+        
+        # Load template
+        template_path = pdf_service.templates_dir / "corporate_contracts_database_template.html"
+        if not template_path.exists():
+            raise HTTPException(
+                status_code=500,
+                detail="Corporate Contract template not found"
+            )
+        
+        with open(template_path, 'r', encoding='utf-8') as f:
+            template_content = f.read()
+        
+        template = Template(template_content)
+        
+        # Prepare template data (same as PDF endpoint)
+        template_data = {
+            'document_title': f'عقد تأسيس الشركة - {contract.entity_name or contract.cr_number}',
+            'contract_date': contract.contract_date.strftime('%Y-%m-%d') if contract.contract_date else 'غير محدد',
+            'print_date': dt.now().strftime('%Y-%m-%d'),
+            'contract_id': contract.contract_id,
+            'contract_copy_number': contract.contract_copy_number,
+            'cr_national_number': contract.cr_national_number,
+            'cr_number': contract.cr_number,
+            'entity_name': contract.entity_name,
+            'entity_name_lang_desc': contract.entity_name_lang_desc,
+            'company_duration': contract.company_duration,
+            'headquarter_city_name': contract.headquarter_city_name,
+            'is_license_based': contract.is_license_based,
+            'entity_type_name': contract.entity_type_name,
+            'entity_form_name': contract.entity_form_name,
+            'fiscal_calendar_type': contract.fiscal_calendar_type,
+            'fiscal_year_end_month': contract.fiscal_year_end_month,
+            'fiscal_year_end_day': contract.fiscal_year_end_day,
+            'fiscal_year_end_year': contract.fiscal_year_end_year,
+            'currency_name': contract.currency_name,
+            'total_capital': contract.total_capital,
+            'paid_capital': contract.paid_capital,
+            'cash_capital': contract.cash_capital,
+            'in_kind_capital': contract.in_kind_capital,
+            'is_set_aside_enabled': contract.is_set_aside_enabled,
+            'profit_allocation_percentage': contract.profit_allocation_percentage,
+            'profit_allocation_purpose': contract.profit_allocation_purpose,
+            'additional_decision_text': contract.additional_decision_text,
+            'stocks': [{'stock_type_name': getattr(s, 'stock_type_name', None), 'stock_count': getattr(s, 'stock_count', None), 'stock_value': getattr(s, 'stock_value', None)} for s in (contract.stocks or [])] if hasattr(contract, 'stocks') else [],
+            'parties': [{'name': getattr(p, 'name', None), 'type_name': getattr(p, 'type_name', None), 'identity_number': getattr(p, 'identity_number', None), 'identity_type': getattr(p, 'identity_type', None), 'nationality': getattr(p, 'nationality', None)} for p in (contract.parties or [])] if hasattr(contract, 'parties') else [],
+            'managers': [{'name': getattr(m, 'name', None), 'type_name': getattr(m, 'type_name', None), 'is_licensed': getattr(m, 'is_licensed', None), 'identity_number': getattr(m, 'identity_number', None), 'nationality': getattr(m, 'nationality', None), 'position_name': getattr(m, 'position_name', None)} for m in (contract.managers or [])] if hasattr(contract, 'managers') else [],
+            'management_config': {'structure_name': getattr(contract.management_config, 'structure_name', None), 'meeting_quorum_name': getattr(contract.management_config, 'meeting_quorum_name', None), 'can_delegate_attendance': getattr(contract.management_config, 'can_delegate_attendance', None), 'term_years': getattr(contract.management_config, 'term_years', None)} if hasattr(contract, 'management_config') and contract.management_config else None,
+            'activities': [{'activity_id': getattr(a, 'activity_id', None), 'activity_name': getattr(a, 'activity_name', None)} for a in (contract.activities or [])] if hasattr(contract, 'activities') else [],
+            'articles': [{'original_id': getattr(art, 'original_id', None), 'article_text': getattr(art, 'article_text', None), 'part_name': getattr(art, 'part_name', None)} for art in (contract.articles or [])] if hasattr(contract, 'articles') else [],
+            'decisions': [{'decision_name': getattr(d, 'decision_name', None), 'approve_percentage': getattr(d, 'approve_percentage', None)} for d in (contract.decisions or [])] if hasattr(contract, 'decisions') else [],
+            'notification_channels': [{'channel_name': getattr(nc, 'channel_name', None)} for nc in (contract.notification_channels or [])] if hasattr(contract, 'notification_channels') else [],
+            'contact_info': {'phone_no': None, 'mobile_no': None, 'email': None, 'website_url': None}
+        }
+        
+        # Add JavaScript for export functionality
+        export_script = f"""
+        <script>
+            function exportToPDF() {{
+                window.location.href = '/api/v1/wathq/pdf/database/corporate-contract/{contract_id}/pdf';
+            }}
+        </script>
+        """
+        
+        html_content = template.render(**template_data)
+        html_content = html_content.replace('</body>', f'{export_script}</body>')
+        
+        return Response(content=html_content, media_type="text/html")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to generate corporate contract preview: {str(e)}"
+        )
+
+
 @router.get("/templates")
 async def list_available_templates(
     current_user: models.User | models.ManagementUser = Depends(

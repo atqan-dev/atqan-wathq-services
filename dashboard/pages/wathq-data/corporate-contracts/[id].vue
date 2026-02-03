@@ -22,21 +22,23 @@
       </div>
       <div class="flex gap-2">
         <UButton
-          icon="i-heroicons-pencil"
-          color="primary"
-          variant="outline"
-          @click="handleEdit"
-        >
-          {{ t('corporateContracts.view.edit') }}
-        </UButton>
-        <UButton
-          icon="i-heroicons-arrow-down-tray"
+          icon="i-heroicons-printer"
           color="gray"
           variant="outline"
-          @click="handleExport"
+          @click="handlePrint"
         >
-          {{ t('corporateContracts.view.export') }}
+          طباعة
         </UButton>
+        <UDropdown :items="exportMenuItems" :popper="{ placement: 'bottom-end' }">
+          <UButton
+            icon="i-heroicons-arrow-down-tray"
+            color="primary"
+            variant="outline"
+            trailing-icon="i-heroicons-chevron-down"
+          >
+            تصدير
+          </UButton>
+        </UDropdown>
       </div>
     </div>
 
@@ -488,6 +490,37 @@ const error = ref<string | null>(null)
 
 const id = computed(() => route.params.id)
 
+// Export menu items
+const exportMenuItems = [
+  [
+    {
+      label: 'تصدير JSON',
+      icon: 'i-heroicons-code-bracket',
+      click: () => handleExportJSON()
+    },
+    {
+      label: 'تصدير CSV',
+      icon: 'i-heroicons-document',
+      click: () => handleExportCSV()
+    },
+    {
+      label: 'تصدير XLS',
+      icon: 'i-heroicons-table-cells',
+      click: () => handleExportXLS()
+    },
+    {
+      label: 'تصدير PDF',
+      icon: 'i-heroicons-document-text',
+      click: () => handleExportPDF()
+    },
+    {
+      label: 'Preview Template',
+      icon: 'i-heroicons-eye',
+      click: () => handlePreviewTemplate()
+    }
+  ]
+]
+
 // Mock data for development
 const getMockContractData = (id: number) => {
   return {
@@ -642,12 +675,310 @@ async function fetchContractData() {
   }
 }
 
-function handleEdit() {
-  console.log('Edit contract:', contractData.value)
+function handlePrint() {
+  window.print()
 }
 
-function handleExport() {
-  console.log('Export contract:', contractData.value)
+function handleExportJSON() {
+  if (!contractData.value) return
+  
+  const dataStr = JSON.stringify(contractData.value, null, 2)
+  const dataBlob = new Blob([dataStr], { type: 'application/json' })
+  const url = URL.createObjectURL(dataBlob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `corporate_contract_${id.value}.json`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function handleExportCSV() {
+  if (!contractData.value) return
+  
+  // Convert contract data to CSV format with UTF-8 BOM for proper Arabic support
+  const BOM = '\uFEFF'
+  const headers = ['Field', 'Value']
+  
+  const rows = [
+    ['Contract ID', contractData.value.contract_id],
+    ['Contract Copy Number', contractData.value.contract_copy_number],
+    ['Contract Date', contractData.value.contract_date],
+    ['CR Number', contractData.value.cr_number],
+    ['CR National Number', contractData.value.cr_national_number],
+    ['Entity Name', contractData.value.entity_name],
+    ['Entity Name (Lang)', contractData.value.entity_name_lang_desc],
+    ['Entity Type', contractData.value.entity_type_name],
+    ['Entity Form', contractData.value.entity_form_name],
+    ['Company Duration', contractData.value.company_duration],
+    ['Headquarter City', contractData.value.headquarter_city_name],
+    ['Is License Based', contractData.value.is_license_based ? 'Yes' : 'No'],
+    ['Currency', contractData.value.currency_name],
+    ['Total Capital', contractData.value.total_capital],
+    ['Paid Capital', contractData.value.paid_capital],
+    ['Cash Capital', contractData.value.cash_capital],
+    ['In-Kind Capital', contractData.value.in_kind_capital],
+    ['Fiscal Calendar Type', contractData.value.fiscal_calendar_type],
+    ['Profit Allocation %', contractData.value.profit_allocation_percentage],
+  ]
+  
+  let csvContent = BOM + headers.join(',') + '\n'
+  rows.forEach(row => {
+    csvContent += row.map(cell => `"${cell || ''}"`).join(',') + '\n'
+  })
+  
+  // Add parties section
+  if (contractData.value.parties && contractData.value.parties.length > 0) {
+    csvContent += '\n\nParties\n'
+    csvContent += 'Name,Type,Identity Number,Identity Type,Nationality,Guardian Name\n'
+    contractData.value.parties.forEach((party: any) => {
+      csvContent += `"${party.name || ''}","${party.type_name || ''}","${party.identity_number || ''}","${party.identity_type || ''}","${party.nationality || ''}","${party.guardian_name || ''}"\n`
+    })
+  }
+  
+  // Add managers section
+  if (contractData.value.managers && contractData.value.managers.length > 0) {
+    csvContent += '\n\nManagers\n'
+    csvContent += 'Name,Position,Identity Number,Nationality,Licensed\n'
+    contractData.value.managers.forEach((manager: any) => {
+      csvContent += `"${manager.name || ''}","${manager.position_name || ''}","${manager.identity_number || ''}","${manager.nationality || ''}","${manager.is_licensed ? 'Yes' : 'No'}"\n`
+    })
+  }
+  
+  // Add stocks section
+  if (contractData.value.stocks && contractData.value.stocks.length > 0) {
+    csvContent += '\n\nStocks\n'
+    csvContent += 'Stock Type,Count,Value\n'
+    contractData.value.stocks.forEach((stock: any) => {
+      csvContent += `"${stock.stock_type_name || ''}","${stock.stock_count || ''}","${stock.stock_value || ''}"\n`
+    })
+  }
+  
+  // Add activities section
+  if (contractData.value.activities && contractData.value.activities.length > 0) {
+    csvContent += '\n\nActivities\n'
+    csvContent += 'Activity ID,Activity Name\n'
+    contractData.value.activities.forEach((activity: any) => {
+      csvContent += `"${activity.activity_id || ''}","${activity.activity_name || ''}"\n`
+    })
+  }
+  
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `corporate_contract_${id.value}.csv`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+function handleExportXLS() {
+  if (!contractData.value) return
+  
+  // Create HTML table for Excel export
+  let htmlContent = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+    <head>
+      <meta charset="utf-8">
+      <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: right; }
+        th { background-color: #4CAF50; color: white; font-weight: bold; }
+        .section-header { background-color: #2196F3; color: white; font-weight: bold; font-size: 14px; }
+      </style>
+    </head>
+    <body>
+      <table>
+        <tr><th colspan="2" class="section-header">معلومات العقد الأساسية / Contract Main Information</th></tr>
+        <tr><td><b>Contract ID</b></td><td>${contractData.value.contract_id || ''}</td></tr>
+        <tr><td><b>Contract Copy Number</b></td><td>${contractData.value.contract_copy_number || ''}</td></tr>
+        <tr><td><b>Contract Date</b></td><td>${contractData.value.contract_date || ''}</td></tr>
+        <tr><td><b>CR Number</b></td><td>${contractData.value.cr_number || ''}</td></tr>
+        <tr><td><b>CR National Number</b></td><td>${contractData.value.cr_national_number || ''}</td></tr>
+        <tr><td><b>Entity Name</b></td><td>${contractData.value.entity_name || ''}</td></tr>
+        <tr><td><b>Entity Name (Lang)</b></td><td>${contractData.value.entity_name_lang_desc || ''}</td></tr>
+        <tr><td><b>Entity Type</b></td><td>${contractData.value.entity_type_name || ''}</td></tr>
+        <tr><td><b>Entity Form</b></td><td>${contractData.value.entity_form_name || ''}</td></tr>
+        <tr><td><b>Company Duration</b></td><td>${contractData.value.company_duration || ''}</td></tr>
+        <tr><td><b>Headquarter City</b></td><td>${contractData.value.headquarter_city_name || ''}</td></tr>
+        <tr><td><b>Is License Based</b></td><td>${contractData.value.is_license_based ? 'Yes' : 'No'}</td></tr>
+        
+        <tr><th colspan="2" class="section-header">معلومات رأس المال / Capital Information</th></tr>
+        <tr><td><b>Currency</b></td><td>${contractData.value.currency_name || ''}</td></tr>
+        <tr><td><b>Total Capital</b></td><td>${contractData.value.total_capital || ''}</td></tr>
+        <tr><td><b>Paid Capital</b></td><td>${contractData.value.paid_capital || ''}</td></tr>
+        <tr><td><b>Cash Capital</b></td><td>${contractData.value.cash_capital || ''}</td></tr>
+        <tr><td><b>In-Kind Capital</b></td><td>${contractData.value.in_kind_capital || ''}</td></tr>
+        
+        <tr><th colspan="2" class="section-header">السنة المالية / Fiscal Year</th></tr>
+        <tr><td><b>Fiscal Calendar Type</b></td><td>${contractData.value.fiscal_calendar_type || ''}</td></tr>
+        <tr><td><b>Fiscal Year End</b></td><td>${contractData.value.fiscal_year_end_day || ''}/${contractData.value.fiscal_year_end_month || ''}/${contractData.value.fiscal_year_end_year || ''}</td></tr>
+        
+        <tr><th colspan="2" class="section-header">توزيع الأرباح / Profit Allocation</th></tr>
+        <tr><td><b>Set Aside Enabled</b></td><td>${contractData.value.is_set_aside_enabled ? 'Yes' : 'No'}</td></tr>
+        <tr><td><b>Profit Allocation %</b></td><td>${contractData.value.profit_allocation_percentage || ''}%</td></tr>
+        <tr><td><b>Profit Allocation Purpose</b></td><td>${contractData.value.profit_allocation_purpose || ''}</td></tr>
+      </table>
+  `
+  
+  // Add Parties table
+  if (contractData.value.parties && contractData.value.parties.length > 0) {
+    htmlContent += `
+      <br/><br/>
+      <table>
+        <tr><th colspan="6" class="section-header">الشركاء / Parties</th></tr>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Identity Number</th>
+          <th>Identity Type</th>
+          <th>Nationality</th>
+          <th>Guardian Name</th>
+        </tr>
+    `
+    contractData.value.parties.forEach((party: any) => {
+      htmlContent += `
+        <tr>
+          <td>${party.name || ''}</td>
+          <td>${party.type_name || ''}</td>
+          <td>${party.identity_number || ''}</td>
+          <td>${party.identity_type || ''}</td>
+          <td>${party.nationality || ''}</td>
+          <td>${party.guardian_name || ''}</td>
+        </tr>
+      `
+    })
+    htmlContent += '</table>'
+  }
+  
+  // Add Managers table
+  if (contractData.value.managers && contractData.value.managers.length > 0) {
+    htmlContent += `
+      <br/><br/>
+      <table>
+        <tr><th colspan="5" class="section-header">المديرون / Managers</th></tr>
+        <tr>
+          <th>Name</th>
+          <th>Position</th>
+          <th>Identity Number</th>
+          <th>Nationality</th>
+          <th>Licensed</th>
+        </tr>
+    `
+    contractData.value.managers.forEach((manager: any) => {
+      htmlContent += `
+        <tr>
+          <td>${manager.name || ''}</td>
+          <td>${manager.position_name || ''}</td>
+          <td>${manager.identity_number || ''}</td>
+          <td>${manager.nationality || ''}</td>
+          <td>${manager.is_licensed ? 'Yes' : 'No'}</td>
+        </tr>
+      `
+    })
+    htmlContent += '</table>'
+  }
+  
+  // Add Stocks table
+  if (contractData.value.stocks && contractData.value.stocks.length > 0) {
+    htmlContent += `
+      <br/><br/>
+      <table>
+        <tr><th colspan="3" class="section-header">الأسهم / Stocks</th></tr>
+        <tr>
+          <th>Stock Type</th>
+          <th>Count</th>
+          <th>Value</th>
+        </tr>
+    `
+    contractData.value.stocks.forEach((stock: any) => {
+      htmlContent += `
+        <tr>
+          <td>${stock.stock_type_name || ''}</td>
+          <td>${stock.stock_count || ''}</td>
+          <td>${stock.stock_value || ''}</td>
+        </tr>
+      `
+    })
+    htmlContent += '</table>'
+  }
+  
+  // Add Activities table
+  if (contractData.value.activities && contractData.value.activities.length > 0) {
+    htmlContent += `
+      <br/><br/>
+      <table>
+        <tr><th colspan="2" class="section-header">الأنشطة / Activities</th></tr>
+        <tr>
+          <th>Activity ID</th>
+          <th>Activity Name</th>
+        </tr>
+    `
+    contractData.value.activities.forEach((activity: any) => {
+      htmlContent += `
+        <tr>
+          <td>${activity.activity_id || ''}</td>
+          <td>${activity.activity_name || ''}</td>
+        </tr>
+      `
+    })
+    htmlContent += '</table>'
+  }
+  
+  htmlContent += '</body></html>'
+  
+  // Create blob and download
+  const blob = new Blob([htmlContent], { type: 'application/vnd.ms-excel;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `corporate_contract_${id.value}.xls`
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+async function handleExportPDF() {
+  if (!id.value) return
+  
+  try {
+    // Call the backend PDF export endpoint with authentication
+    const response = await $fetch(`/api/v1/wathq/pdf/database/corporate-contract/${id.value}/pdf`, {
+      method: 'GET',
+      responseType: 'blob'
+    })
+    
+    // Create blob URL and download
+    const blob = new Blob([response], { type: 'application/pdf' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `corporate_contract_${id.value}.pdf`
+    link.click()
+    URL.revokeObjectURL(url)
+  } catch (err: any) {
+    console.error('Failed to export PDF:', err)
+    alert('فشل في تصدير PDF. يرجى المحاولة مرة أخرى.')
+  }
+}
+
+async function handlePreviewTemplate() {
+  if (!id.value) return
+  
+  try {
+    // Fetch the HTML preview with authentication
+    const htmlContent = await $fetch(`/api/v1/wathq/pdf/database/corporate-contract/${id.value}/preview`, {
+      method: 'GET'
+    })
+    
+    // Open in new window with the HTML content
+    const newWindow = window.open('', '_blank')
+    if (newWindow) {
+      newWindow.document.write(htmlContent as string)
+      newWindow.document.close()
+    }
+  } catch (err: any) {
+    console.error('Failed to preview template:', err)
+    alert('فشل في معاينة القالب. يرجى المحاولة مرة أخرى.')
+  }
 }
 
 function formatDate(dateString: string) {
