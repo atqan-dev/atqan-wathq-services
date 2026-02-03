@@ -76,6 +76,7 @@ import { ref } from 'vue'
 import { useI18n } from '@/composables/useI18n'
 import { useRouter } from 'vue-router'
 import { useAuthenticatedFetch } from '@/composables/useAuthenticatedFetch'
+import { useEmployeeExport } from '@/composables/useEmployeeExport'
 import type { DataTableConfig } from '~/types/datatable'
 import AdvancedDataTable from '~/components/ui/AdvancedDataTable.vue'
 
@@ -83,6 +84,7 @@ const { t } = useI18n()
 const router = useRouter()
 const toast = useToast()
 const { authenticatedFetch } = useAuthenticatedFetch()
+const { exportToPDF, exportToJSON, exportToCSV, exportToExcel, previewEmployee } = useEmployeeExport()
 
 // Sync state
 const isSyncing = ref(false)
@@ -368,6 +370,39 @@ const tableConfig: DataTableConfig<any> = {
       }
     },
     {
+      key: 'preview',
+      label: '',
+      icon: 'i-heroicons-document-magnifying-glass',
+      color: 'blue' as const,
+      variant: 'ghost',
+      size: 'sm',
+      handler: (row) => {
+        previewEmployee(row.employee_id)
+      }
+    },
+    {
+      key: 'export-pdf',
+      label: '',
+      icon: 'i-heroicons-document-text',
+      color: 'red' as const,
+      variant: 'ghost',
+      size: 'sm',
+      handler: async (row) => {
+        await exportToPDF(row.employee_id, row.name)
+      }
+    },
+    {
+      key: 'export-excel',
+      label: '',
+      icon: 'i-heroicons-document-chart-bar',
+      color: 'green' as const,
+      variant: 'ghost',
+      size: 'sm',
+      handler: async (row) => {
+        await exportToExcel(row.employee_id, row.name)
+      }
+    },
+    {
       key: 'edit',
       label: '',
       icon: 'i-heroicons-pencil',
@@ -403,13 +438,39 @@ const tableConfig: DataTableConfig<any> = {
 
   bulkActions: [
     {
-      key: 'export',
-      label: 'Export Selected',
-      icon: 'i-heroicons-arrow-down-tray',
-      color: 'primary' as const,
+      key: 'export-pdf',
+      label: 'Export Selected as PDF',
+      icon: 'i-heroicons-document-text',
+      color: 'red' as const,
       variant: 'outline',
       handler: async (selectedRows) => {
-        console.log('Export selected:', selectedRows)
+        for (const row of selectedRows) {
+          await exportToPDF(row.employee_id, row.name)
+        }
+      }
+    },
+    {
+      key: 'export-excel',
+      label: 'Export Selected as Excel',
+      icon: 'i-heroicons-document-chart-bar',
+      color: 'green' as const,
+      variant: 'outline',
+      handler: async (selectedRows) => {
+        for (const row of selectedRows) {
+          await exportToExcel(row.employee_id, row.name)
+        }
+      }
+    },
+    {
+      key: 'export-json',
+      label: 'Export Selected as JSON',
+      icon: 'i-heroicons-code-bracket',
+      color: 'blue' as const,
+      variant: 'outline',
+      handler: async (selectedRows) => {
+        for (const row of selectedRows) {
+          await exportToJSON(row.employee_id, row.name)
+        }
       }
     }
   ],
