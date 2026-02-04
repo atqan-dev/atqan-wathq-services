@@ -56,14 +56,14 @@
         >
           {{ t('wathqData.syncFromLogs') }}
         </UButton>
-        <UButton
+        <!-- <UButton
           icon="i-heroicons-bolt"
           color="primary"
           size="lg"
           @click="openLiveRequestDialog"
         >
           {{ t('liveRequest.title') }}
-        </UButton>
+        </UButton> -->
       </div>
     </div>
 
