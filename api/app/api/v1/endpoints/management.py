@@ -1247,3 +1247,151 @@ def delete_tenant_service(
         "tenant_id": tenant_service.tenant_id,
         "service_id": tenant_service.service_id,
     }
+
+
+# Role Management for Management Users
+@router.get("/roles", response_model=list[schemas.Role])
+def get_all_roles(
+    skip: int = 0,
+    limit: int = 100,
+    tenant_id: int = None,
+    db: Session = Depends(deps.get_db),
+    current_user: ManagementUser = Depends(get_current_active_management_user),
+) -> Any:
+    """
+    Get all roles. Optionally filter by tenant_id.
+    """
+    if tenant_id:
+        roles = crud.role.get_roles_by_tenant(
+            db, tenant_id=tenant_id, skip=skip, limit=limit
+        )
+    else:
+        # Get all roles (system + tenant roles)
+        roles = crud.role.get_multi(db, skip=skip, limit=limit)
+    return roles
+
+
+@router.get("/tenants/{tenant_id}/roles", response_model=list[schemas.Role])
+def get_tenant_roles(
+    tenant_id: int,
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+    current_user: ManagementUser = Depends(get_current_active_management_user),
+) -> Any:
+    """
+    Get all roles for a specific tenant.
+    """
+    # Check if tenant exists
+    tenant = crud.tenant.get(db, id=tenant_id)
+    if not tenant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tenant not found",
+        )
+
+    roles = crud.role.get_roles_by_tenant(
+        db, tenant_id=tenant_id, skip=skip, limit=limit
+    )
+    return roles
+
+
+@router.post("/tenants/{tenant_id}/roles", response_model=schemas.Role)
+def create_tenant_role(
+    tenant_id: int,
+    role_in: schemas.RoleCreate,
+    db: Session = Depends(deps.get_db),
+    current_user: ManagementUser = Depends(get_current_super_admin),
+) -> Any:
+    """
+    Create a new role for a specific tenant (Super Admin only).
+    """
+    # Check if tenant exists
+    tenant = crud.tenant.get(db, id=tenant_id)
+    if not tenant:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Tenant not found",
+        )
+
+    # Check if role already exists in this tenant
+    existing_role = crud.role.get_by_name_and_tenant(
+        db, name=role_in.name, tenant_id=tenant_id
+    )
+    if existing_role:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Role with this name already exists in the tenant",
+        )
+
+    role = crud.role.create_with_permissions(db, obj_in=role_in, tenant_id=tenant_id)
+    return role
+
+
+@router.put("/tenants/{tenant_id}/roles/{role_id}", response_model=schemas.Role)
+def update_tenant_role(
+    tenant_id: int,
+    role_id: int,
+    role_in: schemas.RoleUpdate,
+    db: Session = Depends(deps.get_db),
+    current_user: ManagementUser = Depends(get_current_super_admin),
+) -> Any:
+    """
+    Update a role for a specific tenant (Super Admin only).
+    """
+    role = crud.role.get(db, id=role_id)
+    if not role:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Role not found",
+        )
+
+    if role.tenant_id != tenant_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Role does not belong to this tenant",
+        )
+
+    # Update permissions if provided
+    if role_in.permission_ids is not None:
+        role = crud.role.update_permissions(
+            db, role=role, permission_ids=role_in.permission_ids
+        )
+
+    # Update other fields
+    role_data = role_in.dict(exclude={"permission_ids"}, exclude_unset=True)
+    role = crud.role.update(db, db_obj=role, obj_in=role_data)
+    return role
+
+
+@router.delete("/tenants/{tenant_id}/roles/{role_id}")
+def delete_tenant_role(
+    tenant_id: int,
+    role_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: ManagementUser = Depends(get_current_super_admin),
+) -> Any:
+    """
+    Delete a role for a specific tenant (Super Admin only).
+    """
+    role = crud.role.get(db, id=role_id)
+    if not role:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Role not found",
+        )
+
+    if role.tenant_id != tenant_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Role does not belong to this tenant",
+        )
+
+    if role.is_default:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete default role",
+        )
+
+    crud.role.remove(db, id=role_id)
+    return {"message": "Role deleted successfully"}

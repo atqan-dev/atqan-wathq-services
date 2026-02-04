@@ -30,10 +30,10 @@ export function useRoles() {
 
     /**
      * Get the base URL for roles API
+     * Management users use /api/v1/management/roles
      */
     function getBaseUrl(): string {
-        // Roles endpoint is the same for both management and tenant users
-        return '/api/v1/roles'
+        return '/api/v1/management/roles'
     }
 
     /**
