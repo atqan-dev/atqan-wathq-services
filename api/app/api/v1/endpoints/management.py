@@ -58,11 +58,11 @@ def get_management_stats(
         }
     except Exception as e:
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Error fetching management stats: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=500,
-            detail=f"Error fetching management stats: {str(e)}"
+            status_code=500, detail=f"Error fetching management stats: {str(e)}"
         )
 
 
@@ -254,6 +254,30 @@ def deactivate_tenant(
     return {"message": "Tenant deactivated successfully"}
 
 
+@router.delete("/tenants/{tenant_id}")
+def delete_tenant(
+    *,
+    db: Session = Depends(deps.get_db),
+    tenant_id: int,
+    current_user: ManagementUser = Depends(get_current_super_admin),
+) -> Any:
+    """Delete tenant (Super Admin only)."""
+    tenant = crud.tenant.get(db, id=tenant_id)
+    if not tenant:
+        raise HTTPException(status_code=404, detail="Tenant not found")
+
+    # Check if tenant has users
+    users_count = crud.user.get_user_count_by_tenant(db, tenant_id=tenant_id)
+    if users_count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot delete tenant with {users_count} users. Please delete or reassign users first.",
+        )
+
+    crud.tenant.remove(db, id=tenant_id)
+    return {"message": "Tenant deleted successfully"}
+
+
 # Regular Users Management (Cross-tenant)
 @router.get("/all-users", response_model=list[schemas.User])
 def read_all_users(
@@ -312,6 +336,7 @@ def deactivate_user(
 # Management User Profiles
 # NOTE: /users/me/profile routes MUST come before /users/{user_id}/profile
 # to avoid FastAPI treating "me" as a user_id parameter
+
 
 @router.get("/users/me/profile", response_model=schemas.ManagementUserProfile)
 def read_current_management_user_profile(
@@ -683,11 +708,11 @@ def get_tenant_all_wathq_call_logs(
         return call_logs
     except Exception as e:
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Error fetching WATHQ call logs: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=500,
-            detail=f"Error fetching WATHQ call logs: {str(e)}"
+            status_code=500, detail=f"Error fetching WATHQ call logs: {str(e)}"
         )
 
 
@@ -708,11 +733,11 @@ def get_tenant_all_wathq_offline_data(
         return offline_data
     except Exception as e:
         import logging
+
         logger = logging.getLogger(__name__)
         logger.error(f"Error fetching WATHQ offline data: {str(e)}", exc_info=True)
         raise HTTPException(
-            status_code=500,
-            detail=f"Error fetching WATHQ offline data: {str(e)}"
+            status_code=500, detail=f"Error fetching WATHQ offline data: {str(e)}"
         )
 
 
@@ -1120,7 +1145,11 @@ def delete_tenant_user(
         "user": old_user_email,
     }
 
-@router.patch("/tenants/{tenant_id}/services/{service_id}/approve", response_model=schemas.TenantService)
+
+@router.patch(
+    "/tenants/{tenant_id}/services/{service_id}/approve",
+    response_model=schemas.TenantService,
+)
 def approve_tenant_service(
     tenant_id: int,
     service_id: int,
@@ -1131,9 +1160,7 @@ def approve_tenant_service(
     Approve a specific service for a specific tenant.
     """
     # Check if service is assigned to the tenant
-    tenant_service = crud.tenant_service.get(
-        db, id=service_id
-    )
+    tenant_service = crud.tenant_service.get(db, id=service_id)
     if not tenant_service:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -1182,9 +1209,7 @@ def update_tenant_service(
     Update a specific service for a specific tenant.
     """
     # Check if service is assigned to the tenant
-    tenant_service = crud.tenant_service.get(
-        db, id=service_id
-    )
+    tenant_service = crud.tenant_service.get(db, id=service_id)
     if not tenant_service:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -1208,9 +1233,7 @@ def delete_tenant_service(
     Delete a specific service for a specific tenant.
     """
     # Check if service is assigned to the tenant
-    tenant_service = crud.tenant_service.get(
-        db, id=service_id
-    )
+    tenant_service = crud.tenant_service.get(db, id=service_id)
     if not tenant_service:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -1224,4 +1247,3 @@ def delete_tenant_service(
         "tenant_id": tenant_service.tenant_id,
         "service_id": tenant_service.service_id,
     }
-        

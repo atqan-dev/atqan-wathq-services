@@ -9,7 +9,7 @@ from alembic import op
 import sqlalchemy as sa
 
 # revision identifiers
-revision = 'add_wathq_api_key_to_tenant_services'
+revision = 'add_wathq_api_key'
 down_revision = 'add_wathq_call_logs'
 branch_labels = None
 depends_on = None

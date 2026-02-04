@@ -1,7 +1,7 @@
 """add wathq offline data table
 
 Revision ID: add_wathq_offline_data
-Revises: add_wathq_api_key_to_tenant_services
+Revises: add_wathq_api_key
 Create Date: 2024-01-01 15:00:00.000000
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers
 revision = 'add_wathq_offline_data'
-down_revision = 'add_wathq_api_key_to_tenant_services'
+down_revision = 'add_wathq_api_key'
 branch_labels = None
 depends_on = None
 

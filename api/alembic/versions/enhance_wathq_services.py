@@ -17,16 +17,7 @@ depends_on = None
 
 
 def upgrade():
-    # Create user_service_permissions table
-    op.create_table('user_service_permissions',
-        sa.Column('user_id', sa.Integer(), nullable=False),
-        sa.Column('service_id', postgresql.UUID(as_uuid=True), nullable=False),
-        sa.ForeignKeyConstraint(['service_id'], ['services.id'], ),
-        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-        sa.PrimaryKeyConstraint('user_id', 'service_id')
-    )
-    
-    # Modify services table
+    # Modify services table - add columns first
     op.add_column('services', sa.Column('slug', sa.String(), nullable=True))
     op.add_column('services', sa.Column('category', sa.String(), nullable=False, server_default='wathq'))
     op.add_column('services', sa.Column('requires_approval', sa.Boolean(), nullable=True, server_default='true'))
@@ -48,6 +39,15 @@ def upgrade():
     # Update services table constraints
     op.create_unique_constraint(None, 'services', ['slug'])
     op.create_index(op.f('ix_services_slug'), 'services', ['slug'], unique=False)
+    
+    # Create user_service_permissions table AFTER services.id is UUID
+    op.create_table('user_service_permissions',
+        sa.Column('user_id', sa.Integer(), nullable=False),
+        sa.Column('service_id', postgresql.UUID(as_uuid=True), nullable=False),
+        sa.ForeignKeyConstraint(['service_id'], ['services.id'], ),
+        sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+        sa.PrimaryKeyConstraint('user_id', 'service_id')
+    )
     
     # Modify tenant_services table
     op.add_column('tenant_services', sa.Column('is_approved', sa.Boolean(), nullable=True, server_default='false'))

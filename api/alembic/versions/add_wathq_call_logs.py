@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers
 revision = 'add_wathq_call_logs'
-down_revision = 'enhance_wathq_services'
+down_revision = 'add_management_users'
 branch_labels = None
 depends_on = None
 

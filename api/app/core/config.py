@@ -66,13 +66,13 @@ class Settings(BaseSettings):
     # Database settings
     PGHOST: str = os.getenv("PGHOST", "localhost")
     PGUSER: str = os.getenv("PGUSER", "postgres")
-    PGPASSWORD: str = os.getenv("PGPASSWORD", "UboHeba2017")
+    PGPASSWORD: str = os.getenv("PGPASSWORD", "Atqan2025")
     PGDATABASE: str = os.getenv("PGDATABASE", "wathq_tenant_services")
     PGPORT: str = os.getenv("PGPORT", "5432")
 
     DATABASE_URL: PostgresDsn | None = os.getenv(
         "DATABASE_URL",
-        "postgresql+psycopg2://postgres:UboHeba2017@localhost:5432/wathq_tenant_services",
+        "postgresql+psycopg2://postgres:Atqan2025@localhost:5432/wathq_tenant_services",
     )
 
     @field_validator("DATABASE_URL", mode="before")
