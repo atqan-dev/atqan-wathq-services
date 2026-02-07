@@ -330,6 +330,12 @@ const mainNavItems = computed((): NavItem[] => [
     requiresAuth: true
   },
   {
+    to: '/wathq-logs',
+    icon: 'i-heroicons-document-magnifying-glass',
+    label: t('sidebar.wathqLogs'),
+    requiresAuth: true
+  },
+  {
     to: '/metrics',
     icon: 'i-heroicons-squares-2x2',
     label: t('sidebar.metrics'),

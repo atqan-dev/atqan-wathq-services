@@ -364,6 +364,7 @@
     "tenants": "Apps",
     "tenantServices": "App Services",
     "wathqServices": "Wathq Services",
+    "wathqLogs": "API Call Logs",
     "metrics": "Metrics",
     "users": "Users",
     "notifications": "Notifications",
