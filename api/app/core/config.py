@@ -56,6 +56,7 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://localhost:4500",
         "http://127.0.0.1:4500",
+        "https://www.verify.notarizationjustice.sa",
         "file://",
         "null",  # For file:// protocol
     ]
